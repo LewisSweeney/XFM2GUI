@@ -13,6 +13,8 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import main.java.tabconstructors.EffectsTabConstructor;
 import main.java.tabconstructors.Op1TabConstructor;
+import main.java.tabconstructors.OpAltTabConstructor;
+import main.java.tabconstructors.OperatorNumber;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -121,8 +123,20 @@ public class Main extends Application {
 
     private void initTabs(){
         Op1TabConstructor opOneCon = new Op1TabConstructor();
+        OpAltTabConstructor opTwoCon = new OpAltTabConstructor(OperatorNumber.THREE);
+        // OpAltTabConstructor opThreeCon = new OpAltTabConstructor(OperatorNumber.THREE);
+        // OpAltTabConstructor opFourCon = new OpAltTabConstructor(OperatorNumber.FOUR);
+       // OpAltTabConstructor opFiveCon = new OpAltTabConstructor(OperatorNumber.FIVE);
+       // OpAltTabConstructor opSixCon = new OpAltTabConstructor(OperatorNumber.SIX);
         EffectsTabConstructor effTabCon = new EffectsTabConstructor();
+
         tabs.get(0).setContent(opOneCon.getLayout());
+        tabs.get(1).setContent(opTwoCon.getLayout());
+       // tabs.get(2).setContent(opThreeCon.getLayout());
+       // tabs.get(3).setContent(opFourCon.getLayout());
+      //  tabs.get(4).setContent(opFiveCon.getLayout());
+      //  tabs.get(5).setContent(opSixCon.getLayout());
+
         tabs.get(8).setContent(effTabCon.getLayout());
     }
 

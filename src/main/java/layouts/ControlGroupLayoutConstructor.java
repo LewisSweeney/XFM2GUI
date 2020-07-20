@@ -67,7 +67,7 @@ public class ControlGroupLayoutConstructor {
             rows.get(currentRow).getChildren().add(con.getLayout());
             currentColumn++;
         }
-
+        
         controlGroup.getChildren().add(groupTitle);
         controlGroup.getChildren().addAll(rows);
     }

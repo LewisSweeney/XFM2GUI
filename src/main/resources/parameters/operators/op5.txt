@@ -1,9 +1,6 @@
--Operator 1-
 Algo
 Feedback
-Sync
 Phase
-Mode
 Ratio
 Ratio Fine
 Fine
@@ -29,8 +26,6 @@ R3
 R4
 R5
 Rate Key
-EG Loop
-EG Loop Seg
 AMS
 PMS
 Wave 1
