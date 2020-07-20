@@ -7,12 +7,15 @@ import main.java.layouts.ControlGroupLayoutConstructor;
 
 import java.util.ArrayList;
 
-public class OpAltTabConstructor {
+/** Creates the nodes for the Operator tabs of the interface
+ * Same construction is used for each operator tab.
+ */
+public class OpTabConstructor {
     VBox layout = new VBox();
     ArrayList<VBox> groups = new ArrayList<>();
     String filePath = "/parameters/operators/op1.txt";
 
-    public OpAltTabConstructor(OperatorNumber operatorNumber) {
+    public OpTabConstructor(OperatorNumber operatorNumber) {
 
         switch(operatorNumber) {
             case ONE -> filePath = "/parameters/operators/op1.txt";

@@ -10,6 +10,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
+/**
+ * Creates the nodes for the effects tab of the interface
+ */
 public class EffectsTabConstructor {
     VBox layout = new VBox();
     ArrayList<VBox> groups = new ArrayList<>();
@@ -27,18 +30,22 @@ public class EffectsTabConstructor {
         groups.add(new ControlGroupLayoutConstructor(5, "/parameters/effects/phaser.txt").getControlGroup());
         groups.add(new ControlGroupLayoutConstructor(3, "/parameters/effects/reverb.txt").getControlGroup());
 
-        groupsOfGroups.add(new HBox(groups.get(5),groups.get(0), groups.get(2),groups.get(7)));
-        groupsOfGroups.add(new HBox(groups.get(3),groups.get(1)));
+        groupsOfGroups.add(new HBox(groups.get(5),groups.get(3),groups.get(1),groups.get(0)));
         groupsOfGroups.add(new HBox(groups.get(4),groups.get(6)));
+        groupsOfGroups.add(new HBox(groups.get(2),groups.get(7)));
+
+        for (HBox h:groupsOfGroups) {
+            h.setSpacing(10);
+            h.setAlignment(Pos.CENTER);
+        }
 
 
     }
 
-
     public VBox getLayout() {
         layout.getChildren().addAll(groupsOfGroups);
         layout.setAlignment(Pos.CENTER);
-        layout.setSpacing(20);
+        layout.setSpacing(10);
         return layout;
     }
 

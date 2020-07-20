@@ -1,4 +1,4 @@
--Operator 1-
+-OPERATOR 1-
 Algo
 Feedback
 Sync

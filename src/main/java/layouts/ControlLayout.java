@@ -5,6 +5,11 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import main.java.utilities.IntField;
 
+/**
+ * This class creates the layout for each individual parameter control
+ * Currently creates an IntField and a Label
+ * TODO: Add knobs/sliders
+ */
 public class ControlLayout {
     private final Integer paramValue = 0;
     private IntField paramField = new IntField(0, 255,0);

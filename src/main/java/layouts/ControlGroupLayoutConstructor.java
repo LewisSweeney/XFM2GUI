@@ -11,6 +11,9 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 
+/**
+ * Groups together individual ControlLayouts into easily manageable VBox nodes
+ */
 public class ControlGroupLayoutConstructor {
     Label groupTitle = new Label("DEFAULT");
     ArrayList<ControlLayout> controls = new ArrayList<>();
@@ -65,6 +68,7 @@ public class ControlGroupLayoutConstructor {
             }
 
             rows.get(currentRow).getChildren().add(con.getLayout());
+            rows.get(currentRow).setStyle("-fx-padding: 0 0 10 0");
             currentColumn++;
         }
         
