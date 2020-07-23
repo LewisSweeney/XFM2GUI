@@ -32,7 +32,9 @@ public class Main extends Application {
     public void start(Stage primaryStage) {
 
         initBorderPane();
+        String style = this.getClass().getResource("/stylesheets/style.css").toExternalForm();
         Scene scene = new Scene(border);
+        scene.getStylesheets().add(style);
 
         primaryStage.setResizable(false);
         primaryStage.setScene(scene);
@@ -63,13 +65,18 @@ public class Main extends Application {
         tabPane.getTabs().addAll(tabs);
         tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
 
-        border.setTop(title);
+        VBox top = new VBox(title,serialPortPicker);
+        top.setAlignment(Pos.CENTER);
+
+        top.setStyle("-fx-padding: 0 0 10 0;");
+
+        border.setTop(top);
         border.setCenter(tabPane);
         border.setBottom(buttonBox);
         border.setMaxWidth(1100);
         border.setMinWidth(1100);
-        border.setMaxHeight((600));
-        border.setMinHeight(600);
+        border.setMaxHeight((700));
+        border.setMinHeight(700);
 
         BorderPane.setAlignment(title, Pos.CENTER);
         BorderPane.setAlignment(tabPane, Pos.CENTER);
@@ -103,29 +110,18 @@ public class Main extends Application {
         Button loadPatch = new Button("Load Program");
 
         serialPortPicker.setPrefWidth(BOTTOM_BUTTON_WIDTH * 1.5);
-        read.setPrefWidth(BOTTOM_BUTTON_WIDTH);
-        write.setPrefWidth(BOTTOM_BUTTON_WIDTH);
-        setUnit0.setPrefWidth(BOTTOM_BUTTON_WIDTH);
-        setUnit1.setPrefWidth(BOTTOM_BUTTON_WIDTH);
-        saveCurrentPatch.setPrefWidth(BOTTOM_BUTTON_WIDTH);
-        loadPatch.setPrefWidth(BOTTOM_BUTTON_WIDTH);
 
         HBox hBox = new HBox(read, setUnit0, saveCurrentPatch);
         HBox hBox2 = new HBox(write, setUnit1, loadPatch);
-        HBox hBox3 = new HBox(serialPortPicker);
 
-        hBox.setAlignment(Pos.CENTER);
-        hBox.setSpacing(10);
+        hBox.getStyleClass().add("button-row");
+        hBox2.getStyleClass().add("button-row");
 
-        hBox2.setAlignment(Pos.CENTER);
-        hBox2.setSpacing(10);
-        hBox2.setStyle("-fx-padding: 0 0 10 0");
-
-        hBox3.setAlignment(Pos.CENTER);
+        //hBox3.setAlignment(Pos.CENTER);
 
 
-        bottomButtons.getChildren().addAll(hBox3, hBox, hBox2);
-        bottomButtons.setSpacing(10);
+        bottomButtons.getChildren().addAll(hBox, hBox2);
+        bottomButtons.getStyleClass().add("bottom-buttons");
         return bottomButtons;
     }
 

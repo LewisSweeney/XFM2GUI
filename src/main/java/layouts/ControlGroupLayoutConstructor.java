@@ -5,16 +5,19 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 
+import javax.swing.text.html.StyleSheet;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Array;
+import java.net.URL;
 import java.util.ArrayList;
 
 /**
  * Groups together individual ControlLayouts into easily manageable VBox nodes
  */
 public class ControlGroupLayoutConstructor {
+
     Label groupTitle = new Label("DEFAULT");
     ArrayList<ControlLayout> controls = new ArrayList<>();
     VBox controlGroup = new VBox();
@@ -24,19 +27,18 @@ public class ControlGroupLayoutConstructor {
     public ControlGroupLayoutConstructor(int rowLength, String filepath) {
         ArrayList<HBox> rows = new ArrayList<>();
         bReader = new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream(filepath)));
-
         ArrayList<String> paramNames = new ArrayList<>();
 
         try {
             String line = bReader.readLine();
             while(line != null){
                 if(line.charAt(0) == '-') {
-                    groupTitle.setText(line);
-                    line = bReader.readLine();
+                    String replace = line.replace("-", "");
+                    groupTitle.setText(replace);
                 } else {
                     paramNames.add(line);
-                    line = bReader.readLine();
                 }
+                line = bReader.readLine();
             }
 
         } catch (IOException ioException) {
@@ -71,13 +73,16 @@ public class ControlGroupLayoutConstructor {
             rows.get(currentRow).setStyle("-fx-padding: 0 0 10 0");
             currentColumn++;
         }
-        
+
+        groupTitle.getStyleClass().add("group-label");
+        controlGroup.setAlignment(Pos.CENTER);
         controlGroup.getChildren().add(groupTitle);
         controlGroup.getChildren().addAll(rows);
     }
 
     public VBox getControlGroup() {
-        controlGroup.setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
+        controlGroup.setBorder(new Border(new BorderStroke(Color.DARKSLATEGRAY, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
+      //  controlGroup.setStyle("-fx-border-radius: 10 10 10 10");
         return controlGroup;
     }
 

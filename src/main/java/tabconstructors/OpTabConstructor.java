@@ -34,6 +34,7 @@ public class OpTabConstructor {
         layout.getChildren().addAll(groups);
         layout.setAlignment(Pos.CENTER);
         layout.setSpacing(20);
+        layout.setStyle("-fx-padding: 0 10 0 10");
         return layout;
     }
 }
