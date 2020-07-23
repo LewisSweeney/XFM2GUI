@@ -1,14 +1,9 @@
 package main.java.layouts;
 
-import eu.hansolo.medusa.Gauge;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
 import main.java.utilities.IntField;
 import main.java.utilities.ParamValueChange;
 
@@ -18,7 +13,7 @@ import main.java.utilities.ParamValueChange;
  * TODO: Add knobs/sliders
  */
 public class ControlLayout {
-    private final Integer paramValue = 0;
+    // private final Integer paramValue = 0;
     private final IntField paramField = new IntField(0, 255,0);
     Label paramName = new Label("DEFAULT");
     BorderPane layoutBorder;
