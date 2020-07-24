@@ -1,39 +1,54 @@
 package main.java;
 
+import com.sun.javafx.stage.StageHelper;
 import javafx.application.Application;
+import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import javafx.stage.Window;
 import jssc.SerialPort;
 import jssc.SerialPortList;
 
+import main.java.externalcode.DraggableTab;
 import main.java.tabconstructors.*;
+import main.java.utilities.REQUIRED_TAB;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class Main extends Application {
 
     private static final int BOTTOM_BUTTON_WIDTH = 200;
+    private ArrayList<Tab> allTabs = new ArrayList<>();
     private ArrayList<Tab> tabs;
+    private TabPane tabPane;
+    private Scene scene;
     private BorderPane border;
     private final String[] portNames = SerialPortList.getPortNames();
     SerialPort serialPort;
     private final ComboBox<String> serialPortPicker = new ComboBox<>();
+
+    public Main() {
+    }
 
     @Override
     public void start(Stage primaryStage) {
 
         initBorderPane();
         String style = this.getClass().getResource("/stylesheets/style.css").toExternalForm();
-        Scene scene = new Scene(border);
+        scene = new Scene(border);
         scene.getStylesheets().add(style);
 
         primaryStage.setResizable(false);
@@ -53,8 +68,7 @@ public class Main extends Application {
         title.setStyle("-fx-font: 72 arial;");
 
         border = new BorderPane();
-        TabPane tabPane = new TabPane();
-
+        tabPane = new TabPane();
 
         initTabList();
         initTabs();
@@ -65,7 +79,7 @@ public class Main extends Application {
         tabPane.getTabs().addAll(tabs);
         tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
 
-        VBox top = new VBox(title,serialPortPicker);
+        VBox top = new VBox(title, serialPortPicker);
         top.setAlignment(Pos.CENTER);
 
         top.setStyle("-fx-padding: 0 0 10 0;");
@@ -89,11 +103,10 @@ public class Main extends Application {
     private VBox initBottomButtons() {
         VBox bottomButtons = new VBox();
 
-        if(portNames.length > 0){
+        if (portNames.length > 0) {
             serialPort = new SerialPort(portNames[0]);
             serialPortPicker.getItems().addAll(portNames);
-        }
-        else{
+        } else {
             serialPort = null;
             serialPortPicker.getItems().add("-NO PORTS AVAILABLE-");
         }
@@ -108,19 +121,24 @@ public class Main extends Application {
         Button setUnit1 = new Button("Set Unit 1");
         Button saveCurrentPatch = new Button("Save Program");
         Button loadPatch = new Button("Load Program");
+        Button reloadTabs = new Button("Refresh Tabs");
+
+        EventHandler<? super MouseEvent> eventHandler = (EventHandler<MouseEvent>) mouseEvent -> reloadTabs();
+        reloadTabs.setOnMouseClicked(eventHandler);
 
         serialPortPicker.setPrefWidth(BOTTOM_BUTTON_WIDTH * 1.5);
 
         HBox hBox = new HBox(read, setUnit0, saveCurrentPatch);
         HBox hBox2 = new HBox(write, setUnit1, loadPatch);
+        HBox hBox3 = new HBox(reloadTabs);
 
         hBox.getStyleClass().add("button-row");
         hBox2.getStyleClass().add("button-row");
-
+        hBox3.getStyleClass().add("button-row");
         //hBox3.setAlignment(Pos.CENTER);
 
 
-        bottomButtons.getChildren().addAll(hBox, hBox2);
+        bottomButtons.getChildren().addAll(hBox, hBox2, hBox3);
         bottomButtons.getStyleClass().add("bottom-buttons");
         return bottomButtons;
     }
@@ -133,7 +151,8 @@ public class Main extends Application {
         try {
             String line = bReader.readLine();
             while (line != null) {
-                Tab t = new Tab(line);
+                DraggableTab t = new DraggableTab(line);
+                t.setClosable(false);
                 tabs.add(t);
                 line = bReader.readLine();
             }
@@ -142,39 +161,119 @@ public class Main extends Application {
             ioException.printStackTrace();
         }
 
+        allTabs.addAll(tabs);
+
     }
 
     // Initialises the previously created tabs with the relevant nodes/content
     private void initTabs() {
-        OpTabConstructor opOneCon = new OpTabConstructor(OperatorNumber.ONE);
-        OpTabConstructor opTwoCon = new OpTabConstructor(OperatorNumber.TWO);
-        OpTabConstructor opThreeCon = new OpTabConstructor(OperatorNumber.THREE);
-        OpTabConstructor opFourCon = new OpTabConstructor(OperatorNumber.FOUR);
-        OpTabConstructor opFiveCon = new OpTabConstructor(OperatorNumber.FIVE);
-        OpTabConstructor opSixCon = new OpTabConstructor(OperatorNumber.SIX);
+        ArrayList<String> op1FilePaths = new ArrayList<>();
+        op1FilePaths.add("/parameters/operators/op1.txt");
 
-        ProgramTabConstructor progTabCon = new ProgramTabConstructor();
-        ModulationTabConstructor modTabCon = new ModulationTabConstructor();
-        EffectsTabConstructor effTabCon = new EffectsTabConstructor();
+        ArrayList<String> op2FilePaths = new ArrayList<>();
+        op2FilePaths.add("/parameters/operators/op2.txt");
 
+        ArrayList<String> op3FilePaths = new ArrayList<>();
+        op3FilePaths.add("/parameters/operators/op3.txt");
 
-        tabs.get(0).setContent(opOneCon.getLayout());
-        tabs.get(1).setContent(opTwoCon.getLayout());
-        tabs.get(2).setContent(opThreeCon.getLayout());
-        tabs.get(3).setContent(opFourCon.getLayout());
-        tabs.get(4).setContent(opFiveCon.getLayout());
-        tabs.get(5).setContent(opSixCon.getLayout());
-        tabs.get(6).setContent(progTabCon.getLayout());
-        tabs.get(7).setContent(modTabCon.getLayout());
-        tabs.get(8).setContent(effTabCon.getLayout());
+        ArrayList<String> op4FilePaths = new ArrayList<>();
+        op4FilePaths.add("/parameters/operators/op4.txt");
+
+        ArrayList<String> op5FilePaths = new ArrayList<>();
+        op5FilePaths.add("/parameters/operators/op5.txt");
+
+        ArrayList<String> op6FilePaths = new ArrayList<>();
+        op6FilePaths.add("/parameters/operators/op6.txt");
+
+        ArrayList<String> progFilePaths = new ArrayList<>();
+        progFilePaths.add("/parameters/program/lfo.txt");
+        progFilePaths.add("/parameters/program/pitcheg.txt");
+        progFilePaths.add("/parameters/program/other.txt");
+
+        ArrayList<String> effectsFilePaths = new ArrayList<>();
+        effectsFilePaths.add("/parameters/effects/am.txt");
+        effectsFilePaths.add("/parameters/effects/bitcrusher.txt");
+        effectsFilePaths.add("/parameters/effects/chorusflanger.txt");
+        effectsFilePaths.add("/parameters/effects/decimator.txt");
+        effectsFilePaths.add("/parameters/effects/delay.txt");
+        effectsFilePaths.add("/parameters/effects/fxrouting.txt");
+        effectsFilePaths.add("/parameters/effects/phaser.txt");
+        effectsFilePaths.add("/parameters/effects/reverb.txt");
+
+        ArrayList<String> modulationFilePaths = new ArrayList<>();
+        modulationFilePaths.add("/parameters/modulation/amplfo.txt");
+        modulationFilePaths.add("/parameters/modulation/arpeggiator.txt");
+        modulationFilePaths.add("/parameters/modulation/egbias.txt");
+        modulationFilePaths.add("/parameters/modulation/perfcontrols.txt");
+        modulationFilePaths.add("/parameters/modulation/pitch.txt");
+        modulationFilePaths.add("/parameters/modulation/pitchlfo.txt");
+
+        TabConstructor tabConstructor = new TabConstructor();
+
+        tabs.get(0).setContent(tabConstructor.getLayout(op1FilePaths, getTabGroupValues(REQUIRED_TAB.op)));
+        tabs.get(1).setContent(tabConstructor.getLayout(op2FilePaths, getTabGroupValues(REQUIRED_TAB.op)));
+        tabs.get(2).setContent(tabConstructor.getLayout(op3FilePaths, getTabGroupValues(REQUIRED_TAB.op)));
+        tabs.get(3).setContent(tabConstructor.getLayout(op4FilePaths, getTabGroupValues(REQUIRED_TAB.op)));
+        tabs.get(4).setContent(tabConstructor.getLayout(op5FilePaths, getTabGroupValues(REQUIRED_TAB.op)));
+        tabs.get(5).setContent(tabConstructor.getLayout(op6FilePaths, getTabGroupValues(REQUIRED_TAB.op)));
+        tabs.get(6).setContent(tabConstructor.getLayout(progFilePaths, getTabGroupValues(REQUIRED_TAB.prog)));
+        tabs.get(7).setContent(tabConstructor.getLayout(modulationFilePaths, getTabGroupValues(REQUIRED_TAB.mod)));
+        tabs.get(8).setContent(tabConstructor.getLayout(effectsFilePaths, getTabGroupValues(REQUIRED_TAB.fx)));
     }
 
     // When the value of serialPortPicker changes, this method will change the active port to the one selected
     // If there are no available ports then does nothing.
-    public void onSerialPortSelection(){
-        if(portNames.length > 0){
+    public void onSerialPortSelection() {
+        if (portNames.length > 0) {
             String portName = serialPortPicker.getValue();
             serialPort = new SerialPort(portName);
         }
+    }
+
+    public ArrayList<String> getTabGroupValues(REQUIRED_TAB r) {
+
+        String filepath = switch (r) {
+            case op -> "/parameters/groupValues/operator.txt";
+            case fx -> "/parameters/groupValues/effects.txt";
+            case mod -> "/parameters/groupValues/modulation.txt";
+            case prog -> "/parameters/groupValues/program.txt";
+        };
+
+        BufferedReader bReader = new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream(filepath)));
+        ArrayList<String> programGroupValues = new ArrayList<>();
+        try {
+            String line = bReader.readLine();
+            while (line != null) {
+                programGroupValues.add(line);
+                line = bReader.readLine();
+            }
+
+        } catch (IOException ioException) {
+            ioException.printStackTrace();
+        }
+        return programGroupValues;
+    }
+
+    /**
+     * In the case of any tabs being closed accidentally, this will refresh the tabslist and return all tabs to the correct position
+     * This will also close any extra windows that the program has opened.
+     */
+    private void reloadTabs() {
+        tabPane.getTabs().clear();
+        tabs.clear();
+        tabs.addAll(allTabs);
+        tabPane.getTabs().addAll(tabs);
+        System.out.println(tabPane.getSelectionModel().getSelectedIndex());
+        tabPane.getSelectionModel().clearAndSelect(0);
+        // tabPane.getSelectionModel().selectFirst();
+        List<Stage> stages = Window.getWindows().stream().filter(Stage.class::isInstance).map(Stage.class::cast).collect(Collectors.toList());
+        for (Stage s : stages) {
+            if (!s.getScene().equals(this.scene)) {
+                s.close();
+            } else{
+                s.toFront();
+            }
+        }
+
     }
 }

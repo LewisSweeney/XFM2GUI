@@ -32,3 +32,13 @@
  -fx-font-weight: bold;
  -fx-font-family: "Courier New";
 }
+
+.group-groups {
+ -fx-spacing: 10;
+ -fx-alignment: center;
+}
+
+.tab-layout {
+ -fx-spacing: 10;
+ -fx-alignment: center;
+}

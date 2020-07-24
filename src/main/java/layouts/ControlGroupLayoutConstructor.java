@@ -23,8 +23,15 @@ public class ControlGroupLayoutConstructor {
     VBox controlGroup = new VBox();
     BufferedReader bReader;
 
+    public int getRowLength() {
+        return rowLength;
+    }
+
+    int rowLength;
+
     // Constructor that takes a list of controls and a row length so it can construct a control group based on that
     public ControlGroupLayoutConstructor(int rowLength, String filepath) {
+        this.rowLength = rowLength;
         ArrayList<HBox> rows = new ArrayList<>();
         bReader = new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream(filepath)));
         ArrayList<String> paramNames = new ArrayList<>();
@@ -35,7 +42,8 @@ public class ControlGroupLayoutConstructor {
                 if(line.charAt(0) == '-') {
                     String replace = line.replace("-", "");
                     groupTitle.setText(replace);
-                } else {
+                }
+                else if(line.charAt(0) != '#'){
                     paramNames.add(line);
                 }
                 line = bReader.readLine();

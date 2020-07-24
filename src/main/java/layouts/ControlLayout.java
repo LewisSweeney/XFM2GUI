@@ -4,7 +4,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.layout.BorderPane;
-import main.java.utilities.IntField;
+import main.java.externalcode.IntField;
 import main.java.utilities.ParamValueChange;
 
 /**
