@@ -9,9 +9,22 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
+/**
+ * Class used for saving patches to local storage.
+ * User will choose the filepath and name, and the program will ensure it's in the proprietary XFM2 format
+ */
 public class PatchSaver {
 
-    // Code for this method is adapted from https://www.genuinecoder.com/save-files-javafx-filechooser/
+    /**
+     * Method that prompts the user to choose a file location and name for the newly saved file.
+     * Should automatically scrub contents if file passed is an existing file.
+     *
+     * Save dialog is a JavaFX feature and should work correctly across platforms
+     *
+     * @param lines ArrayList of strings that hold key and value
+     * @param saveStage JavaFX stage for displaying the Save dialog
+     * Code modified from https://www.genuinecoder.com/save-files-javafx-filechooser/
+     */
     public void saveToFile(ArrayList<String> lines, Stage saveStage) {
 
         FileChooser fileChooser = new FileChooser();

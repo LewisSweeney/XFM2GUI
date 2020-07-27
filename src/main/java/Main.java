@@ -3,16 +3,12 @@ package main.java;
 import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import javafx.stage.Window;
@@ -21,6 +17,7 @@ import jssc.SerialPortList;
 
 import main.java.externalcode.DraggableTab;
 import main.java.externalcode.IntField;
+import main.java.serial.SerialCommandHandler;
 import main.java.tabconstructors.*;
 import main.java.utilities.OPERATOR_NUM;
 import main.java.utilities.PatchLoader;
@@ -34,27 +31,28 @@ import java.util.stream.Collectors;
 public class Main extends Application {
 
     private static final int BOTTOM_BUTTON_WIDTH = 200;
-    private ArrayList<Tab> allTabs = new ArrayList<>();
+
+    private final ArrayList<Tab> allTabs = new ArrayList<>();
     private ArrayList<Tab> tabs;
+
     private TabPane tabPane;
     private Scene scene;
     private BorderPane border;
+    private final ComboBox<String> serialPortPicker = new ComboBox<>();
+    private final Stage fileStage = new Stage();
+
     private final String[] portNames = SerialPortList.getPortNames();
     SerialPort serialPort;
-    private final ComboBox<String> serialPortPicker = new ComboBox<>();
-    final static ArrayList<IntField> paramFields = new ArrayList<>();
-    private Stage fileStage;
+    SerialCommandHandler serialCommandHandler = new SerialCommandHandler(serialPort);
 
-    public Main() {
-    }
+    final static ArrayList<IntField> paramFields = new ArrayList<>();
+
+    String style = this.getClass().getResource("/stylesheets/style.css").toExternalForm();
 
     @Override
     public void start(Stage primaryStage) {
 
-        initBorderPane();
-        String style = this.getClass().getResource("/stylesheets/style.css").toExternalForm();
-        scene = new Scene(border);
-        scene.getStylesheets().add(style);
+        initializeScene();
 
         primaryStage.setResizable(false);
         primaryStage.setScene(scene);
@@ -67,7 +65,7 @@ public class Main extends Application {
     }
 
     // Initialises the BorderPane used as the main node for the GUI
-    private void initBorderPane() {
+    private void initializeScene() {
 
         Label title = new Label("XFM2 GUI");
         title.setStyle("-fx-font: 72 arial;");
@@ -75,9 +73,8 @@ public class Main extends Application {
         border = new BorderPane();
         tabPane = new TabPane();
 
-        initTabList();
         initTabs();
-        VBox buttonBox = initBottomButtons();
+        VBox buttonBox = initButtons();
 
         tabPane.setTabMinWidth(80);
         tabPane.setTabMaxWidth(80);
@@ -99,13 +96,15 @@ public class Main extends Application {
 
         BorderPane.setAlignment(title, Pos.CENTER);
         BorderPane.setAlignment(tabPane, Pos.CENTER);
-        BorderPane.setAlignment(buttonBox, Pos.CENTER);
+
+        scene = new Scene(border);
+        scene.getStylesheets().add(style);
     }
 
     /* Initialises the buttons at the bottom of the page
     TODO: Add button functionality
      */
-    private VBox initBottomButtons() {
+    private VBox initButtons() {
         VBox bottomButtons = new VBox();
 
         if (portNames.length > 0) {
@@ -172,8 +171,8 @@ public class Main extends Application {
         return bottomButtons;
     }
 
-    // Reads the tablist.txt file and creates a tab for each line
-    private void initTabList() {
+    // Initialises the previously created tabs with the relevant nodes/content
+    private void initTabs() {
 
         tabs = new ArrayList<>();
         BufferedReader bReader = new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream("/parameters/tablist.txt")));
@@ -192,10 +191,7 @@ public class Main extends Application {
 
         allTabs.addAll(tabs);
 
-    }
 
-    // Initialises the previously created tabs with the relevant nodes/content
-    private void initTabs() {
         ArrayList<String> op1FilePaths = new ArrayList<>();
         op1FilePaths.add("/parameters/operators/op1.txt");
 
@@ -228,6 +224,7 @@ public class Main extends Application {
         effectsFilePaths.add("/parameters/effects/fxrouting.txt");
         effectsFilePaths.add("/parameters/effects/phaser.txt");
         effectsFilePaths.add("/parameters/effects/reverb.txt");
+        effectsFilePaths.add("/parameters/effects/filter.txt");
 
         ArrayList<String> modulationFilePaths = new ArrayList<>();
         modulationFilePaths.add("/parameters/modulation/amplfo.txt");

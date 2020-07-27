@@ -6,9 +6,22 @@ import javafx.stage.Stage;
 import java.io.*;
 import java.util.ArrayList;
 
+/**
+ * Class used for loading patches from local storage.
+ * User will choose the filepath and name, and the program will ensure it's in the proprietary XFM2 format
+ */
 public class PatchLoader {
 
-
+    /** Prompts a user to find a .XFM2 file to load from their local storage.
+     * If the file exists the method will read each line and produce an arraylist of the strings gathered.
+     *
+     * Code adapted from:
+     *
+     * @param loadStage JavaFX stage for displaying Open dialog
+     * @return Returns a list of lines from the saved file
+     *
+     * Code modified from https://www.genuinecoder.com/save-files-javafx-filechooser/
+     */
     public ArrayList<String> loadFromFile(Stage loadStage) {
         ArrayList<String> lines = new ArrayList<>();
         FileChooser fileChooser = new FileChooser();
