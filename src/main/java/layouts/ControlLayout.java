@@ -1,9 +1,13 @@
 package main.java.layouts;
 
+import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
+import javafx.util.Pair;
+import main.java.Main;
 import main.java.externalcode.IntField;
 import main.java.utilities.ParamValueChange;
 
@@ -22,13 +26,16 @@ public class ControlLayout {
         slider.setMin(0);
         slider.setMax(255);
 
+        String[] paramSplit = p.split(":");
+
         paramName.getStyleClass().add("param-label");
-        paramName.setText(p);
+        paramName.setText(paramSplit[0]);
         paramName.setAlignment(Pos.CENTER);
         paramName.setPrefWidth(100);
 
         paramField.setMaxWidth(45);
         paramField.setAlignment(Pos.CENTER);
+        paramField.setId(paramSplit[1]);
 
         slider.getStyleClass().add("slider-new");
         slider.setMaxWidth(80);
@@ -45,9 +52,15 @@ public class ControlLayout {
         BorderPane.setAlignment(paramField, Pos.CENTER);
     }
 
-
+    public Pair<String, Integer> getParamAndValue(){
+        return new Pair<>(paramField.getId(), paramField.getValue());
+    }
 
     public BorderPane getLayout(){
         return layoutBorder;
+    }
+
+    public IntField getParamField(){
+        return paramField;
     }
 }

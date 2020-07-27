@@ -1,16 +1,18 @@
 package main.java;
 
-import com.sun.javafx.stage.StageHelper;
 import javafx.application.Application;
-import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import javafx.stage.Window;
@@ -18,14 +20,15 @@ import jssc.SerialPort;
 import jssc.SerialPortList;
 
 import main.java.externalcode.DraggableTab;
+import main.java.externalcode.IntField;
 import main.java.tabconstructors.*;
+import main.java.utilities.OPERATOR_NUM;
+import main.java.utilities.PatchLoader;
+import main.java.utilities.PatchSaver;
 import main.java.utilities.REQUIRED_TAB;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.*;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Main extends Application {
@@ -39,6 +42,8 @@ public class Main extends Application {
     private final String[] portNames = SerialPortList.getPortNames();
     SerialPort serialPort;
     private final ComboBox<String> serialPortPicker = new ComboBox<>();
+    final static ArrayList<IntField> paramFields = new ArrayList<>();
+    private Stage fileStage;
 
     public Main() {
     }
@@ -123,8 +128,32 @@ public class Main extends Application {
         Button loadPatch = new Button("Load Program");
         Button reloadTabs = new Button("Refresh Tabs");
 
-        EventHandler<? super MouseEvent> eventHandler = (EventHandler<MouseEvent>) mouseEvent -> reloadTabs();
-        reloadTabs.setOnMouseClicked(eventHandler);
+        EventHandler<? super MouseEvent> readEventHandler = (EventHandler<MouseEvent>) mouseEvent -> onReadButtonPress();
+        read.setOnMouseClicked(readEventHandler);
+
+        EventHandler<? super MouseEvent> saveEventHandler = (EventHandler<MouseEvent>) mouseEvent -> {
+            try {
+                onSaveButtonPress();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        };
+        saveCurrentPatch.setOnMouseClicked(saveEventHandler);
+
+        EventHandler<? super MouseEvent> loadEventHandler = (EventHandler<MouseEvent>) mouseEvent -> {
+            try {
+                onLoadButtonPress();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        };
+        loadPatch.setOnMouseClicked(loadEventHandler);
+
+        EventHandler<? super MouseEvent> writeEventHandler = (EventHandler<MouseEvent>) mouseEvent -> onWriteButtonPress();
+        write.setOnMouseClicked(writeEventHandler);
+
+        EventHandler<? super MouseEvent> reloadTabsEventHandler = (EventHandler<MouseEvent>) mouseEvent -> reloadTabs();
+        reloadTabs.setOnMouseClicked(reloadTabsEventHandler);
 
         serialPortPicker.setPrefWidth(BOTTOM_BUTTON_WIDTH * 1.5);
 
@@ -210,15 +239,17 @@ public class Main extends Application {
 
         TabConstructor tabConstructor = new TabConstructor();
 
-        tabs.get(0).setContent(tabConstructor.getLayout(op1FilePaths, getTabGroupValues(REQUIRED_TAB.op)));
-        tabs.get(1).setContent(tabConstructor.getLayout(op2FilePaths, getTabGroupValues(REQUIRED_TAB.op)));
-        tabs.get(2).setContent(tabConstructor.getLayout(op3FilePaths, getTabGroupValues(REQUIRED_TAB.op)));
-        tabs.get(3).setContent(tabConstructor.getLayout(op4FilePaths, getTabGroupValues(REQUIRED_TAB.op)));
-        tabs.get(4).setContent(tabConstructor.getLayout(op5FilePaths, getTabGroupValues(REQUIRED_TAB.op)));
-        tabs.get(5).setContent(tabConstructor.getLayout(op6FilePaths, getTabGroupValues(REQUIRED_TAB.op)));
-        tabs.get(6).setContent(tabConstructor.getLayout(progFilePaths, getTabGroupValues(REQUIRED_TAB.prog)));
-        tabs.get(7).setContent(tabConstructor.getLayout(modulationFilePaths, getTabGroupValues(REQUIRED_TAB.mod)));
-        tabs.get(8).setContent(tabConstructor.getLayout(effectsFilePaths, getTabGroupValues(REQUIRED_TAB.fx)));
+        tabs.get(0).setContent(tabConstructor.getLayout(op1FilePaths, getTabGroupValues(REQUIRED_TAB.op), OPERATOR_NUM.op1));
+        tabs.get(1).setContent(tabConstructor.getLayout(op2FilePaths, getTabGroupValues(REQUIRED_TAB.op), OPERATOR_NUM.op2));
+        tabs.get(2).setContent(tabConstructor.getLayout(op3FilePaths, getTabGroupValues(REQUIRED_TAB.op), OPERATOR_NUM.op3));
+        tabs.get(3).setContent(tabConstructor.getLayout(op4FilePaths, getTabGroupValues(REQUIRED_TAB.op), OPERATOR_NUM.op4));
+        tabs.get(4).setContent(tabConstructor.getLayout(op5FilePaths, getTabGroupValues(REQUIRED_TAB.op), OPERATOR_NUM.op5));
+        tabs.get(5).setContent(tabConstructor.getLayout(op6FilePaths, getTabGroupValues(REQUIRED_TAB.op), OPERATOR_NUM.op6));
+        tabs.get(6).setContent(tabConstructor.getLayout(progFilePaths, getTabGroupValues(REQUIRED_TAB.prog), OPERATOR_NUM.no));
+        tabs.get(7).setContent(tabConstructor.getLayout(modulationFilePaths, getTabGroupValues(REQUIRED_TAB.mod), OPERATOR_NUM.no));
+        tabs.get(8).setContent(tabConstructor.getLayout(effectsFilePaths, getTabGroupValues(REQUIRED_TAB.fx), OPERATOR_NUM.no));
+
+        paramFields.addAll(tabConstructor.getIntFields());
     }
 
     // When the value of serialPortPicker changes, this method will change the active port to the one selected
@@ -257,23 +288,68 @@ public class Main extends Application {
     /**
      * In the case of any tabs being closed accidentally, this will refresh the tabslist and return all tabs to the correct position
      * This will also close any extra windows that the program has opened.
+     * TODO: Fix refresh bug where tabs draw over each other
      */
     private void reloadTabs() {
+        TabPane newTabPane = new TabPane();
+        newTabPane.getTabs().addAll(allTabs);
+        border.setCenter(newTabPane);
         tabPane.getTabs().clear();
         tabs.clear();
         tabs.addAll(allTabs);
         tabPane.getTabs().addAll(tabs);
         System.out.println(tabPane.getSelectionModel().getSelectedIndex());
         tabPane.getSelectionModel().clearAndSelect(0);
-        // tabPane.getSelectionModel().selectFirst();
+        tabPane.getSelectionModel().selectFirst();
+
         List<Stage> stages = Window.getWindows().stream().filter(Stage.class::isInstance).map(Stage.class::cast).collect(Collectors.toList());
         for (Stage s : stages) {
             if (!s.getScene().equals(this.scene)) {
                 s.close();
-            } else{
+            } else {
                 s.toFront();
             }
         }
-
     }
+
+    private void onWriteButtonPress() {
+        paramFields.sort(Comparator.comparingInt(p -> Integer.parseInt(p.getId())));
+        for (IntField i : paramFields) {
+            System.out.println("Parameter " + i.getId() + " = " + i.getValue());
+        }
+    }
+
+    private void onLoadButtonPress() throws FileNotFoundException {
+        paramFields.sort(Comparator.comparingInt(p -> Integer.parseInt(p.getId())));
+        PatchLoader loader = new PatchLoader();
+        ArrayList<String> lines = loader.loadFromFile(fileStage);
+
+        for(String line:lines){
+            String[] lineSplit = line.split(":");
+            if(lineSplit.length == 2){
+                for(IntField i:paramFields){
+                    if(i.getId().equals(lineSplit[0])){
+                        i.setValue(Integer.parseInt(lineSplit[1]));
+                    }
+                }
+            }
+        }
+    }
+
+    private void onSaveButtonPress() throws IOException {
+        paramFields.sort(Comparator.comparingInt(p -> Integer.parseInt(p.getId())));
+        ArrayList<String> lines = new ArrayList<>();
+        for (IntField i : paramFields) {
+            lines.add(i.getId() + ":" + i.getValue());
+        }
+        PatchSaver saver = new PatchSaver();
+        saver.saveToFile(lines, fileStage);
+    }
+
+    private void onReadButtonPress(){
+        for(IntField i:paramFields){
+            i.setValue(100);
+        }
+    }
+
 }
