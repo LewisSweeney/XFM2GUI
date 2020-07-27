@@ -1,16 +1,15 @@
 package main.java.layouts;
 
 import javafx.geometry.Pos;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
-import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-
-import javax.swing.text.html.StyleSheet;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import main.java.externalcode.IntField;
+import main.java.utilities.OPERATOR_NUM;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.lang.reflect.Array;
-import java.net.URL;
 import java.util.ArrayList;
 
 /**
@@ -22,11 +21,6 @@ public class ControlGroupLayoutConstructor {
     ArrayList<ControlLayout> controls = new ArrayList<>();
     VBox controlGroup = new VBox();
     BufferedReader bReader;
-
-    public int getRowLength() {
-        return rowLength;
-    }
-
     int rowLength;
 
     // Constructor that takes a list of controls and a row length so it can construct a control group based on that
@@ -83,16 +77,67 @@ public class ControlGroupLayoutConstructor {
         }
 
         groupTitle.getStyleClass().add("group-label");
-        controlGroup.setAlignment(Pos.CENTER);
+        controlGroup.getStyleClass().add("group-control");
         controlGroup.getChildren().add(groupTitle);
         controlGroup.getChildren().addAll(rows);
     }
 
     public VBox getControlGroup() {
-        controlGroup.setBorder(new Border(new BorderStroke(Color.DARKSLATEGRAY, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
-      //  controlGroup.setStyle("-fx-border-radius: 10 10 10 10");
         return controlGroup;
     }
 
+    public HBox getOperatorLinkBoxes(OPERATOR_NUM opNum) {
+        VBox layout = new VBox();
+        ArrayList<CheckBox> checkBoxes = new ArrayList<>();
+        ArrayList<Label> checkBoxLabels = new ArrayList<>();
+        ArrayList<Boolean> checkBoxActive = new ArrayList<>();
 
+        Label title = new Label("Link Operators");
+        title.getStyleClass().add("group-label");
+        layout.getChildren().add(title);
+        for (int i = 0; i <= 5; i++) {
+            checkBoxes.add(new CheckBox());
+            int num = i+1;
+            checkBoxLabels.add(new Label("Operator " + num));
+            checkBoxActive.add(false);
+        }
+
+        int currentOp;
+
+        switch (opNum) {
+
+            case op1 -> currentOp = 1;
+
+            case op2 -> currentOp = 2;
+
+            case op3 -> currentOp = 3;
+
+            case op4 -> currentOp = 4;
+
+            case op5 -> currentOp = 5;
+
+            case op6 -> currentOp = 6;
+
+            default -> throw new IllegalStateException("Unexpected value: " + opNum);
+        }
+
+        for (int i = 0; i <= 5; i++) {
+            if (i+1 != currentOp) {
+                HBox checkAndLabel = new HBox(checkBoxes.get(i), checkBoxLabels.get(i));
+                checkAndLabel.getStyleClass().add("check-layout");
+                layout.getChildren().add(checkAndLabel);
+            }
+        }
+
+        layout.getStyleClass().add("check-group");
+        return new HBox(layout);
+    }
+
+    public ArrayList<IntField> getIntFields(){
+        ArrayList<IntField> intFields = new ArrayList<>();
+        for(ControlLayout cl:controls){
+            intFields.add(cl.getParamField());
+        }
+        return intFields;
+    }
 }

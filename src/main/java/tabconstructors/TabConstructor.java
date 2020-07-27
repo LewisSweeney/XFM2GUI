@@ -1,8 +1,15 @@
 package main.java.tabconstructors;
 
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import main.java.externalcode.IntField;
 import main.java.layouts.ControlGroupLayoutConstructor;
+import main.java.utilities.OPERATOR_NUM;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -13,13 +20,16 @@ import java.util.ArrayList;
  * Creates the nodes for the program tab of the interface
  */
 public class TabConstructor {
+    ArrayList<IntField> intFields = new ArrayList<>();
+    ArrayList<ControlGroupLayoutConstructor> groups;
+    ArrayList<HBox> groupsOfGroups;
 
-
-
-    public VBox getLayout(ArrayList<String> filepaths, ArrayList<String> groupValues) {
-        ArrayList<ControlGroupLayoutConstructor> groups = new ArrayList<>();
-        ArrayList<HBox> groupsOfGroups = new ArrayList<>();
-        VBox layout = new VBox();
+    public BorderPane getLayout(ArrayList<String> filepaths, ArrayList<String> groupValues, OPERATOR_NUM opNum) {
+        groups = new ArrayList<>();
+        groupsOfGroups = new ArrayList<>();
+        VBox internalLayout = new VBox();
+        BorderPane layout = new BorderPane();
+        ControlGroupLayoutConstructor cgl = null;
         for (String filepath : filepaths) {
 
             int rowLengths = 1;
@@ -38,11 +48,12 @@ public class TabConstructor {
                 ioException.printStackTrace();
             }
 
-            ControlGroupLayoutConstructor cgl = new ControlGroupLayoutConstructor(rowLengths, filepath);
+            cgl = new ControlGroupLayoutConstructor(rowLengths, filepath);
             groups.add(cgl);
+            intFields.addAll(cgl.getIntFields());
         }
 
-        for(String s:groupValues){
+        for (String s : groupValues) {
             String[] split = s.split(":");
             HBox h = new HBox();
             h.getStyleClass().add("group-groups");
@@ -52,8 +63,19 @@ public class TabConstructor {
             groupsOfGroups.add(h);
         }
 
-        layout.getChildren().addAll(groupsOfGroups);
-        layout.getStyleClass().add("tab-layout");
+
+        internalLayout.getChildren().addAll(groupsOfGroups);
+        layout.setCenter(internalLayout);
+        if (!opNum.equals(OPERATOR_NUM.no)) {
+            assert cgl != null;
+            layout.setLeft(cgl.getOperatorLinkBoxes(opNum));
+        }
+        internalLayout.getStyleClass().add("tab-layout");
         return layout;
     }
+
+    public ArrayList<IntField> getIntFields(){
+        return intFields;
+    }
+
 }

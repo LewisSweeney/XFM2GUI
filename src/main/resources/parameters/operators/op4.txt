@@ -1,36 +1,36 @@
 -OPERATOR 4-
 #8#
-Algo
-Feedback
-Phase
-Ratio
-Ratio Fine
-Fine
-Level
-Level L
-Level R
-Velo Sens
-Key BP
-Key LDepth
-Key RDepth
-Key LCurve
-Key RCurve
-L0
-L1
-L2
-L3
-L4
-L5
-Dly
-R1
-R2
-R3
-R4
-R5
-Rate Key
-AMS
-PMS
-Wave 1
-Wave 2
-W Mode
-W Ratio
+Algo:4
+Feedback:10
+Phase:289
+Ratio:18
+Ratio Fine:24
+Fine:30
+Level:36
+Level L:262
+Level R:263
+Velo Sens:42
+Key BP:48
+Key LDepth:54
+Key RDepth:60
+Key LCurve:66
+Key RCurve:72
+L0:184
+L1:78
+L2:85
+L3:92
+L4:99
+L5:196
+Dly:190
+R1:106
+R2:113
+R3:120
+R4:127
+R5:202
+Rate Key:143
+AMS:162
+PMS:225
+Wave 1:239
+Wave 2:271
+W Mode:277
+W Ratio:283

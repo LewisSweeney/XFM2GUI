@@ -1,40 +1,40 @@
 -OPERATOR 1-
 #8#
-Algo
-Feedback
-Sync
-Phase
-Mode
-Ratio
-Ratio Fine
-Fine
-Level
-Level L
-Level R
-Velo Sens
-Key BP
-Key LDepth
-Key RDepth
-Key LCurve
-Key RCurve
-L0
-L1
-L2
-L3
-L4
-L5
-Dly
-R1
-R2
-R3
-R4
-R5
-Rate Key
-EG Loop
-EG Loop Seg
-AMS
-PMS
-Wave 1
-Wave 2
-W Mode
-W Ratio
+Algo:1
+Feedback:7
+Sync:13
+Phase:286
+Mode:14
+Ratio:15
+Ratio Fine:21
+Fine:27
+Level:33
+Level L:256
+Level R:257
+Velo Sens:39
+Key BP:45
+Key LDepth:51
+Key RDepth:57
+Key LCurve:63
+Key RCurve:69
+L0:181
+L1:75
+L2:82
+L3:89
+L4:96
+L5:193
+Dly:187
+R1:103
+R2:110
+R3:117
+R4:124
+R5:199
+Rate Key:140
+EG Loop:244
+EG Loop Seg:245
+AMS:159
+PMS:222
+Wave 1:236
+Wave 2:268
+W Mode:274
+W Ratio:280

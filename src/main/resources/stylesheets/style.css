@@ -33,6 +33,13 @@
  -fx-font-family: "Courier New";
 }
 
+.group-control {
+ -fx-border-style: solid;
+ -fx-border-color: darkslategray;
+ -fx-border-width: 3;
+ -fx-alignment: center;
+}
+
 .group-groups {
  -fx-spacing: 10;
  -fx-alignment: center;
@@ -41,4 +48,19 @@
 .tab-layout {
  -fx-spacing: 10;
  -fx-alignment: center;
+}
+
+.check-group {
+ -fx-pref-height: inherit;
+ -fx-border-style: solid;
+ -fx-border-color: darkslategray;
+ -fx-border-width: 3;
+ -fx-alignment: center;
+ -fx-padding: 0 10 0 10;
+}
+
+.check-layout {
+ -fx-font-family: Courier;
+ -fx-spacing: 10;
+ -fx-padding: 0 0 10 0;
 }
