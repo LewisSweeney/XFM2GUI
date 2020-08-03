@@ -1,5 +1,6 @@
 package main.java;
 
+
 import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
@@ -12,17 +13,15 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import javafx.stage.Window;
-import jssc.SerialPort;
-import jssc.SerialPortList;
 
+import jssc.SerialPort;
+import jssc.SerialPortException;
+import jssc.SerialPortList;
 import main.java.externalcode.DraggableTab;
 import main.java.externalcode.IntField;
 import main.java.serial.SerialCommandHandler;
 import main.java.tabconstructors.*;
-import main.java.utilities.OPERATOR_NUM;
-import main.java.utilities.PatchLoader;
-import main.java.utilities.PatchSaver;
-import main.java.utilities.REQUIRED_TAB;
+import main.java.utilities.*;
 
 import java.io.*;
 import java.util.*;
@@ -38,10 +37,12 @@ public class Main extends Application {
     private TabPane tabPane;
     private Scene scene;
     private BorderPane border;
-    private final ComboBox<String> serialPortPicker = new ComboBox<>();
-    private final Stage fileStage = new Stage();
 
-    private final String[] portNames = SerialPortList.getPortNames();
+    private final ComboBox<String> serialPortPicker = new ComboBox<>();
+    private Spinner patchSpinner;
+
+    private final Stage fileStage = new Stage();
+    String[] serialPortNameList = SerialPortList.getPortNames();
     SerialPort serialPort;
     SerialCommandHandler serialCommandHandler = new SerialCommandHandler(serialPort);
 
@@ -50,9 +51,10 @@ public class Main extends Application {
     String style = this.getClass().getResource("/stylesheets/style.css").toExternalForm();
 
     @Override
-    public void start(Stage primaryStage) {
+    public void start(Stage primaryStage) throws IOException, SerialPortException {
 
         initializeScene();
+        ParamValueChange.setSerialCommandHandler(serialCommandHandler);
 
         primaryStage.setResizable(false);
         primaryStage.setScene(scene);
@@ -65,7 +67,7 @@ public class Main extends Application {
     }
 
     // Initialises the BorderPane used as the main node for the GUI
-    private void initializeScene() {
+    private void initializeScene() throws IOException, SerialPortException {
 
         Label title = new Label("XFM2 GUI");
         title.setStyle("-fx-font: 72 arial;");
@@ -75,6 +77,7 @@ public class Main extends Application {
 
         initTabs();
         VBox buttonBox = initButtons();
+        initPortSelection();
 
         tabPane.setTabMinWidth(80);
         tabPane.setTabMaxWidth(80);
@@ -99,25 +102,32 @@ public class Main extends Application {
 
         scene = new Scene(border);
         scene.getStylesheets().add(style);
+
+        serialCommandHandler.readProgram(0);
+        setAllIntFieldValues(serialCommandHandler.getAllValues());
     }
 
     /* Initialises the buttons at the bottom of the page
     TODO: Add button functionality
      */
-    private VBox initButtons() {
+    private VBox initButtons() throws IOException, SerialPortException {
         VBox bottomButtons = new VBox();
 
-        if (portNames.length > 0) {
-            serialPort = new SerialPort(portNames[0]);
-            serialPortPicker.getItems().addAll(portNames);
-        } else {
-            serialPort = null;
-            serialPortPicker.getItems().add("-NO PORTS AVAILABLE-");
-        }
+        Label xfmPatch = new Label("XFM2 Program #:");
+        patchSpinner = new Spinner(0,127,0);
+        Button saveToXFM = new Button("Save To XFM2");
 
-
-        serialPortPicker.getSelectionModel().selectFirst();
-        serialPortPicker.setOnAction(e -> onSerialPortSelection());
+        patchSpinner.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
+            if (!"".equals(newValue)) {
+                try {
+                    onSpinnerChange(Integer.parseInt(newValue));
+                } catch (SerialPortException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
 
         Button read = new Button("Read XFM2");
         Button write = new Button("Write to XFM2");
@@ -127,7 +137,14 @@ public class Main extends Application {
         Button loadPatch = new Button("Load Program");
         Button reloadTabs = new Button("Refresh Tabs");
 
-        EventHandler<? super MouseEvent> readEventHandler = (EventHandler<MouseEvent>) mouseEvent -> onReadButtonPress();
+        EventHandler<? super MouseEvent> readEventHandler = (EventHandler<MouseEvent>) mouseEvent -> {
+            try {
+                onReadButtonPress();
+            } catch (SerialPortException | IOException e) {
+                e.printStackTrace();
+            }
+
+        };
         read.setOnMouseClicked(readEventHandler);
 
         EventHandler<? super MouseEvent> saveEventHandler = (EventHandler<MouseEvent>) mouseEvent -> {
@@ -148,7 +165,13 @@ public class Main extends Application {
         };
         loadPatch.setOnMouseClicked(loadEventHandler);
 
-        EventHandler<? super MouseEvent> writeEventHandler = (EventHandler<MouseEvent>) mouseEvent -> onWriteButtonPress();
+        EventHandler<? super MouseEvent> writeEventHandler = (EventHandler<MouseEvent>) mouseEvent -> {
+            try {
+                onWriteButtonPress();
+            } catch (SerialPortException | InterruptedException | IOException e) {
+                e.printStackTrace();
+            }
+        };
         write.setOnMouseClicked(writeEventHandler);
 
         EventHandler<? super MouseEvent> reloadTabsEventHandler = (EventHandler<MouseEvent>) mouseEvent -> reloadTabs();
@@ -159,16 +182,50 @@ public class Main extends Application {
         HBox hBox = new HBox(read, setUnit0, saveCurrentPatch);
         HBox hBox2 = new HBox(write, setUnit1, loadPatch);
         HBox hBox3 = new HBox(reloadTabs);
+        VBox vBox = new VBox(xfmPatch,patchSpinner,saveToXFM);
 
         hBox.getStyleClass().add("button-row");
         hBox2.getStyleClass().add("button-row");
         hBox3.getStyleClass().add("button-row");
+        vBox.getStyleClass().add("button-row");
         //hBox3.setAlignment(Pos.CENTER);
 
 
-        bottomButtons.getChildren().addAll(hBox, hBox2, hBox3);
+        bottomButtons.getChildren().addAll(vBox,hBox, hBox2, hBox3);
         bottomButtons.getStyleClass().add("bottom-buttons");
         return bottomButtons;
+    }
+
+    private void initPortSelection() throws IOException, SerialPortException {
+        if (serialPortNameList.length > 0) {
+            for (String s : serialPortNameList) {
+                SerialPort sP = new SerialPort(s);
+                serialCommandHandler.setSerialPort(sP);
+                if (serialCommandHandler.getAllValues().length == 512) {
+                    serialPort = new SerialPort(s);
+                }
+            }
+
+            serialCommandHandler.setSerialPort(serialPort);
+            for (String s : serialPortNameList) {
+                serialPortPicker.getItems().add(s);
+            }
+
+            serialPortPicker.getSelectionModel().clearSelection();
+            serialPortPicker.getSelectionModel().select(serialPort.getPortName());
+        } else {
+            serialPort = null;
+            serialPortPicker.getItems().add("-NO PORTS AVAILABLE-");
+        }
+
+        serialPortPicker.setOnAction(e -> {
+            try {
+                onSerialPortSelection();
+            } catch (SerialPortException serialPortException) {
+                serialPortException.printStackTrace();
+            }
+
+        });
     }
 
     // Initialises the previously created tabs with the relevant nodes/content
@@ -251,10 +308,14 @@ public class Main extends Application {
 
     // When the value of serialPortPicker changes, this method will change the active port to the one selected
     // If there are no available ports then does nothing.
-    public void onSerialPortSelection() {
-        if (portNames.length > 0) {
+    public void onSerialPortSelection() throws SerialPortException {
+        if (serialPort.isOpened()) {
+            serialPort.closePort();
+        }
+        if (serialPortNameList.length > 0) {
             String portName = serialPortPicker.getValue();
             serialPort = new SerialPort(portName);
+            serialCommandHandler.setSerialPort(serialPort);
         }
     }
 
@@ -288,9 +349,6 @@ public class Main extends Application {
      * TODO: Fix refresh bug where tabs draw over each other
      */
     private void reloadTabs() {
-        TabPane newTabPane = new TabPane();
-        newTabPane.getTabs().addAll(allTabs);
-        border.setCenter(newTabPane);
         tabPane.getTabs().clear();
         tabs.clear();
         tabs.addAll(allTabs);
@@ -309,10 +367,10 @@ public class Main extends Application {
         }
     }
 
-    private void onWriteButtonPress() {
+    private void onWriteButtonPress() throws SerialPortException, InterruptedException, IOException {
         paramFields.sort(Comparator.comparingInt(p -> Integer.parseInt(p.getId())));
-        for (IntField i : paramFields) {
-            System.out.println("Parameter " + i.getId() + " = " + i.getValue());
+        for(IntField intField:paramFields){
+            serialCommandHandler.setIndividualValue(Integer.parseInt(intField.getId()),100);
         }
     }
 
@@ -321,11 +379,11 @@ public class Main extends Application {
         PatchLoader loader = new PatchLoader();
         ArrayList<String> lines = loader.loadFromFile(fileStage);
 
-        for(String line:lines){
+        for (String line : lines) {
             String[] lineSplit = line.split(":");
-            if(lineSplit.length == 2){
-                for(IntField i:paramFields){
-                    if(i.getId().equals(lineSplit[0])){
+            if (lineSplit.length == 2) {
+                for (IntField i : paramFields) {
+                    if (i.getId().equals(lineSplit[0])) {
                         i.setValue(Integer.parseInt(lineSplit[1]));
                     }
                 }
@@ -343,10 +401,29 @@ public class Main extends Application {
         saver.saveToFile(lines, fileStage);
     }
 
-    private void onReadButtonPress(){
-        for(IntField i:paramFields){
-            i.setValue(100);
+    private void onReadButtonPress() throws SerialPortException, IOException {
+        byte[] dump = serialCommandHandler.getAllValues();
+        setAllIntFieldValues(dump);
+    }
+
+    private void onSaveToXFMPress(){
+
+    }
+
+    private void onSpinnerChange(int value) throws SerialPortException, IOException {
+        serialCommandHandler.readProgram(value);
+        setAllIntFieldValues(serialCommandHandler.getAllValues());
+    }
+
+    private void setAllIntFieldValues(byte[] dump){
+        int offset = 48;
+        if (dump.length == 512) {
+            for (IntField intField : paramFields) {
+                int paramAddress = Integer.parseInt(intField.getId()) + offset;
+                intField.setValue(dump[paramAddress] & 0xff);
+            }
         }
     }
+
 
 }

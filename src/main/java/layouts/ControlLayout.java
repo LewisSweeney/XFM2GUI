@@ -4,6 +4,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.layout.BorderPane;
+import jssc.SerialPortException;
 import main.java.externalcode.IntField;
 import main.java.utilities.ParamValueChange;
 
@@ -36,7 +37,13 @@ public class ControlLayout {
         slider.getStyleClass().add("slider-new");
         slider.setMaxWidth(80);
 
-        paramField.textProperty().addListener((observable, oldValue, newValue) -> ParamValueChange.onFieldChange(paramField.getValue(),paramField,slider));
+        paramField.textProperty().addListener((observable, oldValue, newValue) -> {
+            try {
+                ParamValueChange.onFieldChange(paramField.getValue(),paramField,slider);
+            } catch (SerialPortException | InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
 
         slider.valueProperty().addListener((observableValue, number, t1) -> ParamValueChange.onSliderChange((int) slider.getValue(),paramField,slider));
 

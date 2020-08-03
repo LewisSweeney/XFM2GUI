@@ -19,6 +19,7 @@
 
 .tab-pane{
  -fx-font-family: Courier;
+ -fx-font-size: 12;
 }
 
 .param-label {
