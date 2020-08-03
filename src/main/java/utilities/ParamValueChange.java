@@ -5,15 +5,19 @@ import jssc.SerialPortException;
 import main.java.externalcode.IntField;
 import main.java.serial.SerialCommandHandler;
 
+import java.io.IOException;
+
 public class ParamValueChange {
     static SerialCommandHandler serialCommandHandler;
     public static void onSliderChange(int p, IntField i, Slider s){
         i.setValue(p);
     }
 
-    public static void onFieldChange(int p, IntField i, Slider s) throws SerialPortException, InterruptedException {
+    public static void onFieldChange(int p, IntField i, Slider s) throws SerialPortException, InterruptedException, IOException {
         s.setValue(p);
-        System.out.println("Changed value of param number " + i.getId());
+        if(serialCommandHandler.getLIVE_CHANGES()){
+            serialCommandHandler.setIndividualValue(Integer.parseInt(i.getId()),i.getValue());
+        }
     }
 
     public static void setSerialCommandHandler(SerialCommandHandler serialCommandHandler){

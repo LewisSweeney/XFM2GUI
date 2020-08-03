@@ -8,6 +8,8 @@ import jssc.SerialPortException;
 import main.java.externalcode.IntField;
 import main.java.utilities.ParamValueChange;
 
+import java.io.IOException;
+
 /**
  * This class creates the layout for each individual parameter control
  * Currently creates an IntField and a Label
@@ -40,7 +42,7 @@ public class ControlLayout {
         paramField.textProperty().addListener((observable, oldValue, newValue) -> {
             try {
                 ParamValueChange.onFieldChange(paramField.getValue(),paramField,slider);
-            } catch (SerialPortException | InterruptedException e) {
+            } catch (SerialPortException | InterruptedException | IOException e) {
                 e.printStackTrace();
             }
         });

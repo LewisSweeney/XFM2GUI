@@ -36,15 +36,16 @@ public class Main extends Application {
 
     private TabPane tabPane;
     private Scene scene;
-    private BorderPane border;
 
     private final ComboBox<String> serialPortPicker = new ComboBox<>();
-    private Spinner patchSpinner;
+    private final ComboBox<Integer> patchPicker = new ComboBox<>();
 
     private final Stage fileStage = new Stage();
     String[] serialPortNameList = SerialPortList.getPortNames();
     SerialPort serialPort;
     SerialCommandHandler serialCommandHandler = new SerialCommandHandler(serialPort);
+
+    Boolean LIVE_CHANGES = false;
 
     final static ArrayList<IntField> paramFields = new ArrayList<>();
 
@@ -60,6 +61,7 @@ public class Main extends Application {
         primaryStage.setScene(scene);
         primaryStage.setTitle("XFM2 GUI");
         primaryStage.show();
+        serialCommandHandler.setLIVE_CHANGES(true);
     }
 
     public static void main(String[] args) {
@@ -72,7 +74,7 @@ public class Main extends Application {
         Label title = new Label("XFM2 GUI");
         title.setStyle("-fx-font: 72 arial;");
 
-        border = new BorderPane();
+        BorderPane border = new BorderPane();
         tabPane = new TabPane();
 
         initTabs();
@@ -103,31 +105,42 @@ public class Main extends Application {
         scene = new Scene(border);
         scene.getStylesheets().add(style);
 
-        serialCommandHandler.readProgram(0);
+        serialCommandHandler.readProgram(1);
         setAllIntFieldValues(serialCommandHandler.getAllValues());
     }
 
     /* Initialises the buttons at the bottom of the page
     TODO: Add button functionality
      */
-    private VBox initButtons() throws IOException, SerialPortException {
+    private VBox initButtons() {
         VBox bottomButtons = new VBox();
 
         Label xfmPatch = new Label("XFM2 Program #:");
-        patchSpinner = new Spinner(0,127,0);
-        Button saveToXFM = new Button("Save To XFM2");
 
-        patchSpinner.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
-            if (!"".equals(newValue)) {
-                try {
-                    onSpinnerChange(Integer.parseInt(newValue));
-                } catch (SerialPortException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+        EventHandler<? super MouseEvent> saveXFMEventHandler = (EventHandler<MouseEvent>) mouseEvent -> {
+            try {
+                onSaveToXFMPress();
+            } catch (SerialPortException | IOException e) {
+                e.printStackTrace();
+            }
+        };
+        Button saveToXFM = new Button("Save To XFM2");
+        saveToXFM.setOnMouseClicked(saveXFMEventHandler);
+
+        ArrayList<Integer> vals = new ArrayList<>();
+        for (int i = 1; i <= 128; i++) {
+            vals.add(i);
+        }
+        patchPicker.getItems().addAll(vals);
+
+        patchPicker.setOnAction(e -> {
+            try {
+                onPatchPicked(patchPicker.getValue());
+            } catch (SerialPortException | IOException serialPortException) {
+                serialPortException.printStackTrace();
             }
         });
+        patchPicker.getSelectionModel().selectFirst();
 
         Button read = new Button("Read XFM2");
         Button write = new Button("Write to XFM2");
@@ -168,7 +181,7 @@ public class Main extends Application {
         EventHandler<? super MouseEvent> writeEventHandler = (EventHandler<MouseEvent>) mouseEvent -> {
             try {
                 onWriteButtonPress();
-            } catch (SerialPortException | InterruptedException | IOException e) {
+            } catch (SerialPortException | IOException | InterruptedException e) {
                 e.printStackTrace();
             }
         };
@@ -182,7 +195,7 @@ public class Main extends Application {
         HBox hBox = new HBox(read, setUnit0, saveCurrentPatch);
         HBox hBox2 = new HBox(write, setUnit1, loadPatch);
         HBox hBox3 = new HBox(reloadTabs);
-        VBox vBox = new VBox(xfmPatch,patchSpinner,saveToXFM);
+        VBox vBox = new VBox(xfmPatch, patchPicker, saveToXFM);
 
         hBox.getStyleClass().add("button-row");
         hBox2.getStyleClass().add("button-row");
@@ -191,7 +204,7 @@ public class Main extends Application {
         //hBox3.setAlignment(Pos.CENTER);
 
 
-        bottomButtons.getChildren().addAll(vBox,hBox, hBox2, hBox3);
+        bottomButtons.getChildren().addAll(vBox, hBox, hBox2, hBox3);
         bottomButtons.getStyleClass().add("bottom-buttons");
         return bottomButtons;
     }
@@ -367,13 +380,22 @@ public class Main extends Application {
         }
     }
 
-    private void onWriteButtonPress() throws SerialPortException, InterruptedException, IOException {
+    private void onWriteButtonPress() throws SerialPortException, IOException, InterruptedException {
         paramFields.sort(Comparator.comparingInt(p -> Integer.parseInt(p.getId())));
-        for(IntField intField:paramFields){
-            serialCommandHandler.setIndividualValue(Integer.parseInt(intField.getId()),100);
+
+        byte[] oldBytes = serialCommandHandler.getAllValues();
+        for (IntField intField : paramFields) {
+            int paramNum = Integer.parseInt(intField.getId());
+            if (oldBytes[paramNum] != intField.getValue()) {
+                serialCommandHandler.setIndividualValue(Integer.parseInt(intField.getId()), intField.getValue());
+            }
         }
     }
 
+    /**
+     * Handler for load button. Prompts user to load an XFM2 file to be loaded into the program
+     * @throws FileNotFoundException
+     */
     private void onLoadButtonPress() throws FileNotFoundException {
         paramFields.sort(Comparator.comparingInt(p -> Integer.parseInt(p.getId())));
         PatchLoader loader = new PatchLoader();
@@ -391,6 +413,10 @@ public class Main extends Application {
         }
     }
 
+    /**
+     * Handler for save button. Prompts user to specify save location and file name.
+     * @throws IOException
+     */
     private void onSaveButtonPress() throws IOException {
         paramFields.sort(Comparator.comparingInt(p -> Integer.parseInt(p.getId())));
         ArrayList<String> lines = new ArrayList<>();
@@ -401,26 +427,30 @@ public class Main extends Application {
         saver.saveToFile(lines, fileStage);
     }
 
+
     private void onReadButtonPress() throws SerialPortException, IOException {
         byte[] dump = serialCommandHandler.getAllValues();
         setAllIntFieldValues(dump);
     }
 
-    private void onSaveToXFMPress(){
-
+    private void onSaveToXFMPress() throws IOException, SerialPortException {
+        serialCommandHandler.writeProgram(patchPicker.getValue());
     }
 
-    private void onSpinnerChange(int value) throws SerialPortException, IOException {
+    private void onPatchPicked(int value) throws SerialPortException, IOException {
+        serialCommandHandler.setLIVE_CHANGES(false);
+        System.out.println("Getting patch number " + value);
         serialCommandHandler.readProgram(value);
         setAllIntFieldValues(serialCommandHandler.getAllValues());
+        serialCommandHandler.setLIVE_CHANGES(true);
     }
 
-    private void setAllIntFieldValues(byte[] dump){
-        int offset = 48;
+    private void setAllIntFieldValues(byte[] dump) {
+        // int offset = 48;
         if (dump.length == 512) {
             for (IntField intField : paramFields) {
-                int paramAddress = Integer.parseInt(intField.getId()) + offset;
-                intField.setValue(dump[paramAddress] & 0xff);
+                // int paramAddress = Integer.parseInt(intField.getId()) + offset;
+                intField.setValue(dump[Integer.parseInt(intField.getId())] & 0xff);
             }
         }
     }

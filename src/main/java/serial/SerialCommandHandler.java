@@ -15,6 +15,8 @@ public class SerialCommandHandler {
     private static final int BAUD_RATE = 500000;
     private byte[] latestData;
 
+    public Boolean LIVE_CHANGES = false;
+
     public SerialCommandHandler(SerialPort serialPort) {
         SerialCommandHandler.serialPort = serialPort;
     }
@@ -38,13 +40,12 @@ public class SerialCommandHandler {
     }
 
     public void setIndividualValue(int paramNeeded, Integer value) throws SerialPortException, InterruptedException, IOException {
-        System.out.println("Setting Param " + paramNeeded + " to " + value);
         StringBuilder command = new StringBuilder();
         byte[] bytes;
         Thread.sleep(10);
         if (paramNeeded > 255) {
             int secondByte = 255;
-            int thirdByte = paramNeeded - 255;
+            int thirdByte = paramNeeded - 256;
             bytes = new byte[4];
             bytes[0] = 's';
             bytes[1] = (byte) secondByte;
@@ -63,19 +64,22 @@ public class SerialCommandHandler {
     }
 
     public byte[] getAllValues() throws SerialPortException, IOException {
-        System.out.println("Getting dump of values");
         byte[] bytes = new byte[1];
         bytes[0] = 'd';
-        byte[] data = sendCommand(bytes);
-        return data;
+        return sendCommand(bytes);
     }
 
-    public void setAllValues(){
+    public void setAllValues(byte[] values) throws IOException, SerialPortException {
         byte[] bytes = new byte[513];
-        bytes[0] = 'j';
-        for(int i = 1;i<50;i++){
-            bytes[i] = 0;
+
+        for(byte b:bytes){
+            b=0;
         }
+        bytes[0] = 'j';
+
+        if (values.length - 1 >= 0) System.arraycopy(values, 0, bytes, 1, values.length - 1);
+
+        sendCommand(bytes);
     }
 
     public void setUnit(UNIT_NUMBER unit_number) throws SerialPortException, IOException {
@@ -94,8 +98,8 @@ public class SerialCommandHandler {
     }
 
     public void setMidiChannel(UNIT_NUMBER unit_number, Integer midiChannel) throws SerialPortException, IOException {
-        int firstByte = 42;
-        int secondByte = 10;
+        int firstByte = '*';
+        int secondByte;
         if (unit_number == UNIT_NUMBER.ONE) {
             secondByte = 10;
         } else {
@@ -199,10 +203,18 @@ public class SerialCommandHandler {
             }
             //            System.out.println("Returning: " + Arrays.toString(baos.toByteArray()));
         } catch (SerialPortTimeoutException ex) {
-            ;   //don't want to catch it, it just means there is no more data         to read
+            //don't want to catch it, it just means there is no more data         to read
         }
         latestData = baos.toByteArray();
         return baos.toByteArray();
+    }
+
+    public Boolean getLIVE_CHANGES() {
+        return LIVE_CHANGES;
+    }
+
+    public void setLIVE_CHANGES(boolean LIVE_CHANGES){
+        this.LIVE_CHANGES = LIVE_CHANGES;
     }
 
 
