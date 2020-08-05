@@ -109,7 +109,13 @@ public class SerialCommandHandler {
         bytes[0] = (byte) firstByte;
         bytes[1] = (byte) secondByte;
         bytes[2] = midiChannel.byteValue();
-        sendCommand(bytes);
+        byte[] data = sendCommand(bytes);
+        if(unit_number == UNIT_NUMBER.ONE){
+            System.out.println("Set unit 1 channel to " + data[0]);
+        } else{
+            System.out.println("Set unit 2 channel to " + data[0]);
+        }
+
     }
 
     public void setMidiLayering(boolean layering) throws SerialPortException, IOException {
@@ -123,7 +129,11 @@ public class SerialCommandHandler {
             thirdByte = 1;
         }
         bytes[2] = (byte) thirdByte;
-        sendCommand(bytes);
+        byte[] data = sendCommand(bytes);
+        if(data.length > 0){
+            System.out.println("Set layering to " + layering);
+        }
+
     }
 
     public void initializeCurrentProgram() throws SerialPortException, IOException {
@@ -158,27 +168,30 @@ public class SerialCommandHandler {
     }
 
     private byte[] sendCommand(byte[] bytes) throws SerialPortException, IOException {
-        try {
-            serialPort.openPort();
+        if(serialPort != null) {
+            try {
+                serialPort.openPort();
 
-            serialPort.setParams(BAUD_RATE,
-                    SerialPort.DATABITS_8,
-                    SerialPort.STOPBITS_1,
-                    SerialPort.PARITY_NONE);
+                serialPort.setParams(BAUD_RATE,
+                        SerialPort.DATABITS_8,
+                        SerialPort.STOPBITS_1,
+                        SerialPort.PARITY_NONE);
 
-            serialPort.setFlowControlMode(SerialPort.FLOWCONTROL_RTSCTS_IN |
-                    SerialPort.FLOWCONTROL_RTSCTS_OUT);
+                serialPort.setFlowControlMode(SerialPort.FLOWCONTROL_RTSCTS_IN |
+                        SerialPort.FLOWCONTROL_RTSCTS_OUT);
 
-            Thread.sleep(10);
-            serialPort.writeBytes(bytes);
+                Thread.sleep(10);
+                serialPort.writeBytes(bytes);
+            } catch (SerialPortException | InterruptedException ex) {
+                System.out.println("There are an error on writing string to port т: " + ex);
+            }
+            byte[] data = getData();
+            serialPort.closePort();
+            return data;
+        } else{
+            return new byte[1];
         }
-        catch (SerialPortException | InterruptedException ex) {
-            System.out.println("There are an error on writing string to port т: " + ex);
-        }
 
-        byte[] data = getData();
-        serialPort.closePort();
-        return data;
     }
 
     public SerialPort getSerialPort() {
@@ -216,6 +229,7 @@ public class SerialCommandHandler {
     public void setLIVE_CHANGES(boolean LIVE_CHANGES){
         this.LIVE_CHANGES = LIVE_CHANGES;
     }
+
 
 
 }

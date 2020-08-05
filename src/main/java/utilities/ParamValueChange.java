@@ -9,12 +9,14 @@ import java.io.IOException;
 
 public class ParamValueChange {
     static SerialCommandHandler serialCommandHandler;
+    static IntField i;
     public static void onSliderChange(int p, IntField i, Slider s){
         i.setValue(p);
     }
 
     public static void onFieldChange(int p, IntField i, Slider s) throws SerialPortException, InterruptedException, IOException {
         s.setValue(p);
+        ParamValueChange.i = i;
         if(serialCommandHandler.getLIVE_CHANGES()){
             serialCommandHandler.setIndividualValue(Integer.parseInt(i.getId()),i.getValue());
         }
@@ -23,4 +25,5 @@ public class ParamValueChange {
     public static void setSerialCommandHandler(SerialCommandHandler serialCommandHandler){
         ParamValueChange.serialCommandHandler = serialCommandHandler;
     }
+
 }

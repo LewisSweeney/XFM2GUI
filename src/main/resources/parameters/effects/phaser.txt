@@ -1,5 +1,5 @@
 -PHASER-
-#5#
+#2#
 DRY:310
 WET:311
 MODE:312

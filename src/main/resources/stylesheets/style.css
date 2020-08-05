@@ -1,16 +1,51 @@
 
+.app-title{
+ -fx-font-family: Futura;
+ -fx-font-size: 32;
+ -fx-font-weight: bold;
+}
+
+.app-subtitle{
+ -fx-font-family: Futura;
+ -fx-font-size: 20;
+}
+
 .button {
- -fx-pref-width: 200;
+ -fx-pref-width: 150;
+ -fx-font-family: Courier;
+}
+
+.button-group-title{
+ -fx-alignment: center;
+ -fx-spacing: 10;
+ -fx-font-size: 14;
+ -fx-font-family: Courier;
+ -fx-underline: true;
 }
 
 .button-row {
+ -fx-padding: 10 10 10 10;
  -fx-alignment: center;
  -fx-spacing: 10;
+ -fx-font-family: Courier;
+}
+
+.button-column {
+ -fx-alignment: center;
+ -fx-font-family: Courier;
+ -fx-border-width: 2;
+ -fx-border-color: transparent darkslategrey transparent transparent;
+ -fx-border-style: none solid none none;
 }
 
 .bottom-buttons {
  -fx-spacing: 10;
  -fx-padding: 0 0 10 0;
+}
+
+.channel-combo{
+ -fx-pref-width: 70;
+ -fx-font-size: 12;
 }
 
 .slider-new{
@@ -50,6 +85,18 @@
  -fx-spacing: 10;
  -fx-alignment: center;
 }
+
+.tab-pane .tab-header-area .tab-header-background {
+ -fx-background-color: transparent;
+}
+
+.tab-pane .tab-header-area {
+ -fx-border-width: 2;
+ -fx-border-color: transparent transparent lightgray transparent;
+ -fx-border-style: none none solid none;
+}
+
+
 
 .check-group {
  -fx-pref-height: inherit;

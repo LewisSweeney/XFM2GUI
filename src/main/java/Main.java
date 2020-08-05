@@ -19,7 +19,9 @@ import jssc.SerialPortException;
 import jssc.SerialPortList;
 import main.java.externalcode.DraggableTab;
 import main.java.externalcode.IntField;
+import main.java.serial.MIDI_CHANNEL;
 import main.java.serial.SerialCommandHandler;
+import main.java.serial.UNIT_NUMBER;
 import main.java.tabconstructors.*;
 import main.java.utilities.*;
 
@@ -29,16 +31,22 @@ import java.util.stream.Collectors;
 
 public class Main extends Application {
 
-    private static final int BOTTOM_BUTTON_WIDTH = 200;
+    private static final int BOTTOM_BUTTON_WIDTH = 150;
 
     private final ArrayList<Tab> allTabs = new ArrayList<>();
     private ArrayList<Tab> tabs;
 
+    private BorderPane topBorder;
+    private BorderPane border;
     private TabPane tabPane;
     private Scene scene;
 
     private final ComboBox<String> serialPortPicker = new ComboBox<>();
     private final ComboBox<Integer> patchPicker = new ComboBox<>();
+    private final ComboBox<String> midiChOnePicker = new ComboBox<>();
+    private final ComboBox<String> midiChTwoPicker = new ComboBox<>();
+
+    boolean layering = false;
 
     private final Stage fileStage = new Stage();
     String[] serialPortNameList = SerialPortList.getPortNames();
@@ -57,6 +65,10 @@ public class Main extends Application {
         initializeScene();
         ParamValueChange.setSerialCommandHandler(serialCommandHandler);
 
+        LIVE_CHANGES = false;
+        setAllIntFieldValues(serialCommandHandler.getAllValues());
+        LIVE_CHANGES = true;
+
         primaryStage.setResizable(false);
         primaryStage.setScene(scene);
         primaryStage.setTitle("XFM2 GUI");
@@ -71,14 +83,13 @@ public class Main extends Application {
     // Initialises the BorderPane used as the main node for the GUI
     private void initializeScene() throws IOException, SerialPortException {
 
-        Label title = new Label("XFM2 GUI");
-        title.setStyle("-fx-font: 72 arial;");
 
-        BorderPane border = new BorderPane();
+        topBorder = new BorderPane();
+        border = new BorderPane();
         tabPane = new TabPane();
 
         initTabs();
-        VBox buttonBox = initButtons();
+        initButtons();
         initPortSelection();
 
         tabPane.setTabMinWidth(80);
@@ -86,34 +97,27 @@ public class Main extends Application {
         tabPane.getTabs().addAll(tabs);
         tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
 
-        VBox top = new VBox(title, serialPortPicker);
-        top.setAlignment(Pos.CENTER);
 
-        top.setStyle("-fx-padding: 0 0 10 0;");
-
-        border.setTop(top);
         border.setCenter(tabPane);
-        border.setBottom(buttonBox);
-        border.setMaxWidth(1100);
-        border.setMinWidth(1100);
-        border.setMaxHeight((700));
-        border.setMinHeight(700);
+        topBorder.setCenter(border);
+        topBorder.setMaxWidth(1100);
+        topBorder.setMinWidth(1100);
+        topBorder.setMaxHeight((700));
+        topBorder.setMinHeight(700);
 
-        BorderPane.setAlignment(title, Pos.CENTER);
         BorderPane.setAlignment(tabPane, Pos.CENTER);
 
-        scene = new Scene(border);
+        scene = new Scene(topBorder);
         scene.getStylesheets().add(style);
 
-        serialCommandHandler.readProgram(1);
-        setAllIntFieldValues(serialCommandHandler.getAllValues());
     }
 
     /* Initialises the buttons at the bottom of the page
-    TODO: Add button functionality
      */
-    private VBox initButtons() {
-        VBox bottomButtons = new VBox();
+    private void initButtons() {
+        VBox xfmButtons = new VBox();
+        VBox localButtons = new VBox();
+        VBox serialPortSelection = new VBox();
 
         Label xfmPatch = new Label("XFM2 Program #:");
 
@@ -128,7 +132,7 @@ public class Main extends Application {
         saveToXFM.setOnMouseClicked(saveXFMEventHandler);
 
         ArrayList<Integer> vals = new ArrayList<>();
-        for (int i = 1; i <= 128; i++) {
+        for (int i = 0; i <= 127; i++) {
             vals.add(i);
         }
         patchPicker.getItems().addAll(vals);
@@ -190,23 +194,108 @@ public class Main extends Application {
         EventHandler<? super MouseEvent> reloadTabsEventHandler = (EventHandler<MouseEvent>) mouseEvent -> reloadTabs();
         reloadTabs.setOnMouseClicked(reloadTabsEventHandler);
 
-        serialPortPicker.setPrefWidth(BOTTOM_BUTTON_WIDTH * 1.5);
+        // Sets titles of each button sub-section
+        Label serialPortLabel = new Label("Serial Port:");
+        serialPortLabel.getStyleClass().add("button-group-title");
 
-        HBox hBox = new HBox(read, setUnit0, saveCurrentPatch);
-        HBox hBox2 = new HBox(write, setUnit1, loadPatch);
-        HBox hBox3 = new HBox(reloadTabs);
-        VBox vBox = new VBox(xfmPatch, patchPicker, saveToXFM);
+        Label xfmButtonsLabel = new Label("XFM2 Controls");
+        xfmButtonsLabel.getStyleClass().add("button-group-title");
 
-        hBox.getStyleClass().add("button-row");
-        hBox2.getStyleClass().add("button-row");
-        hBox3.getStyleClass().add("button-row");
-        vBox.getStyleClass().add("button-row");
-        //hBox3.setAlignment(Pos.CENTER);
+        Label localButtonsLabel = new Label("Local Controls");
+        localButtonsLabel.getStyleClass().add("button-group-title");
+
+        Label title = new Label("XFM2-GUI");
+        Label subtitle = new Label("By Lewis Sweeney");
+
+        // Sets preferred width of the serialPort Picker
+        // TODO: Change this to CSS.
+        serialPortPicker.setPrefWidth(BOTTOM_BUTTON_WIDTH);
+
+        // Creates new sub-sub-section for the patch control
+        VBox patchControl = new VBox(xfmPatch, patchPicker, saveToXFM);
+
+        // Creates each subsection being added to buttonSet
+        serialPortSelection = new VBox(serialPortLabel, serialPortPicker);
+        xfmButtons.getChildren().addAll(xfmButtonsLabel, read, write, patchControl, initMidiControl());
+        localButtons.getChildren().addAll(localButtonsLabel, saveCurrentPatch, loadPatch, reloadTabs);
+
+        // Assigns style classes for each required node.
+        serialPortSelection.getStyleClass().add("button-row");
+        patchControl.getStyleClass().add("button-row");
+        xfmButtons.getStyleClass().add("button-row");
+        localButtons.getStyleClass().add("button-row");
+        title.getStyleClass().add("app-title");
+        subtitle.getStyleClass().add("app-subtitle");
+
+        VBox buttonSet = new VBox(title, subtitle, xfmButtons, localButtons, serialPortSelection);
+        buttonSet.getStyleClass().add("button-column");
+
+        border.setLeft(buttonSet);
+    }
+
+    private VBox initMidiControl() {
+        for (int i = 0; i < 17; i++) {
+            if (i == 0) {
+                midiChOnePicker.getItems().add("All");
+                midiChTwoPicker.getItems().add("All");
+            } else {
+                midiChOnePicker.getItems().add(String.valueOf(i));
+                midiChTwoPicker.getItems().add(String.valueOf(i));
+            }
+        }
+
+        midiChOnePicker.getStyleClass().add("channel-combo");
+        midiChTwoPicker.getStyleClass().add("channel-combo");
+
+        midiChOnePicker.setOnAction(e -> {
+            try {
+                int val = midiChOnePicker.getSelectionModel().getSelectedIndex();
+                onMidiChannelChange(UNIT_NUMBER.ONE,val);
+            } catch (SerialPortException | IOException serialPortException) {
+                serialPortException.printStackTrace();
+            }
+
+        });
+
+        midiChTwoPicker.setOnAction(e -> {
+            try {
+                int val = midiChOnePicker.getSelectionModel().getSelectedIndex();
+                onMidiChannelChange(UNIT_NUMBER.TWO,val);
+            } catch (SerialPortException | IOException serialPortException) {
+                serialPortException.printStackTrace();
+            }
+
+        });
 
 
-        bottomButtons.getChildren().addAll(vBox, hBox, hBox2, hBox3);
-        bottomButtons.getStyleClass().add("bottom-buttons");
-        return bottomButtons;
+        Label midiTitle = new Label("MIDI Controls:");
+
+        Label midiOne = new Label("Unit 1");
+        VBox midiConOne = new VBox(midiOne, midiChOnePicker);
+        midiConOne.getStyleClass().add("button-row");
+
+        Label midiTwo = new Label("Unit 2");
+        VBox midiConTwo = new VBox(midiTwo, midiChTwoPicker);
+        midiConTwo.getStyleClass().add("button-row");
+
+        HBox midiCons = new HBox(midiConOne, midiConTwo);
+
+        CheckBox layering = new CheckBox("Layering");
+        layering.setOnAction(e ->{
+            try{
+                serialCommandHandler.setMidiLayering(layering.isSelected());
+            } catch (SerialPortException serialPortException) {
+                serialPortException.printStackTrace();
+            } catch (IOException ioException) {
+                ioException.printStackTrace();
+            }
+        });
+
+        VBox layout = new VBox(midiTitle, midiCons, layering);
+        layout.getStyleClass().add("button-row");
+
+
+        return layout;
     }
 
     private void initPortSelection() throws IOException, SerialPortException {
@@ -319,19 +408,12 @@ public class Main extends Application {
         paramFields.addAll(tabConstructor.getIntFields());
     }
 
-    // When the value of serialPortPicker changes, this method will change the active port to the one selected
-    // If there are no available ports then does nothing.
-    public void onSerialPortSelection() throws SerialPortException {
-        if (serialPort.isOpened()) {
-            serialPort.closePort();
-        }
-        if (serialPortNameList.length > 0) {
-            String portName = serialPortPicker.getValue();
-            serialPort = new SerialPort(portName);
-            serialCommandHandler.setSerialPort(serialPort);
-        }
-    }
-
+    /**
+     * Gets the required group values, which are how the various components of each tab are grouped.
+     *
+     * @param r Required tab type, Enum
+     * @return Returns the values of the required groups as an arraylist of strings that contain groupings.
+     */
     public ArrayList<String> getTabGroupValues(REQUIRED_TAB r) {
 
         String filepath = switch (r) {
@@ -380,20 +462,46 @@ public class Main extends Application {
         }
     }
 
+    /**
+     * When the value of serialPortPicker changes, this method will change the active port to the one selected
+     *
+     * @throws SerialPortException
+     */
+    public void onSerialPortSelection() throws SerialPortException {
+        if (serialPort.isOpened()) {
+            serialPort.closePort();
+        }
+        if (serialPortNameList.length > 0) {
+            String portName = serialPortPicker.getValue();
+            serialPort = new SerialPort(portName);
+            serialCommandHandler.setSerialPort(serialPort);
+        }
+    }
+
+    /**
+     * Writes all current param
+     *
+     * @throws SerialPortException
+     * @throws IOException
+     * @throws InterruptedException
+     */
     private void onWriteButtonPress() throws SerialPortException, IOException, InterruptedException {
         paramFields.sort(Comparator.comparingInt(p -> Integer.parseInt(p.getId())));
 
         byte[] oldBytes = serialCommandHandler.getAllValues();
-        for (IntField intField : paramFields) {
-            int paramNum = Integer.parseInt(intField.getId());
-            if (oldBytes[paramNum] != intField.getValue()) {
-                serialCommandHandler.setIndividualValue(Integer.parseInt(intField.getId()), intField.getValue());
+        if (oldBytes.length == 512) {
+            for (IntField intField : paramFields) {
+                int paramNum = Integer.parseInt(intField.getId());
+                if (oldBytes[paramNum] != intField.getValue()) {
+                    serialCommandHandler.setIndividualValue(Integer.parseInt(intField.getId()), intField.getValue());
+                }
             }
         }
     }
 
     /**
      * Handler for load button. Prompts user to load an XFM2 file to be loaded into the program
+     *
      * @throws FileNotFoundException
      */
     private void onLoadButtonPress() throws FileNotFoundException {
@@ -415,6 +523,7 @@ public class Main extends Application {
 
     /**
      * Handler for save button. Prompts user to specify save location and file name.
+     *
      * @throws IOException
      */
     private void onSaveButtonPress() throws IOException {
@@ -427,16 +536,37 @@ public class Main extends Application {
         saver.saveToFile(lines, fileStage);
     }
 
-
+    /**
+     * Reads the current values from the XFM2.
+     * Only particularly useful if live updates are not enabled, as otherwise values
+     * are likely to be the same.
+     *
+     * @throws SerialPortException
+     * @throws IOException
+     */
     private void onReadButtonPress() throws SerialPortException, IOException {
         byte[] dump = serialCommandHandler.getAllValues();
         setAllIntFieldValues(dump);
     }
 
+    /**
+     * Saves the current preset to the selected XFM2 patch number.
+     * TODO: Fix bug with 0th patch not doing anything...
+     *
+     * @throws IOException
+     * @throws SerialPortException
+     */
     private void onSaveToXFMPress() throws IOException, SerialPortException {
         serialCommandHandler.writeProgram(patchPicker.getValue());
     }
 
+    /**
+     * Activates when user changes patch from the drop down menu
+     *
+     * @param value
+     * @throws SerialPortException
+     * @throws IOException
+     */
     private void onPatchPicked(int value) throws SerialPortException, IOException {
         serialCommandHandler.setLIVE_CHANGES(false);
         System.out.println("Getting patch number " + value);
@@ -445,6 +575,16 @@ public class Main extends Application {
         serialCommandHandler.setLIVE_CHANGES(true);
     }
 
+    private void onMidiChannelChange(UNIT_NUMBER unit, int channel) throws IOException, SerialPortException {
+        serialCommandHandler.setMidiChannel(unit, channel);
+    }
+
+    /**
+     * Sets all of the parameter field values to its corresponding position in the dump array
+     * Called when changing patch/program
+     *
+     * @param dump The 512 length byte array containing all parameters.
+     */
     private void setAllIntFieldValues(byte[] dump) {
         // int offset = 48;
         if (dump.length == 512) {
