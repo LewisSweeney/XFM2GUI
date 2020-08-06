@@ -25,6 +25,8 @@ public class IntField extends TextField {
     public void setValue(int newValue)     { value.setValue(newValue); }
     public IntegerProperty valueProperty() { return value; }
 
+    private boolean bitwise = false;
+
     public IntField(int minValue, int maxValue, int initialValue) {
         if (minValue > maxValue)
             throw new IllegalArgumentException(
@@ -106,5 +108,13 @@ public class IntField extends TextField {
                 value.set(Integer.parseInt(textProperty().get()));
             }
         });
+    }
+
+    public boolean isBitwise() {
+        return bitwise;
+    }
+
+    public void setBitwise(boolean bitwise) {
+        this.bitwise = bitwise;
     }
 }

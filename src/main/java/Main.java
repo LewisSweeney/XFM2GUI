@@ -6,6 +6,8 @@ import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -19,7 +21,6 @@ import jssc.SerialPortException;
 import jssc.SerialPortList;
 import main.java.externalcode.DraggableTab;
 import main.java.externalcode.IntField;
-import main.java.serial.MIDI_CHANNEL;
 import main.java.serial.SerialCommandHandler;
 import main.java.serial.UNIT_NUMBER;
 import main.java.tabconstructors.*;
@@ -46,7 +47,7 @@ public class Main extends Application {
     private final ComboBox<String> midiChOnePicker = new ComboBox<>();
     private final ComboBox<String> midiChTwoPicker = new ComboBox<>();
 
-    boolean layering = false;
+    // boolean layering = false;
 
     private final Stage fileStage = new Stage();
     String[] serialPortNameList = SerialPortList.getPortNames();
@@ -73,6 +74,7 @@ public class Main extends Application {
         primaryStage.setScene(scene);
         primaryStage.setTitle("XFM2 GUI");
         primaryStage.show();
+
         serialCommandHandler.setLIVE_CHANGES(true);
     }
 
@@ -83,6 +85,7 @@ public class Main extends Application {
     // Initialises the BorderPane used as the main node for the GUI
     private void initializeScene() throws IOException, SerialPortException {
 
+        System.out.println("PROGRAM STARTING");
 
         topBorder = new BorderPane();
         border = new BorderPane();
@@ -135,8 +138,8 @@ public class Main extends Application {
         for (int i = 0; i <= 127; i++) {
             vals.add(i);
         }
-        patchPicker.getItems().addAll(vals);
 
+        patchPicker.getItems().addAll(vals);
         patchPicker.setOnAction(e -> {
             try {
                 onPatchPicked(patchPicker.getValue());
@@ -146,13 +149,28 @@ public class Main extends Application {
         });
         patchPicker.getSelectionModel().selectFirst();
 
+        Tooltip readTooltip = new Tooltip("Reads the current state of the XFM2 device");
+        Tooltip writeTooltip = new Tooltip("Writes the current parameters to the XFM2");
+        Tooltip saveCurrentTooltip = new Tooltip("Save the current paramater set locally in an XFM2 file");
+        Tooltip loadTooltip = new Tooltip("Load an XFM2 file and set the parameters");
+        Tooltip reloadTooltip = new Tooltip("Move all tabs back to this main window, even if they're closed");
+
         Button read = new Button("Read XFM2");
+        read.setTooltip(readTooltip);
+
         Button write = new Button("Write to XFM2");
+        write.setTooltip(writeTooltip);
         Button setUnit0 = new Button("Set Unit 0");
         Button setUnit1 = new Button("Set Unit 1");
+
         Button saveCurrentPatch = new Button("Save Program");
+        saveCurrentPatch.setTooltip(saveCurrentTooltip);
+
         Button loadPatch = new Button("Load Program");
+        loadPatch.setTooltip(loadTooltip);
+
         Button reloadTabs = new Button("Refresh Tabs");
+        reloadTabs.setTooltip(reloadTooltip);
 
         EventHandler<? super MouseEvent> readEventHandler = (EventHandler<MouseEvent>) mouseEvent -> {
             try {
@@ -198,13 +216,17 @@ public class Main extends Application {
         Label serialPortLabel = new Label("Serial Port:");
         serialPortLabel.getStyleClass().add("button-group-title");
 
+        Image logo = new Image("/images/logo.png");
+        ImageView logoView = new ImageView(logo);
+        logoView.setFitHeight(100);
+        logoView.setFitWidth(100);
+
         Label xfmButtonsLabel = new Label("XFM2 Controls");
         xfmButtonsLabel.getStyleClass().add("button-group-title");
 
         Label localButtonsLabel = new Label("Local Controls");
         localButtonsLabel.getStyleClass().add("button-group-title");
 
-        Label title = new Label("XFM2-GUI");
         Label subtitle = new Label("By Lewis Sweeney");
 
         // Sets preferred width of the serialPort Picker
@@ -224,10 +246,16 @@ public class Main extends Application {
         patchControl.getStyleClass().add("button-row");
         xfmButtons.getStyleClass().add("button-row");
         localButtons.getStyleClass().add("button-row");
-        title.getStyleClass().add("app-title");
         subtitle.getStyleClass().add("app-subtitle");
 
-        VBox buttonSet = new VBox(title, subtitle, xfmButtons, localButtons, serialPortSelection);
+        Label about = new Label("About");
+        EventHandler<? super MouseEvent> aboutEventHandler = (EventHandler<MouseEvent>) mouseEvent -> {
+            AboutSceneConstructor asc = new AboutSceneConstructor();
+            asc.showStage();
+        };
+        about.setOnMouseClicked(aboutEventHandler);
+
+        VBox buttonSet = new VBox(logoView, subtitle, about, xfmButtons, localButtons, serialPortSelection);
         buttonSet.getStyleClass().add("button-column");
 
         border.setLeft(buttonSet);
@@ -271,16 +299,22 @@ public class Main extends Application {
         Label midiTitle = new Label("MIDI Controls:");
 
         Label midiOne = new Label("Unit 1");
+        Tooltip midiOneTooltip = new Tooltip("Set the MIDI channel for Unit 1 on the device");
         VBox midiConOne = new VBox(midiOne, midiChOnePicker);
-        midiConOne.getStyleClass().add("button-row");
+        midiConOne.getStyleClass().add("picker-set");
+        midiOne.setTooltip(midiOneTooltip);
 
         Label midiTwo = new Label("Unit 2");
+        Tooltip midiTwoTooltip = new Tooltip("Set the MIDI channel for Unit 2 on the device");
         VBox midiConTwo = new VBox(midiTwo, midiChTwoPicker);
-        midiConTwo.getStyleClass().add("button-row");
+        midiConTwo.getStyleClass().add("picker-set");
+        midiTwo.setTooltip(midiTwoTooltip);
 
         HBox midiCons = new HBox(midiConOne, midiConTwo);
 
         CheckBox layering = new CheckBox("Layering");
+        Tooltip layeringTooltip = new Tooltip("Toggle layering on the XFM2");
+        layering.setTooltip(layeringTooltip);
         layering.setOnAction(e ->{
             try{
                 serialCommandHandler.setMidiLayering(layering.isSelected());
@@ -292,7 +326,7 @@ public class Main extends Application {
         });
 
         VBox layout = new VBox(midiTitle, midiCons, layering);
-        layout.getStyleClass().add("button-row");
+        layout.getStyleClass().add("picker-row");
 
 
         return layout;
@@ -317,7 +351,8 @@ public class Main extends Application {
             serialPortPicker.getSelectionModel().select(serialPort.getPortName());
         } else {
             serialPort = null;
-            serialPortPicker.getItems().add("-NO PORTS AVAILABLE-");
+            serialPortPicker.getItems().add("NO PORTS");
+            serialPortPicker.getSelectionModel().selectFirst();
         }
 
         serialPortPicker.setOnAction(e -> {
@@ -373,6 +408,7 @@ public class Main extends Application {
         progFilePaths.add("/parameters/program/lfo.txt");
         progFilePaths.add("/parameters/program/pitcheg.txt");
         progFilePaths.add("/parameters/program/other.txt");
+        progFilePaths.add("/parameters/program/amplitudeeg.txt");
 
         ArrayList<String> effectsFilePaths = new ArrayList<>();
         effectsFilePaths.add("/parameters/effects/am.txt");
@@ -417,6 +453,7 @@ public class Main extends Application {
     public ArrayList<String> getTabGroupValues(REQUIRED_TAB r) {
 
         String filepath = switch (r) {
+            case op1 -> "/parameters/groupValues/operator1.txt";
             case op -> "/parameters/groupValues/operator.txt";
             case fx -> "/parameters/groupValues/effects.txt";
             case mod -> "/parameters/groupValues/modulation.txt";
@@ -468,7 +505,7 @@ public class Main extends Application {
      * @throws SerialPortException
      */
     public void onSerialPortSelection() throws SerialPortException {
-        if (serialPort.isOpened()) {
+        if (serialPort != null && serialPort.isOpened()) {
             serialPort.closePort();
         }
         if (serialPortNameList.length > 0) {

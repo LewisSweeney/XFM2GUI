@@ -59,15 +59,9 @@ public class TabConstructor {
             groupsOfGroups.add(h);
         }
 
-
         internalLayout.getChildren().addAll(groupsOfGroups);
         layout.setCenter(internalLayout);
-        /*
-        if (!opNum.equals(OPERATOR_NUM.no)) {
-            assert cgl != null;
-            layout.setLeft(cgl.getOperatorLinkBoxes(opNum));
-        }
-        */
+
         internalLayout.getStyleClass().add("tab-layout");
         return layout;
     }

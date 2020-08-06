@@ -1,5 +1,5 @@
 -OPERATOR 4-
-#8#
+#5#
 Algo:4
 Feedback:10
 Phase:289
@@ -13,8 +13,8 @@ Velo Sens:42
 Key BP:48
 Key LDepth:54
 Key RDepth:60
-Key LCurve:66
-Key RCurve:72
+Key LCurve:66:3
+Key RCurve:72:3
 L0:184
 L1:78
 L2:85
@@ -30,7 +30,7 @@ R5:202
 Rate Key:143
 AMS:162
 PMS:225
-Wave 1:239
-Wave 2:271
-W Mode:277
-W Ratio:283
+Wave 1:239:7
+Wave 2:271:7
+Osc. Mode:277:1
+Osc. Ratio:283
