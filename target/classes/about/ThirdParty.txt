@@ -1,0 +1,20 @@
+This app wouldn't have been possible without the use of various 3rd-party library and code snippets.
+Below is a list of these 3rd-party pieces and links to where to find them.
+
+JSSC
+Used for uk.ac.aber.les35.serial communication. Helped keep uk.ac.aber.les35.serial comms consistent across platforms.
+https://github.com/scream3r/java-simple-uk.ac.aber.les35.serial-connector
+
+Draggable Tabs
+Allowed for the UI to be modular, giving the user some freedom to work how they want.
+https://berry120.blogspot.com/2014/01/draggable-and-detachable-tabs-in-javafx.html
+
+IntFields
+An adaption of the TextField class the takes only numbers in a given range. Useful for the parameter layout.
+https://stackoverflow.com/questions/7555564/what-is-the-recommended-way-to-make-a-numeric-textfield-in-javafx/18959399
+
+XCode
+The program found on the futur3soundz website that is used to initialise the device.
+https://www.futur3soundz.com/
+
+A big thanks to the people who provided this code.

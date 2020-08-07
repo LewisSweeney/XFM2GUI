@@ -1,0 +1,36 @@
+-OPERATOR 1-
+#5#
+Algo:1:BIT:7:OP6/OP5/OP4/OP3/OP2/OP1/OUT
+Feedback:7
+Phase:286
+Ratio:15
+Ratio Fine:21
+Fine:27
+Level:33
+Level L:256
+Level R:257
+Velo Sens:39
+Key BP:45
+Key LDepth:51
+Key RDepth:57
+Key LCurve:63:3
+Key RCurve:69:3
+L0:181
+L1:75
+L2:82
+L3:89
+L4:96
+L5:193
+Dly:187
+R1:103
+R2:110
+R3:117
+R4:124
+R5:199
+Rate Key:140
+AMS:159
+PMS:222
+Wave 1:236:7
+Wave 2:268:7
+Osc. Mode:274:1
+Osc. Ratio:280
