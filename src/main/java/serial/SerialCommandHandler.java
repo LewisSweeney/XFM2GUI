@@ -89,7 +89,6 @@ public class SerialCommandHandler {
         } else {
             command = 2;
         }
-
         byte[] bytes = new byte[1];
         bytes[0] = (byte) command;
 
@@ -100,7 +99,7 @@ public class SerialCommandHandler {
     public void setMidiChannel(UNIT_NUMBER unit_number, Integer midiChannel) throws SerialPortException, IOException {
         int firstByte = '*';
         int secondByte;
-        if (unit_number == UNIT_NUMBER.ONE) {
+        if (unit_number == UNIT_NUMBER.ZERO) {
             secondByte = 10;
         } else {
             secondByte = 11;
@@ -110,10 +109,10 @@ public class SerialCommandHandler {
         bytes[1] = (byte) secondByte;
         bytes[2] = midiChannel.byteValue();
         byte[] data = sendCommand(bytes);
-        if(unit_number == UNIT_NUMBER.ONE){
-            System.out.println("Set unit 1 channel to " + data[0]);
+        if(unit_number == UNIT_NUMBER.ZERO){
+            System.out.println("Set unit 0 channel to " + data[0]);
         } else{
-            System.out.println("Set unit 2 channel to " + data[0]);
+            System.out.println("Set unit 1 channel to " + data[0]);
         }
 
     }

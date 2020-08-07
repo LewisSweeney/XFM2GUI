@@ -107,21 +107,6 @@ public class AboutSceneConstructor {
         };
         xLoadLink.setOnMouseClicked(xLoadEventHandler);
 
-        Label tabTitle = new Label("Draggable Tabs");
-        Label tabText = new Label("Allowed for the UI to be modular, giving the user some freedom to work how they want.");
-        Hyperlink tabLink = new Hyperlink("Find it on the creator's website");
-
-        javafx.event.EventHandler<? super MouseEvent> tabEventHandler = (EventHandler<MouseEvent>) mouseEvent -> {
-            try {
-                Desktop.getDesktop().browse(new URL("https://berry120.blogspot.com/2014/01/draggable-and-detachable-tabs-in-javafx.html").toURI());
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (URISyntaxException e) {
-                e.printStackTrace();
-            }
-        };
-        tabLink.setOnMouseClicked(tabEventHandler);
-
         Label intTitle = new Label("IntFields");
         Label intText = new Label("An adaption of the TextField class the takes only numbers in a given range. Useful for the parameter layout.");
         Hyperlink intLink = new Hyperlink("Find it on StackOverflow");
@@ -135,20 +120,18 @@ public class AboutSceneConstructor {
                 e.printStackTrace();
             }
         };
-        intLink.setOnMouseClicked(tabEventHandler);
+        intLink.setOnMouseClicked(intEventHandler);
 
-        box.getChildren().addAll(aboutTitle,aboutText,jsscTitle,jsscText,jsscLink,xLoadTitle,xLoadText,xLoadLink,tabTitle,tabText,tabLink,intTitle,intText,intLink);
+        box.getChildren().addAll(aboutTitle,aboutText,jsscTitle,jsscText,jsscLink,xLoadTitle,xLoadText,xLoadLink,intTitle,intText,intLink);
 
         aboutText.getStyleClass().add("about-text");
         jsscText.getStyleClass().add("about-text");
         xLoadText.getStyleClass().add("about-text");
-        tabText.getStyleClass().add("about-text");
         intText.getStyleClass().add("about-text");
 
         aboutTitle.getStyleClass().add("about-section-title");
         jsscTitle.getStyleClass().add("about-section-subtitle");
         xLoadTitle.getStyleClass().add("about-section-subtitle");
-        tabTitle.getStyleClass().add("about-section-subtitle");
         intTitle.getStyleClass().add("about-section-subtitle");
 
         jsscLink.getStyleClass().add("about-link");

@@ -7,6 +7,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -18,6 +19,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * This class creates the layout for each individual parameter control
@@ -30,17 +33,17 @@ public class ControlLayout {
     Label paramName = new Label("DEFAULT");
     BorderPane layoutBorder;
     boolean bitwise = false;
-    CheckBox[] bitwiseCheckboxes = new CheckBox[7];
-    Label[] labels = new Label[7];
+    CheckBox[] bitwiseCheckboxes;
+    Label[] labels;
     Slider slider = new Slider();
     public ControlLayout(String p){
-        VBox[] checkAndLabel = new VBox[7];
         String[] paramSplit = p.split(":");
         paramName.getStyleClass().add("param-label");
         paramName.setText(paramSplit[0].toUpperCase());
         paramName.setAlignment(Pos.CENTER);
         paramName.setPrefWidth(100);
         paramField.setId(paramSplit[1]);
+
 
         paramField.textProperty().addListener((observable, oldValue, newValue) -> {
             try {
@@ -52,29 +55,42 @@ public class ControlLayout {
 
 
         if(paramSplit.length > 2 && paramSplit[2].equals("BIT")){
+            VBox[] checkAndLabel = new VBox[Integer.parseInt(paramSplit[3])];
             bitwise = true;
+            labels = new Label[Integer.parseInt(paramSplit[3])];
+            bitwiseCheckboxes = new CheckBox[Integer.parseInt(paramSplit[3])];
+
+            String[] labelSplit = paramSplit[4].split("/");
+
+            for(int i = 0;i<labels.length;i++){
+                labels[i] = new Label(labelSplit[i]);
+                bitwiseCheckboxes[i] = new CheckBox();
+            }
+
+            int bitNums = Integer.parseInt(paramSplit[3]);
             paramField.setBitwise(true);
-            for(int i = 0;i<7;i++){
-                if(i == 0){
-                    bitwiseCheckboxes[i] = new CheckBox();
-                    labels[i] = new Label("Pitch");
-                } else{
-                    bitwiseCheckboxes[i] = new CheckBox();
-                    labels[i] = new Label("Op" + i);
-                }
+            for(int i = 0;i<bitNums;i++){
                 checkAndLabel[i] = new VBox(labels[i],bitwiseCheckboxes[i]);
+                checkAndLabel[i].getStyleClass().add("check-layout");
                 bitwiseCheckboxes[i].setOnAction(e ->{
-                    onCheckChange();
+                    onCheckChange(Integer.parseInt(paramSplit[3]));
                 });
             }
 
-            HBox setOfBoxes = new HBox(checkAndLabel);
+            ArrayList<VBox> reversedCollection = new ArrayList<>(Arrays.asList(checkAndLabel));
+            Collections.reverse(reversedCollection);
+
+            HBox setOfBoxes = new HBox();
+            setOfBoxes.getChildren().addAll(reversedCollection);
+            setOfBoxes.getStyleClass().add("check-groups");
 
             layoutBorder = new BorderPane();
             //layoutBorder.getStylesheets().add(style);
             layoutBorder.setTop(paramName);
             layoutBorder.setCenter(setOfBoxes);
-          //  BorderPane.setAlignment(paramField, Pos.CENTER);
+            BorderPane.setAlignment(paramName, Pos.CENTER);
+            BorderPane.setAlignment(setOfBoxes,Pos.CENTER);
+
         } else {
             slider.setMin(0);
             slider.setMax(255);
@@ -118,12 +134,12 @@ public class ControlLayout {
         return paramField;
     }
 
-    private void onCheckChange(){
+    private void onCheckChange(int bitNum){
         byte paramValue = 0;
-        for(byte i = 0;i<7;i++){
+        for(byte i = 0;i<bitNum;i++){
             if(bitwiseCheckboxes[i].isSelected()){
                 byte add = 1;
-                byte iter = (byte) (7 - i);
+                byte iter = (byte) (bitNum - i);
                 for(byte j = 1;j < iter;j++) {
                     add = (byte) (add * 2);
                 }

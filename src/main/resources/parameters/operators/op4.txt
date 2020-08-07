@@ -1,6 +1,6 @@
 -OPERATOR 4-
 #5#
-Algo:4
+Algo:4:BIT:7:OP6/OP5/OP4/OP3/OP2/OP1/OUT
 Feedback:10
 Phase:289
 Ratio:18
