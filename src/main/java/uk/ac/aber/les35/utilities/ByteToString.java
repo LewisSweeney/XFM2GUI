@@ -1,4 +1,4 @@
-package main.java.utilities;
+package uk.ac.aber.les35.utilities;
 
 public class ByteToString {
     public String byteToString(byte[] bytes){

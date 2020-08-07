@@ -1,10 +1,10 @@
-package main.java.utilities;
+package uk.ac.aber.les35.utilities;
 
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Slider;
 import jssc.SerialPortException;
-import main.java.externalcode.IntField;
-import main.java.serial.SerialCommandHandler;
+import uk.ac.aber.les35.externalcode.IntField;
+import uk.ac.aber.les35.serial.SerialCommandHandler;
 
 import java.io.IOException;
 

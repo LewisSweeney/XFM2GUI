@@ -2,8 +2,8 @@ This app wouldn't have been possible without the use of various 3rd-party librar
 Below is a list of these 3rd-party pieces and links to where to find them.
 
 JSSC
-Used for serial communication. Helped keep serial comms consistent across platforms.
-https://github.com/scream3r/java-simple-serial-connector
+Used for uk.ac.aber.les35.serial communication. Helped keep uk.ac.aber.les35.serial comms consistent across platforms.
+https://github.com/scream3r/java-simple-uk.ac.aber.les35.serial-connector
 
 Draggable Tabs
 Allowed for the UI to be modular, giving the user some freedom to work how they want.

@@ -1,4 +1,4 @@
-package main.java.utilities;
+package uk.ac.aber.les35.utilities;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;

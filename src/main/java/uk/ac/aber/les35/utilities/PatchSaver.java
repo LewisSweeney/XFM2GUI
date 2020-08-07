@@ -1,9 +1,7 @@
-package main.java.utilities;
+package uk.ac.aber.les35.utilities;
 
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import main.java.externalcode.IntField;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;

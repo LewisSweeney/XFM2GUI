@@ -1,12 +1,9 @@
-package main.java.serial;
+package uk.ac.aber.les35.serial;
 
 import jssc.SerialPort;
-import jssc.SerialPortEventListener;
 import jssc.SerialPortException;
 import jssc.SerialPortTimeoutException;
-import main.java.utilities.ByteToString;
 
-import javax.sound.midi.MidiChannel;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
@@ -72,9 +69,6 @@ public class SerialCommandHandler {
     public void setAllValues(byte[] values) throws IOException, SerialPortException {
         byte[] bytes = new byte[513];
 
-        for(byte b:bytes){
-            b=0;
-        }
         bytes[0] = 'j';
 
         if (values.length - 1 >= 0) System.arraycopy(values, 0, bytes, 1, values.length - 1);

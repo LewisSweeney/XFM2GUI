@@ -1,11 +1,11 @@
-package main.java.tabconstructors;
+package uk.ac.aber.les35.tabconstructors;
 
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import main.java.externalcode.IntField;
-import main.java.layouts.ControlGroupLayoutConstructor;
-import main.java.utilities.OPERATOR_NUM;
+import uk.ac.aber.les35.externalcode.IntField;
+import uk.ac.aber.les35.layouts.ControlGroupLayoutConstructor;
+import uk.ac.aber.les35.utilities.OPERATOR_NUM;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -25,7 +25,7 @@ public class TabConstructor {
         groupsOfGroups = new ArrayList<>();
         VBox internalLayout = new VBox();
         BorderPane layout = new BorderPane();
-        ControlGroupLayoutConstructor cgl = null;
+        ControlGroupLayoutConstructor cgl;
         for (String filepath : filepaths) {
 
             int rowLengths = 1;

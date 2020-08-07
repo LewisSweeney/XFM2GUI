@@ -1,12 +1,12 @@
-package main.java.layouts;
+package uk.ac.aber.les35.layouts;
 
 import javafx.geometry.Pos;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import main.java.externalcode.IntField;
-import main.java.utilities.OPERATOR_NUM;
+import uk.ac.aber.les35.externalcode.IntField;
+import uk.ac.aber.les35.utilities.OPERATOR_NUM;
 
 import java.io.BufferedReader;
 import java.io.IOException;

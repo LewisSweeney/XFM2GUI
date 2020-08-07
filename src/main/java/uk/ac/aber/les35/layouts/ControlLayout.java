@@ -1,23 +1,17 @@
-package main.java.layouts;
+package uk.ac.aber.les35.layouts;
 
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import jssc.SerialPortException;
-import main.java.externalcode.IntField;
-import main.java.utilities.ParamValueChange;
+import uk.ac.aber.les35.externalcode.IntField;
+import uk.ac.aber.les35.utilities.ParamValueChange;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -29,7 +23,7 @@ import java.util.Collections;
  */
 public class ControlLayout {
     // private final Integer paramValue = 0;
-    private IntField paramField = new IntField(0, 255,0);
+    IntField paramField = new IntField(0, 255,0);
     Label paramName = new Label("DEFAULT");
     BorderPane layoutBorder;
     boolean bitwise = false;
@@ -72,9 +66,7 @@ public class ControlLayout {
             for(int i = 0;i<bitNums;i++){
                 checkAndLabel[i] = new VBox(labels[i],bitwiseCheckboxes[i]);
                 checkAndLabel[i].getStyleClass().add("check-layout");
-                bitwiseCheckboxes[i].setOnAction(e ->{
-                    onCheckChange(Integer.parseInt(paramSplit[3]));
-                });
+                bitwiseCheckboxes[i].setOnAction(e -> onCheckChange(Integer.parseInt(paramSplit[3])));
             }
 
             ArrayList<VBox> reversedCollection = new ArrayList<>(Arrays.asList(checkAndLabel));

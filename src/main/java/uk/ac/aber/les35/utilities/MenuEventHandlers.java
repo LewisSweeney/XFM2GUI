@@ -1,23 +1,18 @@
-package main.java.utilities;
+package uk.ac.aber.les35.utilities;
 
 import javafx.scene.Scene;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Tab;
 import javafx.stage.Stage;
-import javafx.stage.Window;
 import jssc.SerialPort;
 import jssc.SerialPortException;
-import jssc.SerialPortList;
-import main.java.externalcode.IntField;
-import main.java.serial.SerialCommandHandler;
-import main.java.serial.UNIT_NUMBER;
+import uk.ac.aber.les35.externalcode.IntField;
+import uk.ac.aber.les35.serial.SerialCommandHandler;
+import uk.ac.aber.les35.serial.UNIT_NUMBER;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class MenuEventHandlers {
 
@@ -33,10 +28,10 @@ public class MenuEventHandlers {
     }
 
 
-    /**
-     * In the case of any tabs being closed accidentally, this will refresh the tabslist and return all tabs to the correct position
-     * This will also close any extra windows that the program has opened.
-     * TODO: Fix refresh bug where tabs draw over each other
+    /*
+      In the case of any tabs being closed accidentally, this will refresh the tabslist and return all tabs to the correct position
+      This will also close any extra windows that the program has opened.
+      TODO: Fix refresh bug where tabs draw over each other
      */
     /* private void reloadTabs() {
         List<Stage> stages = Window.getWindows().stream().filter(Stage.class::isInstance).map(Stage.class::cast).collect(Collectors.toList());

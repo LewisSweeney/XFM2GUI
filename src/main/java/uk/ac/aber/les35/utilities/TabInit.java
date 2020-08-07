@@ -1,8 +1,8 @@
-package main.java.utilities;
+package uk.ac.aber.les35.utilities;
 
 import javafx.scene.control.Tab;
-import main.java.externalcode.IntField;
-import main.java.tabconstructors.TabConstructor;
+import uk.ac.aber.les35.externalcode.IntField;
+import uk.ac.aber.les35.tabconstructors.TabConstructor;
 
 import java.io.BufferedReader;
 import java.io.IOException;

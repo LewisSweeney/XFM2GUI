@@ -1,4 +1,4 @@
-package main.java.externalcode;
+package uk.ac.aber.les35.externalcode;
 
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;

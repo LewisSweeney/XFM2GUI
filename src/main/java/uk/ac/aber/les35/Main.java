@@ -1,4 +1,4 @@
-package main.java;
+package uk.ac.aber.les35;
 
 
 import javafx.application.Application;
@@ -14,18 +14,20 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-
 import jssc.SerialPort;
 import jssc.SerialPortException;
 import jssc.SerialPortList;
-import main.java.externalcode.IntField;
-import main.java.serial.SerialCommandHandler;
-import main.java.serial.UNIT_NUMBER;
-import main.java.tabconstructors.*;
-import main.java.utilities.*;
+import uk.ac.aber.les35.externalcode.IntField;
+import uk.ac.aber.les35.serial.SerialCommandHandler;
+import uk.ac.aber.les35.serial.UNIT_NUMBER;
+import uk.ac.aber.les35.tabconstructors.AboutSceneConstructor;
+import uk.ac.aber.les35.utilities.MenuEventHandlers;
+import uk.ac.aber.les35.utilities.ParamValueChange;
+import uk.ac.aber.les35.utilities.TabInit;
 
-import java.io.*;
-import java.util.*;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
 
 public class Main extends Application {
 
@@ -117,7 +119,7 @@ public class Main extends Application {
 
     /* Initialises the buttons at the bottom of the page
      */
-    private void initButtons() throws IOException, SerialPortException {
+    private void initButtons() {
         VBox xfmButtons = new VBox();
         VBox localButtons = new VBox();
         VBox serialPortSelection = new VBox();
@@ -303,7 +305,7 @@ public class Main extends Application {
         unit0.setSelected(true);
         unit1.setToggleGroup(unitGroup);
 
-        EventHandler<ActionEvent> unitEventHandler = (EventHandler<ActionEvent>) mouseEvent -> {
+        EventHandler<ActionEvent> unitEventHandler = mouseEvent -> {
             try {
                 if(unit0.isSelected()){
                     MenuEventHandlers.setUnit(UNIT_NUMBER.ZERO);
