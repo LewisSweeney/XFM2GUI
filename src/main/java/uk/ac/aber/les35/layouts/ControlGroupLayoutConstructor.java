@@ -6,7 +6,8 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import uk.ac.aber.les35.externalcode.IntField;
-import uk.ac.aber.les35.utilities.OPERATOR_NUM;
+import uk.ac.aber.les35.enums.CONTROL_TYPE;
+import uk.ac.aber.les35.enums.OPERATOR_NUM;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -29,6 +30,7 @@ public class ControlGroupLayoutConstructor {
         this.rowLength = rowLength;
         ArrayList<HBox> rows = new ArrayList<>();
         ArrayList<HBox> bitRows = new ArrayList<>();
+        ArrayList<HBox> wavRows = new ArrayList<>();
         bReader = new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream(filepath)));
         ArrayList<String> paramNames = new ArrayList<>();
 
@@ -65,42 +67,68 @@ public class ControlGroupLayoutConstructor {
         int currentBitCol = 0;
         int currentBitRow = 0;
 
+        int currentWavCol = 0;
+        int currentWavRow = 0;
+
 
         for (ControlLayout con : controls) {
-            if(!con.bitwise) {
-                if (currentColumn >= rowLength) {
-                    currentColumn = 0;
-                    currentRow++;
+
+            CONTROL_TYPE conType = con.getControl_type();
+            switch (conType){
+                case WAVE-> {
+                    if (currentWavCol >= rowLength) {
+                        currentWavCol = 0;
+                        currentWavRow++;
+                    }
+                    if (currentWavCol == 0) {
+                        HBox h = new HBox();
+                        h.setAlignment(Pos.CENTER);
+                        wavRows.add(h);
+                    }
+                    wavRows.get(currentWavRow).getChildren().add(con.getLayout());
+                    wavRows.get(currentWavRow).setStyle("-fx-padding: 0 0 10 0");
+                    currentWavCol++;
                 }
-                if (currentColumn == 0) {
-                    HBox h = new HBox();
-                    h.setAlignment(Pos.CENTER);
-                    rows.add(h);
+
+                case BITWISE -> {
+                    if (currentBitCol >= bitRowLength) {
+                        currentBitCol = 0;
+                        currentBitRow++;
+                    }
+                    if (currentBitCol == 0) {
+                        HBox h = new HBox();
+                        h.setAlignment(Pos.CENTER);
+                        bitRows.add(h);
+                    }
+                    bitRows.get(currentBitRow).getChildren().add(con.getLayout());
+                    bitRows.get(currentBitRow).setStyle("-fx-padding: 0 0 10 0");
+                    currentBitCol++;
                 }
-                rows.get(currentRow).getChildren().add(con.getLayout());
-                rows.get(currentRow).setStyle("-fx-padding: 0 0 10 0");
-                currentColumn++;
-            } else{
-                if (currentBitCol >= bitRowLength) {
-                    currentBitCol = 0;
-                    currentBitRow++;
+
+                case SLIDER,TOGGLE -> {
+                    if (currentColumn >= rowLength) {
+                        currentColumn = 0;
+                        currentRow++;
+                    }
+                    if (currentColumn == 0) {
+                        HBox h = new HBox();
+                        h.setAlignment(Pos.CENTER);
+                        rows.add(h);
+                    }
+                    rows.get(currentRow).getChildren().add(con.getLayout());
+                    rows.get(currentRow).setStyle("-fx-padding: 0 0 10 0");
+                    currentColumn++;
                 }
-                if (currentBitCol == 0) {
-                    HBox h = new HBox();
-                    h.setAlignment(Pos.CENTER);
-                    bitRows.add(h);
-                }
-                bitRows.get(currentBitRow).getChildren().add(con.getLayout());
-                bitRows.get(currentBitRow).setStyle("-fx-padding: 0 0 10 0");
-                currentBitCol++;
             }
         }
 
         groupTitle.getStyleClass().add("group-label");
         controlGroup.getStyleClass().add("group-control");
         controlGroup.getChildren().add(groupTitle);
-        controlGroup.getChildren().addAll(rows);
         controlGroup.getChildren().addAll(bitRows);
+        controlGroup.getChildren().addAll(wavRows);
+        controlGroup.getChildren().addAll(rows);
+
     }
 
     public VBox getControlGroup() {

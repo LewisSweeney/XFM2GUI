@@ -1,5 +1,5 @@
 -OPERATOR 4-
-#5#
+#6#
 Algo:4:BIT:7:OP6/OP5/OP4/OP3/OP2/OP1/OUT
 Feedback:10
 Phase:289
@@ -30,7 +30,7 @@ R5:202
 Rate Key:143
 AMS:162
 PMS:225
-Wave 1:239:7
-Wave 2:271:7
-Osc. Mode:277:1
+Wave 1:239:WAVE
+Wave 2:271:WAVE
+Osc. Mode:277:TOGGLE
 Osc. Ratio:283

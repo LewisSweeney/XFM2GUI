@@ -1,0 +1,18 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="XFM2GUI:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/XFM2GUI_jar</output-path>
+    <root id="archive" name="XFM2GUI.jar">
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/src/main/resources/META/META-INF/MANIFEST.MF" />
+      </element>
+      <element id="module-output" name="XFM2GUI" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/openjfx/javafx-base/14/javafx-base-14-mac.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/openjfx/javafx-graphics/14/javafx-graphics-14.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/openjfx/javafx-base/14/javafx-base-14.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/openjfx/javafx-controls/14/javafx-controls-14.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/scream3r/jssc/2.8.0/jssc-2.8.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/openjfx/javafx-controls/14/javafx-controls-14-mac.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/openjfx/javafx-graphics/14/javafx-graphics-14-mac.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>

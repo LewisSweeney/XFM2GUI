@@ -7,3 +7,4 @@ Operator 6
 Program
 Modulations
 Effects
+Options
