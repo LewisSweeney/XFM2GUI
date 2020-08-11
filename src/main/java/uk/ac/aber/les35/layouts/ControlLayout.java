@@ -1,5 +1,7 @@
 package uk.ac.aber.les35.layouts;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
@@ -77,6 +79,15 @@ public class ControlLayout {
      * Creates a control with a combobox and imageview to display the wave shape of the currently selected value
      */
     private void waveControl() {
+        paramField = new IntField(0, 7, 0);
+        paramField.textProperty().addListener((observable, oldValue, newValue) -> {
+            try {
+                ParamValueChangeHandler.onFieldChange(this);
+            } catch (SerialPortException | InterruptedException | IOException e) {
+                e.printStackTrace();
+            }
+        });
+
         waves = new ComboBox<>();
         images = new ArrayList<>();
 
@@ -89,8 +100,10 @@ public class ControlLayout {
             waves.getItems().add("Shape " + (i + 1));
         }
 
-        waves.setOnAction(e -> onWaveSelected(waves.getSelectionModel().getSelectedIndex()));
+        waves.getSelectionModel().selectedItemProperty().addListener( (options, oldValue, newValue) -> onWaveSelected(waves.getSelectionModel().getSelectedIndex())
+        );
         waves.getSelectionModel().selectFirst();
+
 
         waveImage.setImage(images.get(0));
         waveImage.setFitHeight(80);
@@ -191,6 +204,15 @@ public class ControlLayout {
      * Creates a control that has an on/off toggle with radio buttons
      */
     private void switchControl() {
+
+        paramField = new IntField(0, 1, 0);
+        paramField.textProperty().addListener((observable, oldValue, newValue) -> {
+            try {
+                ParamValueChangeHandler.onFieldChange(this);
+            } catch (SerialPortException | InterruptedException | IOException e) {
+                e.printStackTrace();
+            }
+        });
 
         control_type = CONTROL_TYPE.TOGGLE;
         ToggleGroup toggleGroup = new ToggleGroup();
