@@ -7,35 +7,40 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+
 import jssc.SerialPort;
 import jssc.SerialPortException;
+
 import uk.ac.aber.les35.enums.UNIT_NUMBER;
 import uk.ac.aber.les35.externalcode.IntField;
-import uk.ac.aber.les35.sceneconstructors.AboutSceneConstructor;
-import uk.ac.aber.les35.functionhandlers.SerialCommandHandler;
 import uk.ac.aber.les35.functionhandlers.MenuEventHandlers;
+import uk.ac.aber.les35.functionhandlers.SerialCommandHandler;
+import uk.ac.aber.les35.sceneconstructors.AboutSceneConstructor;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 
+/**
+ * Main class for creating the menu section of the GUI.
+ * Has various methods that create, initialise, and set nodes
+ */
 public class MenuInitialiser {
 
     private final ComboBox<String> serialPortPicker = new ComboBox<>();
     private final ComboBox<Integer> patchPicker = new ComboBox<>();
+    private final ComboBox<String> midiChZeroPicker = new ComboBox<>();
     private final ComboBox<String> midiChOnePicker = new ComboBox<>();
-    private final ComboBox<String> midiChTwoPicker = new ComboBox<>();
 
     private final Stage fileStage = new Stage();
 
     private final SerialCommandHandler serialCommandHandler;
     private final SerialPort serialPort;
-    private final String [] serialPortNameList;
+    private final String[] serialPortNameList;
 
     final static ArrayList<IntField> paramFields = new ArrayList<>();
 
@@ -43,21 +48,23 @@ public class MenuInitialiser {
 
     String style = this.getClass().getResource("/stylesheets/style.css").toExternalForm();
 
-    public MenuInitialiser(SerialCommandHandler serialCommandHandler, SerialPort serialPort, String[] serialPortNameList){
+    public MenuInitialiser(SerialCommandHandler serialCommandHandler, SerialPort serialPort, String[] serialPortNameList) {
         this.serialCommandHandler = serialCommandHandler;
         this.serialPort = serialPort;
         this.serialPortNameList = serialPortNameList;
     }
 
-    // Initialises the BorderPane used as the main node for the GUI
+    /**
+     * Initialises and returns the main BorderPane used for the display
+     * @return BorderPane
+     * @throws IOException
+     * @throws SerialPortException
+     */
     public Scene initializeScene() throws IOException, SerialPortException {
-
-        System.out.println("PROGRAM STARTING");
 
         BorderPane topBorder = new BorderPane();
         BorderPane border = new BorderPane();
         TabPane tabPane = new TabPane();
-
 
         tabPane.setTabMinWidth(80);
         tabPane.setTabMaxWidth(80);
@@ -65,8 +72,8 @@ public class MenuInitialiser {
         tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
 
         border.setCenter(tabPane);
-        border.setLeft(getLeftSidebar());
-        initPortSelection(serialPortNameList,serialPort,serialCommandHandler);
+        initPortSelection(serialPort);
+        border.setLeft(getMenuBar());
 
         topBorder.setCenter(border);
         topBorder.setMaxWidth(1100);
@@ -79,13 +86,28 @@ public class MenuInitialiser {
         Scene scene = new Scene(topBorder);
         scene.getStylesheets().add(style);
 
-        MenuEventHandlers.setParams(serialCommandHandler,paramFields, scene);
+        MenuEventHandlers.setParams(serialCommandHandler, paramFields, scene);
+
+        midiChZeroPicker.getSelectionModel().selectFirst();
+        int val = midiChZeroPicker.getSelectionModel().getSelectedIndex();
+        MenuEventHandlers.onMidiChannelChange(UNIT_NUMBER.ZERO, val);
+
+        midiChOnePicker.getSelectionModel().selectFirst();
+        int val2 = midiChOnePicker.getSelectionModel().getSelectedIndex();
+        MenuEventHandlers.onMidiChannelChange(UNIT_NUMBER.ONE, val2);
 
         return scene;
 
     }
 
-    public void initPortSelection(String[] serialPortNameList, SerialPort serialPort, SerialCommandHandler serialCommandHandler) throws IOException, SerialPortException {
+    /**
+     * Initialises the port picker that allows user to change the active serial port
+     * NOTE: The program will attempt to automatically choose an XFM2 device as the default active port
+     * @param serialPort The serialport being worked with that eventually becomes the selected port
+     * @throws IOException
+     * @throws SerialPortException
+     */
+    public void initPortSelection(SerialPort serialPort) throws IOException, SerialPortException {
         if (serialPortNameList.length > 0) {
             for (String s : serialPortNameList) {
                 SerialPort sP = new SerialPort(s);
@@ -108,27 +130,32 @@ public class MenuInitialiser {
             serialPortPicker.getSelectionModel().selectFirst();
         }
 
-        updateSerialPickerListener(serialPort, serialPortNameList,serialPortPicker,patchPicker);
+        updateSerialPickerListener();
     }
 
-    /* Initialises the buttons at the bottom of the page
+    /**
+     * Creates and initialises each tab through the TabInit class
+     * @return ArrayList of tabs that are all ready for use
      */
-    public VBox getLeftSidebar() {
+    public ArrayList<Tab> initTabs() {
+        TabInit tabInit = new TabInit();
+        return tabInit.getTabs(paramFields);
+    }
+
+    /**
+     * Creates the menu bar for the program, calling various methods to create buttons, comboboxes etc.
+     * Sets all action events
+     * @return The menu for the left part of the main BorderPane
+     * TODO: Seperate into smaller sub-methods.
+     */
+    public VBox getMenuBar() {
         VBox xfmButtons = new VBox();
         VBox localButtons = new VBox();
         VBox serialPortSelection;
 
-        Label xfmPatch = new Label("XFM2 Program #:");
+        Label xfmPatch = new Label("Program #:");
 
-        EventHandler<? super MouseEvent> saveXFMEventHandler = (EventHandler<MouseEvent>) mouseEvent -> {
-            try {
-                MenuEventHandlers.onSaveToXFMPress(patchPicker);
-            } catch (SerialPortException | IOException e) {
-                e.printStackTrace();
-            }
-        };
-        Button saveToXFM = new Button("Save To XFM2");
-        saveToXFM.setOnMouseClicked(saveXFMEventHandler);
+        Button[] menuButtons = getMenuButtons();
 
         ArrayList<Integer> vals = new ArrayList<>();
         for (int i = 1; i <= 127; i++) {
@@ -138,7 +165,7 @@ public class MenuInitialiser {
         patchPicker.getItems().addAll(vals);
         patchPicker.setOnAction(e -> {
             try {
-                if(!(patchPicker.getValue() == null)) {
+                if (!(patchPicker.getValue() == null)) {
                     MenuEventHandlers.onPatchPicked(patchPicker.getValue());
                 }
             } catch (SerialPortException | IOException serialPortException) {
@@ -146,62 +173,9 @@ public class MenuInitialiser {
             }
         });
 
-        Tooltip readTooltip = new Tooltip("Reads the current state of the XFM2 device");
-        Tooltip writeTooltip = new Tooltip("Writes the current parameters to the XFM2");
-        Tooltip saveCurrentTooltip = new Tooltip("Save the current paramater set locally in an XFM2 file");
-        Tooltip loadTooltip = new Tooltip("Load an XFM2 file and set the parameters");
-
-        Button read = new Button("Read XFM2");
-        read.setTooltip(readTooltip);
-
-        Button write = new Button("Write to XFM2");
-        write.setTooltip(writeTooltip);
-
-        Button saveCurrentPatch = new Button("Save Program");
-        saveCurrentPatch.setTooltip(saveCurrentTooltip);
-
-        Button loadPatch = new Button("Load Program");
-        loadPatch.setTooltip(loadTooltip);
-
         //Button reloadTabs = new Button("Refresh Tabs");
         //reloadTabs.setTooltip(reloadTooltip);
 
-        EventHandler<? super MouseEvent> readEventHandler = (EventHandler<MouseEvent>) mouseEvent -> {
-            try {
-                MenuEventHandlers.onReadButtonPress();
-            } catch (SerialPortException | IOException e) {
-                e.printStackTrace();
-            }
-
-        };
-        read.setOnMouseClicked(readEventHandler);
-
-        EventHandler<? super MouseEvent> writeEventHandler = (EventHandler<MouseEvent>) mouseEvent -> {
-            try {
-                MenuEventHandlers.onWriteButtonPress();
-            } catch (SerialPortException | IOException | InterruptedException e) {
-                e.printStackTrace();
-            }
-        };
-        write.setOnMouseClicked(writeEventHandler);
-
-        EventHandler<? super MouseEvent> saveEventHandler = (EventHandler<MouseEvent>) mouseEvent -> {
-            try {
-                MenuEventHandlers.onSaveButtonPress(fileStage);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        };
-        saveCurrentPatch.setOnMouseClicked(saveEventHandler);
-
-        EventHandler<? super MouseEvent> loadEventHandler = (EventHandler<MouseEvent>) mouseEvent -> {
-            try {
-                MenuEventHandlers.onLoadButtonPress(fileStage);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
-        };
-        loadPatch.setOnMouseClicked(loadEventHandler);
 
         CheckBox liveChanges = new CheckBox("Live Changes");
         liveChanges.setSelected(true);
@@ -220,7 +194,7 @@ public class MenuInitialiser {
         logoView.setFitHeight(100);
         logoView.setFitWidth(100);
 
-        Label xfmButtonsLabel = new Label("XFM2 Controls");
+        Label xfmButtonsLabel = new Label("Device Controls");
 
         xfmButtonsLabel.getStyleClass().add("button-group-title");
 
@@ -236,10 +210,10 @@ public class MenuInitialiser {
         // Creates new sub-sub-section for the patch control
         VBox patchControl = new VBox(xfmPatch, patchPicker);
 
-        // Creates each subsection being added to buttonSet
+        // Creates each subsection being added to menuLayout
         serialPortSelection = new VBox(serialPortLabel, serialPortPicker);
-        xfmButtons.getChildren().addAll(xfmButtonsLabel, patchControl, read, write, saveToXFM, initMidiControl());
-        localButtons.getChildren().addAll(localButtonsLabel, saveCurrentPatch, loadPatch,liveChanges);
+        xfmButtons.getChildren().addAll(xfmButtonsLabel, patchControl, menuButtons[0], menuButtons[1], menuButtons[2], getUnitControls());
+        localButtons.getChildren().addAll(localButtonsLabel, menuButtons[3], menuButtons[4], liveChanges);
 
         // Assigns style classes for each required node.
         serialPortSelection.getStyleClass().add("button-row");
@@ -249,99 +223,41 @@ public class MenuInitialiser {
         subtitle.getStyleClass().add("app-subtitle");
 
         Hyperlink about = new Hyperlink("About");
-        EventHandler<? super MouseEvent> aboutEventHandler = (EventHandler<MouseEvent>) mouseEvent -> {
+        about.setOnAction(actionEvent -> {
             AboutSceneConstructor asc = new AboutSceneConstructor();
             asc.showStage();
-        };
-        about.setOnMouseClicked(aboutEventHandler);
+        });
 
-        VBox buttonSet = new VBox(logoView, about, xfmButtons, localButtons, serialPortSelection);
+        VBox menuLayout = new VBox(logoView, about, xfmButtons, localButtons, serialPortSelection);
 
-        buttonSet.getStyleClass().add("button-column");
+        menuLayout.getStyleClass().add("button-column");
 
-        return buttonSet;
+        return menuLayout;
     }
 
-    private VBox initMidiControl() {
-        for (int i = 0; i < 17; i++) {
-            if (i == 0) {
-                midiChOnePicker.getItems().add("All");
-                midiChTwoPicker.getItems().add("All");
-            } else {
-                midiChOnePicker.getItems().add(String.valueOf(i));
-                midiChTwoPicker.getItems().add(String.valueOf(i));
-            }
-        }
 
-        midiChOnePicker.getStyleClass().add("channel-combo");
-        midiChTwoPicker.getStyleClass().add("channel-combo");
-
-        midiChOnePicker.setOnAction(e -> {
-            try {
-                int val = midiChOnePicker.getSelectionModel().getSelectedIndex();
-                MenuEventHandlers.onMidiChannelChange(UNIT_NUMBER.ZERO,val);
-            } catch (SerialPortException | IOException serialPortException) {
-                serialPortException.printStackTrace();
-            }
-
-        });
-
-        midiChTwoPicker.setOnAction(e -> {
-            try {
-                int val = midiChOnePicker.getSelectionModel().getSelectedIndex();
-                MenuEventHandlers.onMidiChannelChange(UNIT_NUMBER.ONE,val);
-            } catch (SerialPortException | IOException serialPortException) {
-                serialPortException.printStackTrace();
-            }
-
-        });
-
-        ToggleGroup unitGroup = new ToggleGroup();
-
-        RadioButton unit0 = new RadioButton();
-        RadioButton unit1 = new RadioButton();
-
-        unit0.setToggleGroup(unitGroup);
-        unit0.setSelected(true);
-        unit1.setToggleGroup(unitGroup);
-
-        EventHandler<ActionEvent> unitEventHandler = mouseEvent -> {
-            try {
-                if(unit0.isSelected()){
-                    MenuEventHandlers.setUnit(UNIT_NUMBER.ZERO);
-                } else{
-                    MenuEventHandlers.setUnit(UNIT_NUMBER.ONE);
-                }
-            } catch (SerialPortException | IOException e) {
-                e.printStackTrace();
-            }
-        };
-
-        unit0.setOnAction(unitEventHandler);
-        unit1.setOnAction(unitEventHandler);
-
+    /**
+     * Constructs the Unit subsection of the left-hand menu
+     * @return VBox containing the required nodes
+     */
+    private VBox getUnitControls() {
 
         Label midiTitle = new Label("Unit and MIDI Controls:");
+        ToggleGroup unitGroup = new ToggleGroup();
 
-        Label midiOne = new Label("Unit 0");
-        Tooltip midiOneTooltip = new Tooltip("Set the MIDI channel for Unit 1 on the device");
-        VBox midiConOne = new VBox(midiOne,unit0, midiChOnePicker);
+        VBox midiConOne = getIndividualMidiControl(midiChZeroPicker,UNIT_NUMBER.ZERO,unitGroup);
         midiConOne.getStyleClass().add("picker-set");
-        midiOne.setTooltip(midiOneTooltip);
 
-        Label midiTwo = new Label("Unit 1");
-        Tooltip midiTwoTooltip = new Tooltip("Set the MIDI channel for Unit 2 on the device");
-        VBox midiConTwo = new VBox(midiTwo, unit1, midiChTwoPicker);
+        VBox midiConTwo = getIndividualMidiControl(midiChOnePicker, UNIT_NUMBER.ONE,unitGroup);
         midiConTwo.getStyleClass().add("picker-set");
-        midiTwo.setTooltip(midiTwoTooltip);
 
         HBox midiCons = new HBox(midiConOne, midiConTwo);
 
         CheckBox layering = new CheckBox("Layering");
         Tooltip layeringTooltip = new Tooltip("Toggle layering on the XFM2");
         layering.setTooltip(layeringTooltip);
-        layering.setOnAction(e ->{
-            try{
+        layering.setOnAction(e -> {
+            try {
                 serialCommandHandler.setMidiLayering(layering.isSelected());
             } catch (SerialPortException | IOException serialPortException) {
                 serialPortException.printStackTrace();
@@ -355,17 +271,141 @@ public class MenuInitialiser {
         return layout;
     }
 
-    public ArrayList<Tab> initTabs(){
-        TabInit tabInit = new TabInit();
-        return tabInit.getTabs(paramFields);
+    /**
+     * Creates an individual unit control, containing a combobox, label, and radio button
+     * Initialises the action events for each necessary node
+     * @return a VBox containing the required nodes
+     */
+    private VBox getIndividualMidiControl(ComboBox<String> midiPicker, UNIT_NUMBER unit_number, ToggleGroup toggleGroup) {
+        for (int i = 0; i < 17; i++) {
+            if (i == 0) {
+                midiPicker.getItems().add("All");
+            } else {
+                midiPicker.getItems().add(String.valueOf(i));
+            }
+        }
+
+        midiPicker.getStyleClass().add("channel-combo");
+
+        midiPicker.setOnAction(e -> {
+            try {
+                int val = midiPicker.getSelectionModel().getSelectedIndex();
+                MenuEventHandlers.onMidiChannelChange(unit_number, val);
+            } catch (SerialPortException | IOException serialPortException) {
+                serialPortException.printStackTrace();
+            }
+
+        });
+
+        RadioButton unit = new RadioButton();
+
+        unit.setOnAction(actionEvent -> {
+            try {
+                if (unit.isSelected()) {
+                    MenuEventHandlers.setUnit(unit_number);
+                }
+            } catch (SerialPortException | IOException e) {
+                e.printStackTrace();
+            }
+        });
+
+        unit.setToggleGroup(toggleGroup);
+
+        Label controlLabel = new Label("Unit 1");
+        Tooltip midiTooltip = new Tooltip("Set the MIDI channel for Unit 1 on the device");
+
+        if(unit_number == UNIT_NUMBER.ZERO){
+            unit.setSelected(true);
+            controlLabel.setText("Unit 0");
+            midiTooltip.setText("Set the MIDI channel for Unit 0 on the device");
+        }
+
+        controlLabel.setTooltip(midiTooltip);
+        midiPicker.getSelectionModel().selectFirst();
+
+        return new VBox(controlLabel,unit,midiPicker);
     }
 
+    /**
+     * Creates all buttons required for the menu, assigning tooltips and action event handlers for each
+     * @return Button[] containing each required button
+     */
+    private Button[] getMenuButtons() {
+
+        Button[] menuButtons = new Button[5];
+
+        menuButtons[0] = new Button("Read Device");
+        Tooltip readTooltip = new Tooltip("Reads the current state of the XFM device");
+        menuButtons[0].setTooltip(readTooltip);
+
+        menuButtons[1] = new Button("Write to Device");
+        Tooltip writeTooltip = new Tooltip("Writes the current parameters to the XFM");
+        menuButtons[1].setTooltip(writeTooltip);
+
+        menuButtons[2] = new Button("Save to Device");
+        Tooltip saveXFMTooltip = new Tooltip("Saves the current parameters to the currently selected XFM patch");
+        menuButtons[2].setTooltip(saveXFMTooltip);
+
+        menuButtons[3] = new Button("Save Locally");
+        Tooltip saveCurrentTooltip = new Tooltip("Save the current paramater set locally");
+        menuButtons[3].setTooltip(saveCurrentTooltip);
+
+        menuButtons[4] = new Button("Load Local Patch");
+        Tooltip loadTooltip = new Tooltip("Load an XFM2 file and set the parameters");
+        menuButtons[4].setTooltip(loadTooltip);
+
+        menuButtons[0].setOnAction(actionEvent -> {
+            try {
+                MenuEventHandlers.onReadButtonPress();
+            } catch (SerialPortException | IOException e) {
+                e.printStackTrace();
+            }
+        });
+
+        menuButtons[1].setOnAction(actionEvent -> {
+            try {
+                MenuEventHandlers.onWriteButtonPress();
+            } catch (SerialPortException | IOException | InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
+
+        menuButtons[2].setOnAction(actionEvent -> {
+            try {
+                MenuEventHandlers.onSaveToXFMPress(patchPicker);
+            } catch (IOException | SerialPortException e) {
+                e.printStackTrace();
+            }
+        });
 
 
-    public void updateSerialPickerListener(SerialPort serialPort, String[] serialPortNameList, ComboBox<String> serialPortPicker, ComboBox<Integer> patchPicker){
+        menuButtons[3].setOnAction(actionEvent -> {
+            try {
+                MenuEventHandlers.onSaveButtonPress(fileStage);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+
+        menuButtons[4].setOnAction(actionEvent -> {
+            try {
+                MenuEventHandlers.onLoadButtonPress(fileStage);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        });
+
+        return menuButtons;
+    }
+
+    /**
+     * Updates the listener of the serialportpicker
+     * Currently only used once, may move back to relevant method
+     */
+    public void updateSerialPickerListener() {
         serialPortPicker.setOnAction(e -> {
             try {
-                MenuEventHandlers.onSerialPortSelection(serialPortNameList,serialPortPicker,serialPort,patchPicker);
+                MenuEventHandlers.onSerialPortSelection(serialPortNameList, serialPortPicker, serialPort, patchPicker);
             } catch (SerialPortException | IOException serialPortException) {
                 serialPortException.printStackTrace();
             }

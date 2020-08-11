@@ -13,6 +13,9 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 
+/**
+ * Creates the scene for the About section of the program
+ */
 public class AboutSceneConstructor {
     Stage newStage = new Stage();
     String style = this.getClass().getResource("/stylesheets/style.css").toExternalForm();
@@ -52,6 +55,7 @@ public class AboutSceneConstructor {
         about.getStyleClass().add("about");
         return about;
     }
+
     private VBox getContactSection(){
         VBox about = new VBox();
         Label aboutTitle = new Label("About This App");

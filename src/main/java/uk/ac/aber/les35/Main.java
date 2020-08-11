@@ -14,6 +14,9 @@ import uk.ac.aber.les35.functionhandlers.ParamValueChangeHandler;
 
 import java.io.IOException;
 
+/**
+ * Starts the program, constructing the GUI and readying the system for XFM communication
+ */
 public class Main extends Application {
 
     String[] serialPortNameList = SerialPortList.getPortNames();

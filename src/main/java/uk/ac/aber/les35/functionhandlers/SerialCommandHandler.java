@@ -9,6 +9,9 @@ import uk.ac.aber.les35.enums.UNIT_NUMBER;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
+/**
+ * Handles all serial-over-USB communications, using JSSC to send byte arrays as commands
+ */
 public class SerialCommandHandler {
     private static SerialPort serialPort;
     private static final int BAUD_RATE = 500000;
@@ -52,12 +55,24 @@ public class SerialCommandHandler {
         sendCommand(bytes);
     }
 
+    /**
+     * Returns all current parameter values as a byte[512]
+     * @return
+     * @throws SerialPortException
+     * @throws IOException
+     */
     public byte[] getAllValues() throws SerialPortException, IOException {
         byte[] bytes = new byte[1];
         bytes[0] = 'd';
         return sendCommand(bytes);
     }
 
+    /**
+     * Takes values from all parameter fields, inserts them into a byte[512] and sends them to the board
+     * @param values The values from the parameter fields
+     * @throws IOException
+     * @throws SerialPortException
+     */
     public void setAllValues(byte[] values) throws IOException, SerialPortException {
         byte[] bytes = new byte[1];
 
@@ -67,6 +82,12 @@ public class SerialCommandHandler {
         sendCommand(values);
     }
 
+    /**
+     * Changes the synthesizer unit being worked on depending on user selection
+     * @param unit_number
+     * @throws SerialPortException
+     * @throws IOException
+     */
     public void setUnit(UNIT_NUMBER unit_number) throws SerialPortException, IOException {
         int command;
         if (unit_number == UNIT_NUMBER.ONE) {
@@ -81,9 +102,17 @@ public class SerialCommandHandler {
 
     }
 
+    /**
+     * Sets the MIDI channel paramter value for the unit (unit_number) to the value sent (midiChannel)
+     * @param unit_number Enum for choosing unit ZERO or ONE
+     * @param midiChannel int 0-16, where 0 = omni setting on the device, and 1-16 correspond to channel numbers
+     * @throws SerialPortException
+     * @throws IOException
+     */
     public void setMidiChannel(UNIT_NUMBER unit_number, Integer midiChannel) throws SerialPortException, IOException {
         int firstByte = '*';
         int secondByte;
+        byte[] currentVals = getAllValues();
         if (unit_number == UNIT_NUMBER.ZERO) {
             secondByte = 10;
         } else {
@@ -99,9 +128,16 @@ public class SerialCommandHandler {
         } else{
             System.out.println("Set unit 1 channel to " + data[0]);
         }
+        byte[] newVals = getAllValues();
 
     }
 
+    /**
+     * Sets the MIDI Layering parameter to 0 or 1 depending on the passed boolean
+     * @param layering boolean that corresponds to numerical value which is sent ot board
+     * @throws SerialPortException
+     * @throws IOException
+     */
     public void setMidiLayering(boolean layering) throws SerialPortException, IOException {
         int firstByte = 42;
         int secondByte = 12;
@@ -114,18 +150,21 @@ public class SerialCommandHandler {
         }
         bytes[2] = (byte) thirdByte;
         byte[] data = sendCommand(bytes);
-        if(data.length > 0){
-            System.out.println("Set layering to " + layering);
-        }
-
     }
 
+    // UNUSED
     public void initializeCurrentProgram() throws SerialPortException, IOException {
         byte[] bytes = new byte[1];
         bytes[0] = 'i';
         sendCommand(bytes);
     }
 
+    /**
+     * Changes the program currently loaded into XFM memory to the one selected from the menu
+     * @param progNum Program number to be set
+     * @throws SerialPortException
+     * @throws IOException
+     */
     public void readProgram(Integer progNum) throws SerialPortException, IOException {
         if (progNum > 0 && progNum < 128) {
             byte[] bytes = new byte[2];
@@ -136,6 +175,12 @@ public class SerialCommandHandler {
         }
     }
 
+    /**
+     * Takes all parameters within the application, writes them to the board, and then saves to the specified program
+     * @param progNum Program number to be saved over
+     * @throws SerialPortException
+     * @throws IOException
+     */
     public void writeProgram(Integer progNum) throws SerialPortException, IOException {
         if(progNum == null){
             alertHandler.SendAlert(ALERT_TYPE.NO_PATCH_CHOSEN);
@@ -149,12 +194,26 @@ public class SerialCommandHandler {
         }
     }
 
+    /**
+     * -UNUSED-
+     * Deletes all programs from the eeprom, setting all parameter values to zero
+     * @throws SerialPortException
+     * @throws IOException
+     */
     public void initEeprom() throws SerialPortException, IOException {
         byte[] bytes = new byte[1];
         bytes[0] = '$';
         sendCommand(bytes);
     }
 
+    /**
+     * Generic method that sends the given bytes to the board
+     * Used for all command methods
+     * @param bytes byte[] that contains the bytes to be sent to the board
+     * @return returns any data that the board replies with
+     * @throws SerialPortException
+     * @throws IOException
+     */
     private byte[] sendCommand(byte[] bytes) throws SerialPortException, IOException {
         if(serialPort != null) {
             try {
@@ -186,14 +245,12 @@ public class SerialCommandHandler {
 
     }
 
-    public SerialPort getSerialPort() {
-        return serialPort;
-    }
-
-    public void setSerialPort(SerialPort serialPort) {
-        SerialCommandHandler.serialPort = serialPort;
-    }
-
+    /**
+     * Method used to get data from the device once a command has been sent to the board
+     * @return byte[] which is translated by the program for display in the GUI
+     * @throws SerialPortException
+     * @throws IOException
+     */
     byte[] getData() throws SerialPortException, IOException {
         if(serialPort == null){
             return null;
@@ -211,6 +268,15 @@ public class SerialCommandHandler {
             //don't want to catch it, it just means there is no more data         to read
         }
         return baos.toByteArray();
+    }
+
+    // GETTERS AND SETTERS
+    public SerialPort getSerialPort() {
+        return serialPort;
+    }
+
+    public void setSerialPort(SerialPort serialPort) {
+        SerialCommandHandler.serialPort = serialPort;
     }
 
     public Boolean getLIVE_CHANGES() {

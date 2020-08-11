@@ -21,8 +21,8 @@ import java.util.Collections;
 
 /**
  * This class creates the layout for each individual parameter control
- * Currently creates an IntField and a Label
- * TODO: Add knobs/sliders
+ * Creates different control depending on passed parameters, but always creates an IntField to store parameter values,
+ * even if not visible
  */
 public class ControlLayout {
     // private final Integer paramValue = 0;
@@ -64,7 +64,7 @@ public class ControlLayout {
         if (paramSplit.length > 2) {
             switch (paramSplit[2]) {
                 case "BIT" -> bitwiseControl(paramSplit);
-                case "WAVE" -> waveControl(paramSplit);
+                case "WAVE" -> waveControl();
                 case "TOGGLE" -> switchControl();
                 default -> sliderControl(paramSplit);
             }
@@ -73,58 +73,10 @@ public class ControlLayout {
         }
     }
 
-    public BorderPane getLayout() {
-        return layoutBorder;
-    }
-
-    public IntField getParamField() {
-        return paramField;
-    }
-
-    public CONTROL_TYPE getControl_type() {
-        return control_type;
-    }
-
-    public CheckBox[] getBitwiseCheckboxes() {
-        return bitwiseCheckboxes;
-    }
-
-    public ComboBox<String> getWaves() {
-        return waves;
-    }
-
-    public Slider getSlider() {
-        return slider;
-    }
-
-    public ImageView getWaveImage() {
-        return waveImage;
-    }
-
-    public RadioButton[] getRadioButtons() {
-        return radioButtons;
-    }
-
-    public void setWaveImage(int val) {
-        waveImage.setImage(images.get(val));
-    }
-
-    private void onCheckChange(int bitNum) {
-        byte paramValue = 0;
-        for (byte i = 0; i < bitNum; i++) {
-            if (bitwiseCheckboxes[i].isSelected()) {
-                byte add = 1;
-                byte iter = (byte) (bitNum - i);
-                for (byte j = 1; j < iter; j++) {
-                    add = (byte) (add * 2);
-                }
-                paramValue = (byte) (paramValue + add);
-            }
-        }
-        paramField.setValue(paramValue & 0xFF);
-    }
-
-    private void waveControl(String[] paramSplit) {
+    /**
+     * Creates a control with a combobox and imageview to display the wave shape of the currently selected value
+     */
+    private void waveControl() {
         waves = new ComboBox<>();
         images = new ArrayList<>();
 
@@ -138,6 +90,7 @@ public class ControlLayout {
         }
 
         waves.setOnAction(e -> onWaveSelected(waves.getSelectionModel().getSelectedIndex()));
+        waves.getSelectionModel().selectFirst();
 
         waveImage.setImage(images.get(0));
         waveImage.setFitHeight(80);
@@ -155,6 +108,10 @@ public class ControlLayout {
 
     }
 
+    /**
+     * Creates a bitwise control with relevant numbers of checkboxes
+     * @param paramSplit
+     */
     private void bitwiseControl(String[] paramSplit) {
         VBox[] checkAndLabel = new VBox[Integer.parseInt(paramSplit[3])];
         bitwise = true;
@@ -191,6 +148,10 @@ public class ControlLayout {
         BorderPane.setAlignment(setOfBoxes, Pos.CENTER);
     }
 
+    /**
+     * Creates a control that has a slider and a visible IntField to control parameter values
+     * @param paramSplit
+     */
     private void sliderControl(String[] paramSplit) {
 
         slider.setMin(0);
@@ -198,9 +159,17 @@ public class ControlLayout {
 
         control_type = CONTROL_TYPE.SLIDER;
 
-        if (paramSplit.length > 2 && !paramSplit[2].equals("BIT")) {
+        if (paramSplit.length > 2) {
             slider.setMax(Double.parseDouble(paramSplit[2]));
             paramField = new IntField(0, Integer.parseInt(paramSplit[2]), 0);
+            paramField.textProperty().addListener((observable, oldValue, newValue) -> {
+                try {
+                    ParamValueChangeHandler.onFieldChange(this);
+                } catch (SerialPortException | InterruptedException | IOException e) {
+                    e.printStackTrace();
+                }
+            });
+
         }
         paramField.setMaxWidth(45);
         paramField.setAlignment(Pos.CENTER);
@@ -218,6 +187,9 @@ public class ControlLayout {
         BorderPane.setAlignment(paramField, Pos.CENTER);
     }
 
+    /**
+     * Creates a control that has an on/off toggle with radio buttons
+     */
     private void switchControl() {
 
         control_type = CONTROL_TYPE.TOGGLE;
@@ -237,6 +209,7 @@ public class ControlLayout {
 
         HBox radioButtonBox = new HBox(mode0Box,mode1Box);
         radioButtonBox.getStyleClass().add("check-groups");
+        radioButtonBox.setStyle("-fx-alignment: center");
 
         layoutBorder = new BorderPane();
         layoutBorder.setTop(paramName);
@@ -252,6 +225,29 @@ public class ControlLayout {
 
     }
 
+    /**
+     * Called when a bitwise checkbox has its state changed
+     * @param bitNum Number of bits being used in the bitwise parameter checking
+     */
+    private void onCheckChange(int bitNum) {
+        byte paramValue = 0;
+        for (byte i = 0; i < bitNum; i++) {
+            if (bitwiseCheckboxes[i].isSelected()) {
+                byte add = 1;
+                byte iter = (byte) (bitNum - i);
+                for (byte j = 1; j < iter; j++) {
+                    add = (byte) (add * 2);
+                }
+                paramValue = (byte) (paramValue + add);
+            }
+        }
+        paramField.setValue(paramValue & 0xFF);
+    }
+
+    /**
+     * Changes the value in the hidden paramfield depending on the radio button that's selected
+     * @param selected The true or false state passed from the method
+     */
     private void onToggle(boolean selected) {
         if(selected){
             paramField.setValue(1);
@@ -260,8 +256,49 @@ public class ControlLayout {
         }
     }
 
+    /**
+     * Changes the image and parameter value for the relevant wave control
+     * @param index index of selected item in combobox
+     */
     private void onWaveSelected(int index) {
         paramField.setValue(index);
         waveImage.setImage(images.get(index));
+    }
+
+    // -GETTERS AND SETTERS-
+    public BorderPane getLayout() {
+        return layoutBorder;
+    }
+
+    public IntField getParamField() {
+        return paramField;
+    }
+
+    public CONTROL_TYPE getControl_type() {
+        return control_type;
+    }
+
+    public CheckBox[] getBitwiseCheckboxes() {
+        return bitwiseCheckboxes;
+    }
+
+    public ComboBox<String> getWaves() {
+        return waves;
+    }
+
+    public Slider getSlider() {
+        return slider;
+    }
+
+    public ImageView getWaveImage() {
+        return waveImage;
+    }
+
+    public RadioButton[] getRadioButtons() {
+        return radioButtons;
+    }
+
+    public void setWaveImage(int val) {
+        waveImage.setImage(images.get(val));
     }
 }

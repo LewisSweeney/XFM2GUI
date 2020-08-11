@@ -13,6 +13,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 
+/**
+ * Handles all menu action events, performing commands and/or GUI changes
+ */
 public class MenuEventHandlers {
 
     static SerialCommandHandler serialCommandHandler;
@@ -28,6 +31,7 @@ public class MenuEventHandlers {
 
 
     /*
+      UNUSED
       In the case of any tabs being closed accidentally, this will refresh the tabslist and return all tabs to the correct position
       This will also close any extra windows that the program has opened.
       TODO: Fix refresh bug where tabs draw over each other
@@ -73,7 +77,7 @@ public class MenuEventHandlers {
     }
 
     /**
-     * Writes all current param
+     * Writes all current parameters to the board
      *
      * @throws SerialPortException
      * @throws IOException
@@ -178,8 +182,15 @@ public class MenuEventHandlers {
         serialCommandHandler.setLIVE_CHANGES(true);
     }
 
-    public static void onMidiChannelChange(UNIT_NUMBER unit, int channel) throws IOException, SerialPortException {
-        serialCommandHandler.setMidiChannel(unit, channel);
+    /**
+     * Changes the midi channel for the relevant unit_number to the one selected by the user
+     * @param unit_number Enum, either ZERO or ONE
+     * @param channel
+     * @throws IOException
+     * @throws SerialPortException
+     */
+    public static void onMidiChannelChange(UNIT_NUMBER unit_number, int channel) throws IOException, SerialPortException {
+        serialCommandHandler.setMidiChannel(unit_number, channel);
     }
 
     /**
@@ -198,11 +209,21 @@ public class MenuEventHandlers {
         }
     }
 
+    /**
+     * Changes the active unit to the one selected from the unit radio buttons
+     * @param unit_number Enum that determines whether unit ZERO or ONE is active
+     * @throws IOException
+     * @throws SerialPortException
+     */
     public static void setUnit(UNIT_NUMBER unit_number) throws IOException, SerialPortException {
         serialCommandHandler.setUnit(unit_number);
         System.out.println("Active Unit changed to " + unit_number);
     }
 
+    /**
+     * Handles the changing of the state of the liveChanges checkbox
+     * @param live
+     */
     public static void onLiveChanged(boolean live){
         serialCommandHandler.setLIVE_CHANGES(live);
     }

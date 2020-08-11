@@ -131,6 +131,8 @@ public class ControlGroupLayoutConstructor {
 
     }
 
+    // GETTERS
+
     public VBox getControlGroup() {
         return controlGroup;
     }

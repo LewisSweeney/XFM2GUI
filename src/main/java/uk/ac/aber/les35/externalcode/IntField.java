@@ -106,6 +106,7 @@ public class IntField extends TextField {
                 }
 
                 value.set(Integer.parseInt(textProperty().get()));
+
             }
         });
     }
