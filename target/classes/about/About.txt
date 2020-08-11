@@ -1,7 +1,0 @@
-This application has been developed as part of my MSc dissertation. The app is intended for use with the XFM2 synthesizer module created by futur3soundz.
-The aim of the project was to create a platform independent application to program the device using its USB-over-uk.ac.aber.les35.serial capabilities.
-
-The application can change all of the parameters and patches of your XFM2 device, as well as save and load programs locally.
-Unfortunately, the device will still need access to a windows machine to install the initial program.
-
-If you're seeing this text, I'd like to thank you for downloading this app and I hope it's been useful to you
