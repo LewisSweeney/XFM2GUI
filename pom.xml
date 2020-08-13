@@ -12,20 +12,27 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
+                <version>3.7.0</version>
 
                 <configuration>
                     <source>14</source>
                     <target>14</target>
                 </configuration>
             </plugin>
+
             <plugin>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.3</version>
 
                 <configuration>
-                    <mainClass>uk.ac.aber.les35.GUIStarter</mainClass>
+                    <mainClass>uk.ac.aber.lsweeney.GUIStarter</mainClass>
+                    <launcher>launch</launcher>
+                    <compress>2</compress>
+                    <jlinkZipName>XFMGUI</jlinkZipName>
+                    <jlinkImageName>XFMGUI</jlinkImageName>
+                    <noManPages>true</noManPages>
+                    <noHeaderFiles>true</noHeaderFiles>
                     <source>14</source>
                     <target>14</target>
                     <release>14</release>
@@ -33,6 +40,7 @@
             </plugin>
         </plugins>
     </build>
+
     <dependencies>
         <dependency>
             <groupId>org.scream3r</groupId>
@@ -54,22 +62,11 @@
         </dependency>
 
 
-        <!-- https://mvnrepository.com/artifact/org.controlsfx/controlsfx -->
-        <dependency>
-            <groupId>org.controlsfx</groupId>
-            <artifactId>controlsfx</artifactId>
-            <version>11.0.2</version>
-        </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>RELEASE</version>
+            <version>5.7.0-M1</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>de.saxsys</groupId>
-            <artifactId>jfx-testrunner</artifactId>
-            <version>1.2</version>
         </dependency>
 
     </dependencies>

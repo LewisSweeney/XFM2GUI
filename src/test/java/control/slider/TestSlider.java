@@ -3,7 +3,7 @@ package control.slider;
 import javafx.embed.swing.JFXPanel;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import uk.ac.aber.les35.layouts.ControlLayout;
+import uk.ac.aber.lsweeney.layouts.ControlLayout;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
