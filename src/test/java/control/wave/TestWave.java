@@ -1,26 +1,32 @@
 package control.wave;
 
+import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.image.Image;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import uk.ac.aber.lsweeney.layouts.ControlLayout;
+import uk.ac.aber.lsweeney.controls.ParameterControl;
+import uk.ac.aber.lsweeney.layouts.ControlLayoutFactory;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 
 public class TestWave {
 
+    ControlLayoutFactory controlLayoutFactory = ControlLayoutFactory.getSingleInstance();
+
     @BeforeAll
     public static void initialise(){
         // NEEDED FOR INITIALIZING TOOLKIT
-        JFXPanel fxPanel = new JFXPanel();
+        Platform.startup(() -> {
+
+        });
     }
 
     @Test
     public void ChangingValueOfComboBoxChangesImageviewContentsAndParamFieldValue(){
         String testString = "Algo:2:WAVE";
-        ControlLayout tester = new ControlLayout(testString);
+        ParameterControl tester = controlLayoutFactory.createControl(testString);
         Image tempImage;
 
         assertEquals(0, tester.getParamField().getValue(), "Initial value of ParamField should be 0");
@@ -39,7 +45,7 @@ public class TestWave {
     @Test
     public void ChangingValueOfParamFieldChangesImageviewContentsAndComboBoxValue(){
         String testString = "Algo:2:WAVE";
-        ControlLayout tester = new ControlLayout(testString);
+        ParameterControl tester = controlLayoutFactory.createControl(testString);
         Image tempImage = tester.getWaveImage().getImage();
 
         assertEquals(0, tester.getParamField().getValue(), "Initial value of ParamField should be 0");
@@ -59,7 +65,7 @@ public class TestWave {
     public void ChangingValueOfParamFieldToUnderMinValSetsMinIndexOnComboboxAndImage(){
 
         String testString = "Algo:2:WAVE";
-        ControlLayout tester = new ControlLayout(testString);
+        ParameterControl tester = controlLayoutFactory.createControl(testString);
 
         tester.getWaves().getSelectionModel().select(1);
         Image tempImage = tester.getWaveImage().getImage();
@@ -81,8 +87,7 @@ public class TestWave {
     public void ChangingIndexOfComboboxToUnderMaxValChangesNothing(){
 
         String testString = "Algo:2:WAVE";
-        ControlLayout tester = new ControlLayout(testString);
-
+        ParameterControl tester = controlLayoutFactory.createControl(testString);
 
         tester.getWaves().getSelectionModel().select(1);
         Image tempImage = tester.getWaveImage().getImage();
@@ -103,7 +108,7 @@ public class TestWave {
     public void ChangingValueOfParamFieldToOverMaxValSetsMaxIndexOnComboboxAndImage(){
 
         String testString = "Algo:2:WAVE";
-        ControlLayout tester = new ControlLayout(testString);
+        ParameterControl tester = controlLayoutFactory.createControl(testString);
         Image tempImage = tester.getWaveImage().getImage();
 
         assertEquals(0, tester.getParamField().getValue(), "Initial value of ParamField should be 0");
@@ -123,7 +128,7 @@ public class TestWave {
     public void ChangingIndexOfComboboxToOverMaxValChangesNothing(){
 
         String testString = "Algo:2:WAVE";
-        ControlLayout tester = new ControlLayout(testString);
+        ParameterControl tester = controlLayoutFactory.createControl(testString);
         Image tempImage = tester.getWaveImage().getImage();
 
         assertEquals(0, tester.getParamField().getValue(), "Initial value of ParamField should be 0");

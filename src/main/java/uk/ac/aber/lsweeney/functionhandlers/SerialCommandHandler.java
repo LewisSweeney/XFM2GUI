@@ -17,7 +17,6 @@ public class SerialCommandHandler {
     private static final int BAUD_RATE = 500000;
     AlertHandler alertHandler = new AlertHandler();
 
-    public Boolean LIVE_CHANGES = false;
 
     public SerialCommandHandler(SerialPort serialPort) {
         SerialCommandHandler.serialPort = serialPort;
@@ -25,7 +24,7 @@ public class SerialCommandHandler {
 
     /**
      * Used for setting an individual value on the XFM2.
-     * Happends when program is in "Live Changes" mode
+     * Happens when program is in "Live Changes" mode
      * @param paramNeeded The ID of the param being changed
      * @param value The value the param is being set to
      * @throws SerialPortException
@@ -123,11 +122,7 @@ public class SerialCommandHandler {
         bytes[1] = (byte) secondByte;
         bytes[2] = midiChannel.byteValue();
         byte[] data = sendCommand(bytes);
-        if(unit_number == UNIT_NUMBER.ZERO){
-            System.out.println("Set unit 0 channel to " + data[0]);
-        } else{
-            System.out.println("Set unit 1 channel to " + data[0]);
-        }
+        initializeCurrentProgram();
         byte[] newVals = getAllValues();
 
     }
@@ -255,19 +250,17 @@ public class SerialCommandHandler {
         if(serialPort == null){
             return null;
         }
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         byte[] b;
 
         try {
             while ((b = serialPort.readBytes(1, 100)) != null) {
-                baos.write(b);
-                //                System.out.println ("Wrote: " + b.length + " bytes");
+                byteArrayOutputStream.write(b);
             }
-            //            System.out.println("Returning: " + Arrays.toString(baos.toByteArray()));
         } catch (SerialPortTimeoutException ex) {
-            //don't want to catch it, it just means there is no more data         to read
+            System.out.println("Serial Port Timed Out");
         }
-        return baos.toByteArray();
+        return byteArrayOutputStream.toByteArray();
     }
 
     // GETTERS AND SETTERS
@@ -277,14 +270,6 @@ public class SerialCommandHandler {
 
     public void setSerialPort(SerialPort serialPort) {
         SerialCommandHandler.serialPort = serialPort;
-    }
-
-    public Boolean getLIVE_CHANGES() {
-        return LIVE_CHANGES;
-    }
-
-    public void setLIVE_CHANGES(boolean LIVE_CHANGES){
-        this.LIVE_CHANGES = LIVE_CHANGES;
     }
 
 

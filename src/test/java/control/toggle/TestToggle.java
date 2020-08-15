@@ -1,23 +1,30 @@
 package control.toggle;
 
+import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import uk.ac.aber.lsweeney.layouts.ControlLayout;
+import uk.ac.aber.lsweeney.controls.ParameterControl;
+import uk.ac.aber.lsweeney.layouts.ControlLayoutFactory;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestToggle {
+
+    ControlLayoutFactory controlLayoutFactory = ControlLayoutFactory.getSingleInstance();
+
     @BeforeAll
     public static void initialise() {
         // NEEDED FOR INITIALIZING TOOLKIT
-        JFXPanel fxPanel = new JFXPanel();
+        Platform.startup(() -> {
+
+        });
     }
 
     @Test
     public void FiringRadioButtonOneThenTwoLeavesOnlyTwoEnabled() {
         String testString = "Algo:2:TOGGLE";
-        ControlLayout tester = new ControlLayout(testString);
+        ParameterControl tester = controlLayoutFactory.createControl(testString);
 
         tester.getRadioButtons()[0].fire();
 
@@ -33,7 +40,7 @@ public class TestToggle {
     @Test
     public void FiringRadioButtonOneSetsParamfieldValueTo0() {
         String testString = "Algo:2:TOGGLE";
-        ControlLayout tester = new ControlLayout(testString);
+        ParameterControl tester = controlLayoutFactory.createControl(testString);
 
         assertEquals(0, tester.getParamField().getValue(), "Initial value of ParamField should be 0");
 
@@ -45,7 +52,7 @@ public class TestToggle {
     @Test
     public void FiringRadioButtonTwoSetsParamfieldValueTo1() {
         String testString = "Algo:2:TOGGLE";
-        ControlLayout tester = new ControlLayout(testString);
+        ParameterControl tester = controlLayoutFactory.createControl(testString);
 
         assertEquals(0, tester.getParamField().getValue(), "Initial value of ParamField should be 0");
 
@@ -57,7 +64,7 @@ public class TestToggle {
     @Test
     public void SettingParamfieldValueTo0SetsRadioButtonOneAsSelected(){
         String testString = "Algo:2:TOGGLE";
-        ControlLayout tester = new ControlLayout(testString);
+        ParameterControl tester = controlLayoutFactory.createControl(testString);
 
         tester.getRadioButtons()[1].fire();
 
@@ -73,7 +80,7 @@ public class TestToggle {
     @Test
     public void SettingParamfieldValueTo1SetsRadioButtonTwoAsSelected(){
         String testString = "Algo:2:TOGGLE";
-        ControlLayout tester = new ControlLayout(testString);
+        ParameterControl tester = controlLayoutFactory.createControl(testString);
 
 
         assertEquals(0, tester.getParamField().getValue(), "Initial value of ParamField should be 1");
@@ -88,8 +95,7 @@ public class TestToggle {
     @Test
     public void SettingParamfieldValueToMoreThan1SetsRadioButtonTwoAsSelected(){
         String testString = "Algo:2:TOGGLE";
-        ControlLayout tester = new ControlLayout(testString);
-
+        ParameterControl tester = controlLayoutFactory.createControl(testString);
 
         assertEquals(0, tester.getParamField().getValue(), "Initial value of ParamField should be 0");
         assertFalse(tester.getRadioButtons()[1].isSelected(), "Radio Button two should not be selected");
@@ -103,7 +109,7 @@ public class TestToggle {
     @Test
     public void SettingParamfieldValueToLessThan0SetsRadioButtonOneAsSelected(){
         String testString = "Algo:2:TOGGLE";
-        ControlLayout tester = new ControlLayout(testString);
+        ParameterControl tester = controlLayoutFactory.createControl(testString);
 
         tester.getRadioButtons()[1].fire();
         assertEquals(1, tester.getParamField().getValue(), "Initial value of ParamField should be 1");

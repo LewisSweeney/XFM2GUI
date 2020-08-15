@@ -16,19 +16,27 @@ import java.util.Comparator;
 /**
  * Handles all menu action events, performing commands and/or GUI changes
  */
-public class MenuEventHandlers {
+public class MenuEventHandler {
 
-    static SerialCommandHandler serialCommandHandler;
-    static ArrayList<IntField> paramFields;
-    static Scene scene;
+    private static final MenuEventHandler SINGLE_INSTANCE = new MenuEventHandler();
+
+    private OptionsHandler optionsHandler = OptionsHandler.getSingleInstance();
+
+    private SerialCommandHandler serialCommandHandler;
+    private ArrayList<IntField> paramFields;
+    private Scene scene;
    // static SerialPort serialPort;
 
-    public static void setParams(SerialCommandHandler serialCommandHandler, ArrayList<IntField> paramFields, Scene scene){
-        MenuEventHandlers.serialCommandHandler = serialCommandHandler;
-        MenuEventHandlers.scene = scene;
-        MenuEventHandlers.paramFields = paramFields;
+    public static MenuEventHandler getSingleInstance(){
+        return SINGLE_INSTANCE;
     }
 
+
+    public void setParams(SerialCommandHandler serialCommandHandler, ArrayList<IntField> paramFields, Scene scene){
+        this.serialCommandHandler = serialCommandHandler;
+        this.scene = scene;
+        this.paramFields = paramFields;
+    }
 
     /*
       UNUSED
@@ -63,7 +71,7 @@ public class MenuEventHandlers {
      *
      * @throws SerialPortException
      */
-    public static void onSerialPortSelection(String[] serialPortNameList, ComboBox<String> serialPortPicker, SerialPort serialPort, ComboBox<Integer> patchPicker) throws SerialPortException, IOException {
+    public void onSerialPortSelection(String[] serialPortNameList, ComboBox<String> serialPortPicker, SerialPort serialPort, ComboBox<Integer> patchPicker) throws SerialPortException, IOException {
         if (serialPort != null && serialPort.isOpened()) {
             serialPort.closePort();
         }
@@ -83,7 +91,7 @@ public class MenuEventHandlers {
      * @throws IOException
      * @throws InterruptedException
      */
-    public static void onWriteButtonPress() throws SerialPortException, IOException, InterruptedException {
+    public void onWriteButtonPress() throws SerialPortException, IOException, InterruptedException {
         paramFields.sort(Comparator.comparingInt(p -> Integer.parseInt(p.getId())));
 
         byte[] bytes = new byte[512];
@@ -111,10 +119,12 @@ public class MenuEventHandlers {
      *
      * @throws FileNotFoundException
      */
-    public static void onLoadButtonPress(Stage fileStage) throws FileNotFoundException {
+    public void onLoadButtonPress(Stage fileStage) throws IOException, InterruptedException, SerialPortException {
         paramFields.sort(Comparator.comparingInt(p -> Integer.parseInt(p.getId())));
         PatchLoader loader = new PatchLoader();
         ArrayList<String> lines = loader.loadFromFile(fileStage);
+
+        optionsHandler.setLiveChanges(false);
 
         for (String line : lines) {
             String[] lineSplit = line.split(":");
@@ -126,6 +136,10 @@ public class MenuEventHandlers {
                 }
             }
         }
+
+        optionsHandler.setLiveChanges(true);
+
+        onWriteButtonPress();
     }
 
     /**
@@ -133,7 +147,7 @@ public class MenuEventHandlers {
      *
      * @throws IOException
      */
-    public static void onSaveButtonPress(Stage fileStage) throws IOException {
+    public void onSaveButtonPress(Stage fileStage) throws IOException {
         paramFields.sort(Comparator.comparingInt(p -> Integer.parseInt(p.getId())));
         ArrayList<String> lines = new ArrayList<>();
         for (IntField i : paramFields) {
@@ -151,7 +165,7 @@ public class MenuEventHandlers {
      * @throws SerialPortException
      * @throws IOException
      */
-    public static void onReadButtonPress() throws SerialPortException, IOException {
+    public void onReadButtonPress() throws SerialPortException, IOException {
         byte[] dump = serialCommandHandler.getAllValues();
         setAllIntFieldValues(dump);
     }
@@ -163,7 +177,7 @@ public class MenuEventHandlers {
      * @throws IOException
      * @throws SerialPortException
      */
-    public static void onSaveToXFMPress(ComboBox<Integer> patchPicker) throws IOException, SerialPortException {
+    public void onSaveToXFMPress(ComboBox<Integer> patchPicker) throws IOException, SerialPortException {
         serialCommandHandler.writeProgram(patchPicker.getValue());
     }
 
@@ -174,12 +188,11 @@ public class MenuEventHandlers {
      * @throws SerialPortException
      * @throws IOException
      */
-    public static void onPatchPicked(int value) throws SerialPortException, IOException {
-        serialCommandHandler.setLIVE_CHANGES(false);
-        System.out.println("Getting patch number " + value);
+    public void onPatchPicked(int value) throws SerialPortException, IOException {
+        optionsHandler.setLiveChanges(false);
         serialCommandHandler.readProgram(value);
         setAllIntFieldValues(serialCommandHandler.getAllValues());
-        serialCommandHandler.setLIVE_CHANGES(true);
+        optionsHandler.revertLiveChanges();
     }
 
     /**
@@ -189,7 +202,7 @@ public class MenuEventHandlers {
      * @throws IOException
      * @throws SerialPortException
      */
-    public static void onMidiChannelChange(UNIT_NUMBER unit_number, int channel) throws IOException, SerialPortException {
+    public void onMidiChannelChange(UNIT_NUMBER unit_number, int channel) throws IOException, SerialPortException {
         serialCommandHandler.setMidiChannel(unit_number, channel);
     }
 
@@ -199,7 +212,7 @@ public class MenuEventHandlers {
      *
      * @param dump The 512 length byte array containing all parameters.
      */
-    public static void setAllIntFieldValues(byte[] dump) {
+    public void setAllIntFieldValues(byte[] dump) {
         // int offset = 48;
         if (dump.length == 512) {
             for (IntField intField : paramFields) {
@@ -215,16 +228,19 @@ public class MenuEventHandlers {
      * @throws IOException
      * @throws SerialPortException
      */
-    public static void setUnit(UNIT_NUMBER unit_number) throws IOException, SerialPortException {
+    public void setUnit(UNIT_NUMBER unit_number) throws IOException, SerialPortException {
         serialCommandHandler.setUnit(unit_number);
-        System.out.println("Active Unit changed to " + unit_number);
+    }
+
+    public void setLayering(boolean layering) throws IOException, SerialPortException {
+        serialCommandHandler.setMidiLayering(layering);
     }
 
     /**
      * Handles the changing of the state of the liveChanges checkbox
      * @param live
      */
-    public static void onLiveChanged(boolean live){
-        serialCommandHandler.setLIVE_CHANGES(live);
+    public void onLiveChanged(boolean live){
+        optionsHandler.setLiveChanges(live);
     }
 }

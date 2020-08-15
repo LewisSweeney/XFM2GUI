@@ -110,6 +110,10 @@
     -fx-font-size: 12;
 }
 
+.control{
+    -fx-alignment: center;
+}
+
 .param-label {
     -fx-font-family: Courier;
 }

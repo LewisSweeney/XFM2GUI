@@ -5,8 +5,10 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import uk.ac.aber.lsweeney.controls.BitwiseControl;
+import uk.ac.aber.lsweeney.controls.ParameterControl;
+import uk.ac.aber.lsweeney.controls.WaveControl;
 import uk.ac.aber.lsweeney.externalcode.IntField;
-import uk.ac.aber.lsweeney.enums.CONTROL_TYPE;
 import uk.ac.aber.lsweeney.enums.OPERATOR_NUM;
 
 import java.io.BufferedReader;
@@ -20,10 +22,12 @@ import java.util.ArrayList;
 public class ControlGroupLayoutConstructor {
 
     Label groupTitle = new Label("DEFAULT");
-    ArrayList<ControlLayout> controls = new ArrayList<>();
+    ArrayList<ParameterControl> controls = new ArrayList<>();
     VBox controlGroup = new VBox();
     BufferedReader bReader;
     int rowLength;
+
+    ControlLayoutFactory controlLayoutFactory = ControlLayoutFactory.getSingleInstance();
 
     // Constructor that takes a list of controls and a row length so it can construct a control group based on that
     public ControlGroupLayoutConstructor(int rowLength, String filepath) {
@@ -32,7 +36,7 @@ public class ControlGroupLayoutConstructor {
         ArrayList<HBox> bitRows = new ArrayList<>();
         ArrayList<HBox> wavRows = new ArrayList<>();
         bReader = new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream(filepath)));
-        ArrayList<String> paramNames = new ArrayList<>();
+        ArrayList<String> parameterStrings = new ArrayList<>();
 
         try {
             String line = bReader.readLine();
@@ -41,7 +45,7 @@ public class ControlGroupLayoutConstructor {
                     String replace = line.replace("-", "");
                     groupTitle.setText(replace);
                 } else if (line.charAt(0) != '#') {
-                    paramNames.add(line);
+                    parameterStrings.add(line);
                 }
                 line = bReader.readLine();
             }
@@ -50,9 +54,8 @@ public class ControlGroupLayoutConstructor {
             ioException.printStackTrace();
         }
 
-        for (String p : paramNames) {
-            ControlLayout controlLayout = new ControlLayout(p);
-            controls.add(controlLayout);
+        for (String p : parameterStrings) {
+            controls.add(controlLayoutFactory.createControl(p));
         }
 
 
@@ -71,58 +74,54 @@ public class ControlGroupLayoutConstructor {
         int currentWavRow = 0;
 
 
-        for (ControlLayout con : controls) {
+        for (ParameterControl con : controls) {
 
-            CONTROL_TYPE conType = con.getControl_type();
-            switch (conType){
-                case WAVE-> {
-                    if (currentWavCol >= rowLength) {
-                        currentWavCol = 0;
-                        currentWavRow++;
-                    }
-                    if (currentWavCol == 0) {
-                        HBox h = new HBox();
-                        h.setAlignment(Pos.CENTER);
-                        wavRows.add(h);
-                    }
-                    wavRows.get(currentWavRow).getChildren().add(con.getLayout());
-                    wavRows.get(currentWavRow).setStyle("-fx-padding: 0 0 10 0");
-                    currentWavCol++;
+            if (con instanceof WaveControl) {
+                if (currentWavCol >= rowLength) {
+                    currentWavCol = 0;
+                    currentWavRow++;
                 }
-
-                case BITWISE -> {
-                    if (currentBitCol >= bitRowLength) {
-                        currentBitCol = 0;
-                        currentBitRow++;
-                    }
-                    if (currentBitCol == 0) {
-                        HBox h = new HBox();
-                        h.setAlignment(Pos.CENTER);
-                        bitRows.add(h);
-                    }
-                    bitRows.get(currentBitRow).getChildren().add(con.getLayout());
-                    bitRows.get(currentBitRow).setStyle("-fx-padding: 0 0 10 0");
-                    currentBitCol++;
+                if (currentWavCol == 0) {
+                    HBox h = new HBox();
+                    h.setAlignment(Pos.CENTER);
+                    wavRows.add(h);
                 }
-
-                case SLIDER,TOGGLE -> {
-                    if (currentColumn >= rowLength) {
-                        currentColumn = 0;
-                        currentRow++;
-                    }
-                    if (currentColumn == 0) {
-                        HBox h = new HBox();
-                        h.setAlignment(Pos.CENTER);
-                        rows.add(h);
-                    }
-                    rows.get(currentRow).getChildren().add(con.getLayout());
-                    rows.get(currentRow).setStyle("-fx-padding: 0 0 10 0");
-                    currentColumn++;
+                wavRows.get(currentWavRow).getChildren().add(con.getLayout());
+                wavRows.get(currentWavRow).setStyle("-fx-padding: 0 0 10 0");
+                currentWavCol++;
+            } else if (con instanceof BitwiseControl) {
+                if (currentBitCol >= bitRowLength) {
+                    currentBitCol = 0;
+                    currentBitRow++;
                 }
+                if (currentBitCol == 0) {
+                    HBox h = new HBox();
+                    h.setAlignment(Pos.CENTER);
+                    bitRows.add(h);
+                }
+                bitRows.get(currentBitRow).getChildren().add(con.getLayout());
+                bitRows.get(currentBitRow).setStyle("-fx-padding: 0 0 10 0");
+                currentBitCol++;
+            } else {
+                if (currentColumn >= rowLength) {
+                    currentColumn = 0;
+                    currentRow++;
+                }
+                if (currentColumn == 0) {
+                    HBox h = new HBox();
+                    h.setAlignment(Pos.CENTER);
+                    rows.add(h);
+                }
+                rows.get(currentRow).getChildren().add(con.getLayout());
+                rows.get(currentRow).setStyle("-fx-padding: 0 0 10 0");
+                currentColumn++;
             }
+
+
         }
 
         groupTitle.getStyleClass().add("group-label");
+
         controlGroup.getStyleClass().add("group-control");
         controlGroup.getChildren().add(groupTitle);
         controlGroup.getChildren().addAll(bitRows);
@@ -186,8 +185,8 @@ public class ControlGroupLayoutConstructor {
 
     public ArrayList<IntField> getIntFields() {
         ArrayList<IntField> intFields = new ArrayList<>();
-        for (ControlLayout cl : controls) {
-            intFields.add(cl.getParamField());
+        for (ParameterControl c : controls) {
+            intFields.add(c.getParamField());
         }
         return intFields;
     }

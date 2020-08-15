@@ -1,24 +1,30 @@
 package control.slider;
 
+import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import uk.ac.aber.lsweeney.layouts.ControlLayout;
+import uk.ac.aber.lsweeney.controls.ParameterControl;
+import uk.ac.aber.lsweeney.layouts.ControlLayoutFactory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestSlider {
 
+    ControlLayoutFactory controlLayoutFactory = ControlLayoutFactory.getSingleInstance();
+
     @BeforeAll
     public static void initialise(){
         // NEEDED FOR INITIALIZING TOOLKIT
-        JFXPanel fxPanel = new JFXPanel();
+        Platform.startup(() -> {
+
+        });
     }
 
     @Test
     public void SetSliderValTo255ShouldSetParamFieldValTo255(){
         String testString = "Tester:0";
-        ControlLayout tester = new ControlLayout(testString);
+        ParameterControl tester = controlLayoutFactory.createControl(testString);
 
         assertEquals(0, tester.getParamField().getValue(), "Initial value of ParamField should be 0");
         assertEquals(0, tester.getSlider().getValue(), "Initial value of Slider should be 0");
@@ -30,7 +36,7 @@ public class TestSlider {
     @Test
     public void SetParamFieldValTo255ShouldSetSliderValTo255(){
         String testString = "Tester:0";
-        ControlLayout tester = new ControlLayout(testString);
+        ParameterControl tester = controlLayoutFactory.createControl(testString);
 
         assertEquals(0, tester.getParamField().getValue(), "Initial value of ParamField should be 0");
         assertEquals(0, tester.getSlider().getValue(), "Initial value of Slider should be 0");
@@ -42,7 +48,7 @@ public class TestSlider {
     @Test
     public void SetParamFieldValMoreThan255RoundsDownTo255(){
         String testString = "Tester:0";
-        ControlLayout tester = new ControlLayout(testString);
+        ParameterControl tester = controlLayoutFactory.createControl(testString);
 
         assertEquals(0, tester.getParamField().getValue(), "Initial value of ParamField should be 0");
         tester.getParamField().setValue(1000);
@@ -52,7 +58,7 @@ public class TestSlider {
     @Test
     public void SetSliderValMoreThan255RoundsDownTo255(){
         String testString = "Tester:0";
-        ControlLayout tester = new ControlLayout(testString);
+        ParameterControl tester = controlLayoutFactory.createControl(testString);
 
         assertEquals(0, tester.getSlider().getValue(), "Initial value of Slider should be 0");
         tester.getParamField().setValue(1000);
@@ -62,7 +68,7 @@ public class TestSlider {
     @Test
     public void SetParamFieldValLessThan0RoundsUpTo0(){
         String testString = "Tester:0";
-        ControlLayout tester = new ControlLayout(testString);
+        ParameterControl tester = controlLayoutFactory.createControl(testString);
 
         assertEquals(0, tester.getParamField().getValue(), "Initial value of ParamField should be 0");
         tester.getParamField().setValue(-1000);
@@ -72,7 +78,7 @@ public class TestSlider {
     @Test
     public void SetSliderValLessThan0RoundsUpTo0(){
         String testString = "Tester:0";
-        ControlLayout tester = new ControlLayout(testString);
+        ParameterControl tester = controlLayoutFactory.createControl(testString);
 
         assertEquals(0, tester.getSlider().getValue(), "Initial value of Slider should be 0");
         tester.getParamField().setValue(-1000);
@@ -82,7 +88,7 @@ public class TestSlider {
     @Test
     public void SettingParamFieldWithMaxValOfLessThan255TopsOutAtWhenSetTo255(){
         String testString = "Tester:0:128";
-        ControlLayout tester = new ControlLayout(testString);
+        ParameterControl tester = controlLayoutFactory.createControl(testString);
 
         assertEquals(0, tester.getSlider().getValue(), "Initial value of Slider should be 0");
         assertEquals(0, tester.getParamField().getValue(), "Initial value of ParamField should be 0");
@@ -95,7 +101,7 @@ public class TestSlider {
     @Test
     public void SettingSliderWithMaxValOfLessThan255TopsOutAtWhenSetTo255(){
         String testString = "Tester:0:128";
-        ControlLayout tester = new ControlLayout(testString);
+        ParameterControl tester = controlLayoutFactory.createControl(testString);
 
         assertEquals(0, tester.getSlider().getValue(), "Initial value of Slider should be 0");
         assertEquals(0, tester.getParamField().getValue(), "Initial value of ParamField should be 0");

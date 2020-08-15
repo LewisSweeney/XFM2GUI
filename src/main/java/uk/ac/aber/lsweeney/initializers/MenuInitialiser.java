@@ -15,15 +15,13 @@ import javafx.stage.Stage;
 import jssc.SerialPort;
 import jssc.SerialPortException;
 
-import uk.ac.aber.lsweeney.enums.ALERT_TYPE;
 import uk.ac.aber.lsweeney.enums.UNIT_NUMBER;
 import uk.ac.aber.lsweeney.externalcode.IntField;
 import uk.ac.aber.lsweeney.functionhandlers.AlertHandler;
-import uk.ac.aber.lsweeney.functionhandlers.MenuEventHandlers;
+import uk.ac.aber.lsweeney.functionhandlers.MenuEventHandler;
 import uk.ac.aber.lsweeney.functionhandlers.SerialCommandHandler;
 import uk.ac.aber.lsweeney.sceneconstructors.AboutSceneConstructor;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -46,9 +44,15 @@ public class MenuInitialiser {
 
     final static ArrayList<IntField> paramFields = new ArrayList<>();
 
+    final static AlertHandler alertHandler = new AlertHandler();
+
+    final static MenuEventHandler menuEventHandler = MenuEventHandler.getSingleInstance();
+
     int BUTTON_WIDTH = 150;
 
     String style = this.getClass().getResource("/stylesheets/style.css").toExternalForm();
+
+
 
     public MenuInitialiser(SerialCommandHandler serialCommandHandler, SerialPort serialPort, String[] serialPortNameList) {
         this.serialCommandHandler = serialCommandHandler;
@@ -88,15 +92,24 @@ public class MenuInitialiser {
         Scene scene = new Scene(topBorder);
         scene.getStylesheets().add(style);
 
-        MenuEventHandlers.setParams(serialCommandHandler, paramFields, scene);
+        menuEventHandler.setParams(serialCommandHandler, paramFields, scene);
 
         midiChZeroPicker.getSelectionModel().selectFirst();
         int val = midiChZeroPicker.getSelectionModel().getSelectedIndex();
-        MenuEventHandlers.onMidiChannelChange(UNIT_NUMBER.ZERO, val);
+        menuEventHandler.onMidiChannelChange(UNIT_NUMBER.ZERO, val);
 
         midiChOnePicker.getSelectionModel().selectFirst();
         int val2 = midiChOnePicker.getSelectionModel().getSelectedIndex();
-        MenuEventHandlers.onMidiChannelChange(UNIT_NUMBER.ONE, val2);
+        menuEventHandler.onMidiChannelChange(UNIT_NUMBER.ONE, val2);
+
+        menuEventHandler.setUnit(UNIT_NUMBER.ZERO);
+
+        try {
+            menuEventHandler.onPatchPicked(1);
+            menuEventHandler.setLayering(false);
+        } catch (SerialPortException | IOException e) {
+            e.printStackTrace();
+        }
 
         return scene;
 
@@ -118,7 +131,7 @@ public class MenuInitialiser {
                 byte[] tempData = serialCommandHandler.getAllValues();
                 System.out.println("DATA LENGTH" + tempData.length);
                 if (tempData.length == 512) {
-                    serialPort = new SerialPort(s);
+                    serialPort = sP;
                 }
             }
 
@@ -130,15 +143,15 @@ public class MenuInitialiser {
             if(serialPort == null){
                 serialPortPicker.getSelectionModel().selectFirst();
                 serialPort = new SerialPort(serialPortPicker.getValue());
+                serialCommandHandler.setSerialPort(serialPort);
             }
 
             serialPortPicker.getSelectionModel().clearSelection();
             serialPortPicker.getSelectionModel().select(serialPort.getPortName());
         } else {
+            System.out.println("SETTING NULL ANYWAY FOR SOME REASON");
             serialPort = null;
             serialPortPicker.setPromptText("NO PORTS");
-            AlertHandler alertHandler = new AlertHandler();
-            alertHandler.SendAlert(ALERT_TYPE.NO_DEVICE);
         }
 
         updateSerialPickerListener();
@@ -177,12 +190,13 @@ public class MenuInitialiser {
         patchPicker.setOnAction(e -> {
             try {
                 if (!(patchPicker.getValue() == null)) {
-                    MenuEventHandlers.onPatchPicked(patchPicker.getValue());
+                    menuEventHandler.onPatchPicked(patchPicker.getValue());
                 }
             } catch (SerialPortException | IOException serialPortException) {
                 serialPortException.printStackTrace();
             }
         });
+        patchPicker.getSelectionModel().selectFirst();
 
         //Button reloadTabs = new Button("Refresh Tabs");
         //reloadTabs.setTooltip(reloadTooltip);
@@ -190,7 +204,7 @@ public class MenuInitialiser {
 
         CheckBox liveChanges = new CheckBox("Live Changes");
         liveChanges.setSelected(true);
-        EventHandler<ActionEvent> actionEventEventHandler = actionEvent -> MenuEventHandlers.onLiveChanged(liveChanges.isSelected());
+        EventHandler<ActionEvent> actionEventEventHandler = actionEvent -> menuEventHandler.onLiveChanged(liveChanges.isSelected());
         liveChanges.setOnAction(actionEventEventHandler);
 
         // EventHandler<? super MouseEvent> reloadTabsEventHandler = (EventHandler<MouseEvent>) mouseEvent -> reloadTabs();
@@ -269,7 +283,7 @@ public class MenuInitialiser {
         layering.setTooltip(layeringTooltip);
         layering.setOnAction(e -> {
             try {
-                serialCommandHandler.setMidiLayering(layering.isSelected());
+                menuEventHandler.setLayering(layering.isSelected());
             } catch (SerialPortException | IOException serialPortException) {
                 serialPortException.printStackTrace();
             }
@@ -301,7 +315,7 @@ public class MenuInitialiser {
         midiPicker.setOnAction(e -> {
             try {
                 int val = midiPicker.getSelectionModel().getSelectedIndex();
-                MenuEventHandlers.onMidiChannelChange(unit_number, val);
+                menuEventHandler.onMidiChannelChange(unit_number, val);
             } catch (SerialPortException | IOException serialPortException) {
                 serialPortException.printStackTrace();
             }
@@ -313,7 +327,7 @@ public class MenuInitialiser {
         unit.setOnAction(actionEvent -> {
             try {
                 if (unit.isSelected()) {
-                    MenuEventHandlers.setUnit(unit_number);
+                    menuEventHandler.setUnit(unit_number);
                 }
             } catch (SerialPortException | IOException e) {
                 e.printStackTrace();
@@ -367,7 +381,7 @@ public class MenuInitialiser {
 
         menuButtons[0].setOnAction(actionEvent -> {
             try {
-                MenuEventHandlers.onReadButtonPress();
+                menuEventHandler.onReadButtonPress();
             } catch (SerialPortException | IOException e) {
                 e.printStackTrace();
             }
@@ -375,7 +389,7 @@ public class MenuInitialiser {
 
         menuButtons[1].setOnAction(actionEvent -> {
             try {
-                MenuEventHandlers.onWriteButtonPress();
+                menuEventHandler.onWriteButtonPress();
             } catch (SerialPortException | IOException | InterruptedException e) {
                 e.printStackTrace();
             }
@@ -383,7 +397,7 @@ public class MenuInitialiser {
 
         menuButtons[2].setOnAction(actionEvent -> {
             try {
-                MenuEventHandlers.onSaveToXFMPress(patchPicker);
+                menuEventHandler.onSaveToXFMPress(patchPicker);
             } catch (IOException | SerialPortException e) {
                 e.printStackTrace();
             }
@@ -392,7 +406,7 @@ public class MenuInitialiser {
 
         menuButtons[3].setOnAction(actionEvent -> {
             try {
-                MenuEventHandlers.onSaveButtonPress(fileStage);
+                menuEventHandler.onSaveButtonPress(fileStage);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -400,8 +414,8 @@ public class MenuInitialiser {
 
         menuButtons[4].setOnAction(actionEvent -> {
             try {
-                MenuEventHandlers.onLoadButtonPress(fileStage);
-            } catch (FileNotFoundException e) {
+                menuEventHandler.onLoadButtonPress(fileStage);
+            } catch (SerialPortException | InterruptedException | IOException e) {
                 e.printStackTrace();
             }
         });
@@ -416,7 +430,7 @@ public class MenuInitialiser {
     public void updateSerialPickerListener() {
         serialPortPicker.setOnAction(e -> {
             try {
-                MenuEventHandlers.onSerialPortSelection(serialPortNameList, serialPortPicker, serialPort, patchPicker);
+                menuEventHandler.onSerialPortSelection(serialPortNameList, serialPortPicker, serialPort, patchPicker);
             } catch (SerialPortException | IOException serialPortException) {
                 serialPortException.printStackTrace();
             }

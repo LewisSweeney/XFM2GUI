@@ -7,10 +7,9 @@ import javafx.stage.Stage;
 import jssc.SerialPort;
 import jssc.SerialPortException;
 import jssc.SerialPortList;
+import uk.ac.aber.lsweeney.enums.ALERT_TYPE;
+import uk.ac.aber.lsweeney.functionhandlers.*;
 import uk.ac.aber.lsweeney.initializers.MenuInitialiser;
-import uk.ac.aber.lsweeney.functionhandlers.SerialCommandHandler;
-import uk.ac.aber.lsweeney.functionhandlers.MenuEventHandlers;
-import uk.ac.aber.lsweeney.functionhandlers.ParamValueChangeHandler;
 
 import java.io.IOException;
 
@@ -23,7 +22,11 @@ public class Main extends Application {
     SerialPort serialPort;
     SerialCommandHandler serialCommandHandler = new SerialCommandHandler(serialPort);
 
-    Boolean LIVE_CHANGES = false;
+    AlertHandler alertHandler = new AlertHandler();
+
+    MenuEventHandler menuEventHandler = MenuEventHandler.getSingleInstance();
+    OptionsHandler optionsHandler = OptionsHandler.getSingleInstance();
+
 
     @Override
     public void start(Stage primaryStage) throws IOException, SerialPortException {
@@ -31,16 +34,23 @@ public class Main extends Application {
         Scene scene = menuInitialiser.initializeScene();
         ParamValueChangeHandler.setSerialCommandHandler(serialCommandHandler);
 
-        LIVE_CHANGES = false;
-        MenuEventHandlers.setAllIntFieldValues(serialCommandHandler.getAllValues());
-        LIVE_CHANGES = true;
+
+
+        optionsHandler.setLiveChanges(false);
+        menuEventHandler.setAllIntFieldValues(serialCommandHandler.getAllValues());
+        optionsHandler.setLiveChanges(true);
 
         primaryStage.setResizable(false);
         primaryStage.setScene(scene);
         primaryStage.setTitle("XFM2GUI");
         primaryStage.show();
 
-        serialCommandHandler.setLIVE_CHANGES(true);
+        if(serialCommandHandler.getSerialPort() == null){
+            alertHandler.SendAlert(ALERT_TYPE.NO_DEVICE);
+        } else if(serialCommandHandler.getAllValues().length != 512 || serialCommandHandler.getAllValues().length != 287){
+            alertHandler.SendAlert(ALERT_TYPE.NOT_XFM);
+        }
+
     }
 
     public static void main(String[] args) {

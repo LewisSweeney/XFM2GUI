@@ -4,8 +4,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Slider;
 import jssc.SerialPortException;
-import uk.ac.aber.lsweeney.enums.CONTROL_TYPE;
-import uk.ac.aber.lsweeney.layouts.ControlLayout;
+import uk.ac.aber.lsweeney.controls.*;
 
 import java.io.IOException;
 
@@ -15,13 +14,14 @@ import java.io.IOException;
  */
 public class ParamValueChangeHandler {
     static SerialCommandHandler serialCommandHandler;
+    private static OptionsHandler optionsHandler = OptionsHandler.getSingleInstance();
 
     /**
      * When the slider value is changed this method ensures the parameter IntField is also updated
      *
      * @param c The ControlLayout being used for inspecting nodes and values
      */
-    public static void onSliderChange(ControlLayout c) {
+    public static void onSliderChange(ParameterControl c) {
         c.getParamField().setValue((int) c.getSlider().getValue());
     }
 
@@ -34,24 +34,31 @@ public class ParamValueChangeHandler {
      * @throws InterruptedException
      * @throws IOException
      */
-    public static void onFieldChange(ControlLayout c) throws SerialPortException, InterruptedException, IOException {
-        Slider s = c.getSlider();
-        s.setValue(c.getParamField().getValue());
-        if(c.getParamField().getValue() > s.getMax()){
-            s.setValue(s.getMax());
+    public static void onFieldChange(ParameterControl c) throws SerialPortException, InterruptedException, IOException {
+
+
+        if (c instanceof BitwiseControl) {
+            bitwiseChange(c);
+        } else if (c instanceof WaveControl) {
+            waveChange(c);
+        } else if (c instanceof ToggleControl) {
+            toggleChange(c);
+        } else if (c instanceof SliderControl) {
+            sliderChange(c);
         }
 
-        if (c.getControl_type() == CONTROL_TYPE.BITWISE) {
-            bitwiseChange(c);
-        } else if (c.getControl_type() == CONTROL_TYPE.WAVE) {
-            waveChange(c);
-        } else if (c.getControl_type() == CONTROL_TYPE.TOGGLE) {
-            toggleChange(c);
-        }
         if (serialCommandHandler != null) {
-            if (serialCommandHandler.getLIVE_CHANGES()) {
+            if (optionsHandler.getLiveChanges()) {
                 serialCommandHandler.setIndividualValue(Integer.parseInt(c.getParamField().getId()), c.getParamField().getValue());
             }
+        }
+    }
+
+    private static void sliderChange(ParameterControl c) {
+        Slider s = c.getSlider();
+        s.setValue(c.getParamField().getValue());
+        if (c.getParamField().getValue() > s.getMax()) {
+            s.setValue(s.getMax());
         }
     }
 
@@ -60,20 +67,24 @@ public class ParamValueChangeHandler {
      *
      * @param c The ControlLayout being used for inspecting nodes and values
      */
-    private static void bitwiseChange(ControlLayout c) {
+    private static void bitwiseChange(ParameterControl c) {
         int j = 1;
         int sub = 1;
         CheckBox[] bitwiseCheck = c.getBitwiseCheckboxes();
-        if (bitwiseCheck.length == 6) {
-            j = 2;
-            sub = 2;
+        if (bitwiseCheck.length > 1) {
+            if (bitwiseCheck.length == 6) {
+                j = 2;
+                sub = 2;
+            }
+
+            String s1 = String.format("%8s", Integer.toBinaryString(c.getParamField().getValue() & 0xFF)).replace(' ', '0');
+
+            for (int k = 0; j < 8; j++) {
+                bitwiseCheck[j - sub].setSelected(s1.charAt(j) != '0');
+            }
         }
 
-        String s1 = String.format("%8s", Integer.toBinaryString(c.getParamField().getValue() & 0xFF)).replace(' ', '0');
-
-        for (int k = 0; j < 8; j++) {
-            bitwiseCheck[j - sub].setSelected(s1.charAt(j) != '0');
-        }
+        System.out.println("Parm Val" + c.getParamField().getValue());
     }
 
     /**
@@ -81,7 +92,7 @@ public class ParamValueChangeHandler {
      *
      * @param c The ControlLayout being used for inspecting nodes and values
      */
-    private static void waveChange(ControlLayout c) {
+    private static void waveChange(ParameterControl c) {
         int val = c.getParamField().getValue();
 
         if (val < 0) {
@@ -89,9 +100,10 @@ public class ParamValueChangeHandler {
         } else if (val > 7) {
             val = 7;
         }
-
-        c.getWaves().getSelectionModel().select(val);
-        c.setWaveImage(c.getWaves().getSelectionModel().getSelectedIndex());
+        if (c.getWaves() != null) {
+            c.getWaves().getSelectionModel().select(val);
+            c.setWaveImage(c.getWaves().getSelectionModel().getSelectedIndex());
+        }
     }
 
     /**
@@ -99,15 +111,16 @@ public class ParamValueChangeHandler {
      *
      * @param c The ControlLayout being used for inspecting nodes and values
      */
-    private static void toggleChange(ControlLayout c) {
+    private static void toggleChange(ParameterControl c) {
         RadioButton[] radioButtons = c.getRadioButtons();
-
-        if (c.getParamField().getValue() > 0) {
-            radioButtons[0].setSelected(false);
-            radioButtons[1].setSelected(true);
-        } else {
-            radioButtons[1].setSelected(false);
-            radioButtons[0].setSelected(true);
+        if (radioButtons != null) {
+            if (c.getParamField().getValue() > 0) {
+                radioButtons[0].setSelected(false);
+                radioButtons[1].setSelected(true);
+            } else {
+                radioButtons[1].setSelected(false);
+                radioButtons[0].setSelected(true);
+            }
         }
     }
 

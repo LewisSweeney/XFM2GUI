@@ -1,24 +1,30 @@
 package control.bitwise;
 
+import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.control.CheckBox;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import uk.ac.aber.lsweeney.layouts.ControlLayout;
+import uk.ac.aber.lsweeney.controls.ParameterControl;
+import uk.ac.aber.lsweeney.layouts.ControlLayoutFactory;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestBitwiseSeven {
+    ControlLayoutFactory controlLayoutFactory = ControlLayoutFactory.getSingleInstance();
     @BeforeAll
     public static void initialise(){
         // NEEDED FOR INITIALIZING TOOLKIT
-        JFXPanel fxPanel = new JFXPanel();
+       // JFXPanel fxPanel = new JFXPanel();
+        Platform.startup(() -> {
+
+        });
     }
 
     @Test
     public void TickingTwoLeastSignificantBoxesShouldSetParamFieldValTo3(){
         String testString = "Algo:2:BIT:7:OP6/OP5/OP4/OP3/OP2/OP1/OUT";
-        ControlLayout tester = new ControlLayout(testString);
+        ParameterControl tester = controlLayoutFactory.createControl(testString);
 
         assertEquals(0, tester.getParamField().getValue(), "Initial value of ParamField should be 0");
         tester.getBitwiseCheckboxes()[6].fire();
@@ -29,7 +35,7 @@ public class TestBitwiseSeven {
     @Test
     public void SettingParamFieldValTo3ShouldOnlyTickTwoLeastSignificantCheckboxes(){
         String testString = "Algo:2:BIT:7:OP6/OP5/OP4/OP3/OP2/OP1/OUT";
-        ControlLayout tester = new ControlLayout(testString);
+        ParameterControl tester = controlLayoutFactory.createControl(testString);
 
         assertEquals(0, tester.getParamField().getValue(), "Initial value of ParamField should be 0");
         assertFalse(tester.getBitwiseCheckboxes()[0].isSelected(), "Box 0 should not be ticked");
@@ -53,7 +59,7 @@ public class TestBitwiseSeven {
     @Test
     public void SettingAllCheckBoxesTickedShouldEqual127(){
         String testString = "Algo:2:BIT:7:OP6/OP5/OP4/OP3/OP2/OP1/OUT";
-        ControlLayout tester = new ControlLayout(testString);
+        ParameterControl tester = controlLayoutFactory.createControl(testString);
 
         assertEquals(0, tester.getParamField().getValue(),"Paramfield val should be 0 intially");
         for(CheckBox c:tester.getBitwiseCheckboxes()){
@@ -65,7 +71,7 @@ public class TestBitwiseSeven {
     @Test
     public void SettingParamFieldValTo127ShouldTickAllCheckBoxes(){
         String testString = "Algo:2:BIT:7:OP6/OP5/OP4/OP3/OP2/OP1/OUT";
-        ControlLayout tester = new ControlLayout(testString);
+        ParameterControl tester = controlLayoutFactory.createControl(testString);
 
         assertEquals(0, tester.getParamField().getValue(),"Paramfield val should be 0 intially");
         assertFalse(tester.getBitwiseCheckboxes()[0].isSelected(), "Box 0 should not be ticked");
