@@ -18,6 +18,7 @@ public class ToggleControl extends ParameterControl {
     public ToggleControl(String name, String paramID, int maxVal) {
         super(name, paramID, maxVal);
         radioButtons = new RadioButton[2];
+        constructLayout();
     }
 
     private void constructLayout(){

@@ -18,9 +18,10 @@ public class SliderControl extends ParameterControl {
         slider.setMax(maxVal);
 
         slider.valueProperty().addListener((observableValue, number, t1) -> ParamValueChangeHandler.onSliderChange(this));
+        constructLayout();
     }
 
-    private void constructLayout(){
+    private void constructLayout() {
         slider.getStyleClass().add("slider-new");
         slider.setMaxWidth(80);
         paramField.setMaxWidth(45);
@@ -37,12 +38,12 @@ public class SliderControl extends ParameterControl {
     }
 
     @Override
-    public Slider getSlider(){
+    public Slider getSlider() {
         return slider;
     }
 
     @Override
-    public BorderPane getLayout(){
+    public BorderPane getLayout() {
 
         return borderPane;
     }

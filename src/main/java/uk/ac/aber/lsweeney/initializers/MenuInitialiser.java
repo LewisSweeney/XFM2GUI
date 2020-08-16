@@ -129,7 +129,7 @@ public class MenuInitialiser {
                 serialCommandHandler.setSerialPort(sP);
                 System.out.println("Port Name: " + s);
                 byte[] tempData = serialCommandHandler.getAllValues();
-                System.out.println("DATA LENGTH" + tempData.length);
+                System.out.println("DATA LENGTH " + tempData.length);
                 if (tempData.length == 512) {
                     serialPort = sP;
                 }

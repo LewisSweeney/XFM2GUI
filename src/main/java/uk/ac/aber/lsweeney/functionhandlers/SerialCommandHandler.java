@@ -1,5 +1,6 @@
 package uk.ac.aber.lsweeney.functionhandlers;
 
+
 import jssc.SerialPort;
 import jssc.SerialPortException;
 import jssc.SerialPortTimeoutException;
@@ -63,7 +64,25 @@ public class SerialCommandHandler {
     public byte[] getAllValues() throws SerialPortException, IOException {
         byte[] bytes = new byte[1];
         bytes[0] = 'd';
-        return sendCommand(bytes);
+
+        serialPort.openPort();
+
+        serialPort.setParams(BAUD_RATE,
+                SerialPort.DATABITS_8,
+                SerialPort.STOPBITS_1,
+                SerialPort.PARITY_NONE);
+
+        serialPort.setFlowControlMode(SerialPort.FLOWCONTROL_RTSCTS_IN |
+                SerialPort.FLOWCONTROL_RTSCTS_OUT);
+
+        serialPort.writeBytes(bytes);
+
+        serialPort.writeString("d");
+
+        byte[] data = getData();
+        serialPort.closePort();
+        return data;
+        // return sendCommand(bytes);
     }
 
     /**
@@ -254,7 +273,7 @@ public class SerialCommandHandler {
         byte[] b;
 
         try {
-            while ((b = serialPort.readBytes(1, 100)) != null) {
+            while ((b = serialPort.readBytes(1, 500)) != null) {
                 byteArrayOutputStream.write(b);
             }
         } catch (SerialPortTimeoutException ex) {
