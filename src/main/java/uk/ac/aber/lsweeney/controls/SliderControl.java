@@ -34,6 +34,8 @@ public class SliderControl extends ParameterControl {
         borderPane.setCenter(slider);
         borderPane.setBottom(paramField);
         BorderPane.setAlignment(paramField, Pos.CENTER);
+        BorderPane.setAlignment(paramName,Pos.CENTER);
+        BorderPane.setAlignment(slider,Pos.CENTER);
         borderPane.getStyleClass().add("control");
     }
 

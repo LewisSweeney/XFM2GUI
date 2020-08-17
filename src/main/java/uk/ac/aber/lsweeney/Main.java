@@ -10,6 +10,7 @@ import jssc.SerialPortList;
 import uk.ac.aber.lsweeney.enums.ALERT_TYPE;
 import uk.ac.aber.lsweeney.functionhandlers.*;
 import uk.ac.aber.lsweeney.initializers.MenuInitialiser;
+import uk.ac.aber.lsweeney.serial.other.SerialHandlerOther;
 
 import java.io.IOException;
 
@@ -20,7 +21,7 @@ public class Main extends Application {
 
     String[] serialPortNameList = SerialPortList.getPortNames();
     SerialPort serialPort;
-    SerialCommandHandler serialCommandHandler = new SerialCommandHandler(serialPort);
+    SerialHandlerOther serialHandlerOther = new SerialHandlerOther(serialPort);
 
     AlertHandler alertHandler = new AlertHandler();
 
@@ -30,14 +31,14 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws IOException, SerialPortException {
-        MenuInitialiser menuInitialiser = new MenuInitialiser(serialCommandHandler, serialPort, serialPortNameList);
-        Scene scene = menuInitialiser.initializeScene();
-        ParamValueChangeHandler.setSerialCommandHandler(serialCommandHandler);
 
+        MenuInitialiser menuInitialiser = new MenuInitialiser(serialHandlerOther, serialPort, serialPortNameList);
+        Scene scene = menuInitialiser.initializeScene();
+        ParamValueChangeHandler.setSerialHandlerOther(serialHandlerOther);
 
 
         optionsHandler.setLiveChanges(false);
-        menuEventHandler.setAllIntFieldValues(serialCommandHandler.getAllValues());
+        menuEventHandler.setAllIntFieldValues(serialHandlerOther.getAllValues());
         optionsHandler.setLiveChanges(true);
 
         primaryStage.setResizable(false);
@@ -45,9 +46,9 @@ public class Main extends Application {
         primaryStage.setTitle("XFM2GUI");
         primaryStage.show();
 
-        if(serialCommandHandler.getSerialPort() == null){
+        if (serialHandlerOther.getSerialPort() == null) {
             alertHandler.SendAlert(ALERT_TYPE.NO_DEVICE);
-        } else if(serialCommandHandler.getAllValues().length != 512 || serialCommandHandler.getAllValues().length != 287){
+        } else if (serialHandlerOther.getAllValues().length != 512 || serialHandlerOther.getAllValues().length != 287) {
             alertHandler.SendAlert(ALERT_TYPE.NOT_XFM);
         }
 
@@ -56,19 +57,6 @@ public class Main extends Application {
     public static void main(String[] args) {
         launch(args);
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 }

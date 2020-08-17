@@ -1,10 +1,10 @@
-Operator 1
-Operator 2
-Operator 3
-Operator 4
-Operator 5
-Operator 6
-Program
-Modulations
-Effects
+Op. 1
+Op. 2
+Op. 3
+Op. 4
+Op. 5
+Op. 6
+Prog.
+Mod.
+FX
 Options

@@ -5,6 +5,7 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.Slider;
 import jssc.SerialPortException;
 import uk.ac.aber.lsweeney.controls.*;
+import uk.ac.aber.lsweeney.serial.other.SerialHandlerOther;
 
 import java.io.IOException;
 
@@ -13,7 +14,7 @@ import java.io.IOException;
  * sending commands to the SerialCommandHandler, to be executed if Live Changes are enabled
  */
 public class ParamValueChangeHandler {
-    static SerialCommandHandler serialCommandHandler;
+    static SerialHandlerOther serialHandlerOther;
     private static OptionsHandler optionsHandler = OptionsHandler.getSingleInstance();
 
     /**
@@ -47,9 +48,9 @@ public class ParamValueChangeHandler {
             sliderChange(c);
         }
 
-        if (serialCommandHandler != null) {
+        if (serialHandlerOther != null) {
             if (optionsHandler.getLiveChanges()) {
-                serialCommandHandler.setIndividualValue(Integer.parseInt(c.getParamField().getId()), c.getParamField().getValue());
+                serialHandlerOther.setIndividualValue(Integer.parseInt(c.getParamField().getId()), c.getParamField().getValue());
             }
         }
     }
@@ -127,10 +128,10 @@ public class ParamValueChangeHandler {
     /**
      * Used to change the SerialCommandHandler being used to send serial commands
      *
-     * @param serialCommandHandler SerialCommandHandler being passed in for use
+     * @param serialHandlerOther SerialCommandHandler being passed in for use
      */
-    public static void setSerialCommandHandler(SerialCommandHandler serialCommandHandler) {
-        ParamValueChangeHandler.serialCommandHandler = serialCommandHandler;
+    public static void setSerialHandlerOther(SerialHandlerOther serialHandlerOther) {
+        ParamValueChangeHandler.serialHandlerOther = serialHandlerOther;
     }
 
 }

@@ -1,4 +1,4 @@
-package uk.ac.aber.lsweeney.functionhandlers;
+package uk.ac.aber.lsweeney.serial.other;
 
 
 import jssc.SerialPort;
@@ -6,6 +6,7 @@ import jssc.SerialPortException;
 import jssc.SerialPortTimeoutException;
 import uk.ac.aber.lsweeney.enums.ALERT_TYPE;
 import uk.ac.aber.lsweeney.enums.UNIT_NUMBER;
+import uk.ac.aber.lsweeney.functionhandlers.AlertHandler;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -13,14 +14,14 @@ import java.io.IOException;
 /**
  * Handles all serial-over-USB communications, using JSSC to send byte arrays as commands
  */
-public class SerialCommandHandler {
+public class SerialHandlerOther {
     private static SerialPort serialPort;
     private static final int BAUD_RATE = 500000;
     AlertHandler alertHandler = new AlertHandler();
 
 
-    public SerialCommandHandler(SerialPort serialPort) {
-        SerialCommandHandler.serialPort = serialPort;
+    public SerialHandlerOther(SerialPort serialPort) {
+        SerialHandlerOther.serialPort = serialPort;
     }
 
     /**
@@ -64,25 +65,7 @@ public class SerialCommandHandler {
     public byte[] getAllValues() throws SerialPortException, IOException {
         byte[] bytes = new byte[1];
         bytes[0] = 'd';
-
-        serialPort.openPort();
-
-        serialPort.setParams(BAUD_RATE,
-                SerialPort.DATABITS_8,
-                SerialPort.STOPBITS_1,
-                SerialPort.PARITY_NONE);
-
-        serialPort.setFlowControlMode(SerialPort.FLOWCONTROL_RTSCTS_IN |
-                SerialPort.FLOWCONTROL_RTSCTS_OUT);
-
-        serialPort.writeBytes(bytes);
-
-        serialPort.writeString("d");
-
-        byte[] data = getData();
-        serialPort.closePort();
-        return data;
-        // return sendCommand(bytes);
+        return sendCommand(bytes);
     }
 
     /**
@@ -288,7 +271,7 @@ public class SerialCommandHandler {
     }
 
     public void setSerialPort(SerialPort serialPort) {
-        SerialCommandHandler.serialPort = serialPort;
+        SerialHandlerOther.serialPort = serialPort;
     }
 
 

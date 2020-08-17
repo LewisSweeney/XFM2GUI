@@ -60,6 +60,7 @@ public class BitwiseControl extends ParameterControl {
         BorderPane.setAlignment(paramName, Pos.CENTER);
         BorderPane.setAlignment(setOfBoxes, Pos.CENTER);
         borderPane.getStyleClass().add("control");
+        paramName.getStyleClass().add("algo-title");
     }
 
     @Override

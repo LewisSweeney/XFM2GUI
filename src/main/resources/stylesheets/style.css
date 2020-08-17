@@ -44,12 +44,19 @@
 }
 
 .button {
-    -fx-pref-width: 150;
+    -fx-pref-width: 55;
+    -fx-pref-height: 30;
     -fx-font-family: Courier;
+    -fx-font-size: 12;
+}
+
+.button-box {
+    -fx-spacing: 10;
+    -fx-alignment: center;
 }
 
 .button-group-title {
-    -fx-alignment: center;
+    -fx-alignment: baseline-left;
     -fx-font-size: 14;
     -fx-font-family: Courier;
     -fx-underline: true;
@@ -58,7 +65,7 @@
 .button-row {
     -fx-padding: 10 10 10 10;
     -fx-alignment: center;
-    -fx-spacing: 10;
+    -fx-spacing: 5;
     -fx-font-family: Courier;
 }
 
@@ -77,9 +84,10 @@
 }
 
 .picker-set {
-    -fx-padding: 0 10 10 10;
+    -fx-padding: 0 10 10 0;
     -fx-alignment: center;
-    -fx-spacing: 10;
+    -fx-vgap: 5;
+    -fx-hgap: 10;
     -fx-font-family: Courier;
 }
 
@@ -112,6 +120,7 @@
 
 .control{
     -fx-alignment: center;
+    -fx-padding: 0 5 0 5
 }
 
 .param-label {
@@ -128,10 +137,10 @@
 
 .group-control {
     -fx-border-style: solid;
-    -fx-border-color: #000000;
-    -fx-border-radius: 10 10 10 10;
+    -fx-border-color: slategrey;
+    -fx-border-radius: 0 10 0 10;
     -fx-background-radius: 10 10 10 10;
-    -fx-border-width: 3;
+    -fx-border-width: 2;
     -fx-alignment: center;
 }
 
@@ -182,4 +191,8 @@
 .wave-image {
     -fx-max-width: 50;
     -fx-padding: 5 10 5 10;
+}
+
+.algo-title{
+    -fx-padding: 2 0 4 0
 }

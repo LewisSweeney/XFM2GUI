@@ -7,6 +7,7 @@ import jssc.SerialPort;
 import jssc.SerialPortException;
 import uk.ac.aber.lsweeney.externalcode.IntField;
 import uk.ac.aber.lsweeney.enums.UNIT_NUMBER;
+import uk.ac.aber.lsweeney.serial.other.SerialHandlerOther;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -22,7 +23,7 @@ public class MenuEventHandler {
 
     private OptionsHandler optionsHandler = OptionsHandler.getSingleInstance();
 
-    private SerialCommandHandler serialCommandHandler;
+    private SerialHandlerOther serialHandlerOther;
     private ArrayList<IntField> paramFields;
     private Scene scene;
    // static SerialPort serialPort;
@@ -32,8 +33,8 @@ public class MenuEventHandler {
     }
 
 
-    public void setParams(SerialCommandHandler serialCommandHandler, ArrayList<IntField> paramFields, Scene scene){
-        this.serialCommandHandler = serialCommandHandler;
+    public void setParams(SerialHandlerOther serialHandlerOther, ArrayList<IntField> paramFields, Scene scene){
+        this.serialHandlerOther = serialHandlerOther;
         this.scene = scene;
         this.paramFields = paramFields;
     }
@@ -78,8 +79,8 @@ public class MenuEventHandler {
         if (serialPortNameList.length > 0) {
             String portName = serialPortPicker.getValue();
             serialPort = new SerialPort(portName);
-            serialCommandHandler.setSerialPort(serialPort);
-            setAllIntFieldValues(serialCommandHandler.getAllValues());
+            serialHandlerOther.setSerialPort(serialPort);
+            setAllIntFieldValues(serialHandlerOther.getAllValues());
             patchPicker.getSelectionModel().clearSelection();
         }
     }
@@ -100,7 +101,7 @@ public class MenuEventHandler {
             bytes[Integer.parseInt(p.getId())] = (byte) p.getValue();
         }
 
-        serialCommandHandler.setAllValues(bytes);
+        serialHandlerOther.setAllValues(bytes);
 
         //byte[] oldBytes = serialCommandHandler.getAllValues();
        /* if (oldBytes.length == 512) {
@@ -166,7 +167,7 @@ public class MenuEventHandler {
      * @throws IOException
      */
     public void onReadButtonPress() throws SerialPortException, IOException {
-        byte[] dump = serialCommandHandler.getAllValues();
+        byte[] dump = serialHandlerOther.getAllValues();
         setAllIntFieldValues(dump);
     }
 
@@ -178,7 +179,7 @@ public class MenuEventHandler {
      * @throws SerialPortException
      */
     public void onSaveToXFMPress(ComboBox<Integer> patchPicker) throws IOException, SerialPortException {
-        serialCommandHandler.writeProgram(patchPicker.getValue());
+        serialHandlerOther.writeProgram(patchPicker.getValue());
     }
 
     /**
@@ -190,8 +191,8 @@ public class MenuEventHandler {
      */
     public void onPatchPicked(int value) throws SerialPortException, IOException {
         optionsHandler.setLiveChanges(false);
-        serialCommandHandler.readProgram(value);
-        setAllIntFieldValues(serialCommandHandler.getAllValues());
+        serialHandlerOther.readProgram(value);
+        setAllIntFieldValues(serialHandlerOther.getAllValues());
         optionsHandler.revertLiveChanges();
     }
 
@@ -203,7 +204,7 @@ public class MenuEventHandler {
      * @throws SerialPortException
      */
     public void onMidiChannelChange(UNIT_NUMBER unit_number, int channel) throws IOException, SerialPortException {
-        serialCommandHandler.setMidiChannel(unit_number, channel);
+        serialHandlerOther.setMidiChannel(unit_number, channel);
     }
 
     /**
@@ -229,11 +230,11 @@ public class MenuEventHandler {
      * @throws SerialPortException
      */
     public void setUnit(UNIT_NUMBER unit_number) throws IOException, SerialPortException {
-        serialCommandHandler.setUnit(unit_number);
+        serialHandlerOther.setUnit(unit_number);
     }
 
     public void setLayering(boolean layering) throws IOException, SerialPortException {
-        serialCommandHandler.setMidiLayering(layering);
+        serialHandlerOther.setMidiLayering(layering);
     }
 
     /**
