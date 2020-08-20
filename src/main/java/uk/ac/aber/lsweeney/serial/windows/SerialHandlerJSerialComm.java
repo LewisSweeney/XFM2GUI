@@ -25,19 +25,17 @@ public class SerialHandlerJSerialComm {
      * @return returns any data that the board replies with
      * @throws IOException
      */
-    public byte[] sendCommand(byte[] bytes, boolean needData) throws IOException {
+    public byte[] sendCommand(byte[] bytes, int expectedDataBits) throws IOException {
         if (serialPort != null) {
 
             if (!serialPort.isOpen()) {
                 serialPort.openPort();
             }
 
-
-
             serialPort.writeBytes(bytes, bytes.length);
             byte[] data = null;
-            if(needData) {
-                data = getData();
+            if(expectedDataBits > 0) {
+                data = getData(expectedDataBits);
             }
             serialPort.closePort();
             return data;
@@ -53,20 +51,23 @@ public class SerialHandlerJSerialComm {
      *
      * @return byte[] which is translated by the program for display in the GUI
      */
-    byte[] getData() {
+    byte[] getData(int expectedDataBits) {
         ArrayList<Byte> byteArrayList = new ArrayList<>();
 
         if (serialPort == null) {
             return null;
         }
 
-        while (serialPort.bytesAvailable() <1) {}
+        while (serialPort.bytesAvailable() < expectedDataBits) {
+        }
+
 
         while (serialPort.bytesAvailable() > 0) {
-            try {
-                Thread.sleep(1);
-            } catch (InterruptedException ex) {}
-            byteArrayList.add(readSingleByte());
+         // try {
+          //    Thread.sleep(1);
+        //  } catch (InterruptedException ex) {}
+          byte newByte = readSingleByte();
+          byteArrayList.add(newByte);
         }
 
         byte[] data = new byte[byteArrayList.size()];

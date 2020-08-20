@@ -41,7 +41,6 @@ public class Main extends Application {
 
         optionsHandler.setLiveChanges(false);
         menuEventHandler.setAllIntFieldValues(serialHandlerBridge.getAllValues());
-        optionsHandler.setLiveChanges(true);
 
         primaryStage.setResizable(false);
         primaryStage.setScene(scene);

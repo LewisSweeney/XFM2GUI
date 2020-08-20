@@ -21,6 +21,7 @@ import uk.ac.aber.lsweeney.enums.UNIT_NUMBER;
 import uk.ac.aber.lsweeney.externalcode.IntField;
 import uk.ac.aber.lsweeney.functionhandlers.AlertHandler;
 import uk.ac.aber.lsweeney.functionhandlers.MenuEventHandler;
+import uk.ac.aber.lsweeney.functionhandlers.OptionsHandler;
 import uk.ac.aber.lsweeney.serial.SerialHandlerBridge;
 import uk.ac.aber.lsweeney.serial.other.SerialHandlerJSSC;
 import uk.ac.aber.lsweeney.sceneconstructors.AboutSceneConstructor;
@@ -90,8 +91,7 @@ public class MenuInitialiser {
 
         topBorder.setCenter(border);
         topBorder.setPrefWidth(950);
-        topBorder.setMaxHeight(650);
-        topBorder.setMinHeight(650);
+        topBorder.setPrefHeight(700);
 
         BorderPane.setAlignment(tabPane, Pos.CENTER);
 
@@ -177,6 +177,7 @@ public class MenuInitialiser {
                         byte[] tempData = serialHandler.getAllValues();
                         if (tempData.length == 512) {
                             serialPort = s;
+                            break;
                         }
                     }
 
@@ -250,9 +251,10 @@ public class MenuInitialiser {
 
 
         CheckBox liveChanges = new CheckBox("Live Changes");
-        liveChanges.setSelected(true);
         EventHandler<ActionEvent> actionEventEventHandler = actionEvent -> menuEventHandler.onLiveChanged(liveChanges.isSelected());
         liveChanges.setOnAction(actionEventEventHandler);
+        liveChanges.setSelected(false);
+        OptionsHandler.getSingleInstance().setLiveChanges(false);
 
         // EventHandler<? super MouseEvent> reloadTabsEventHandler = (EventHandler<MouseEvent>) mouseEvent -> reloadTabs();
         // reloadTabs.setOnMouseClicked(reloadTabsEventHandler);
