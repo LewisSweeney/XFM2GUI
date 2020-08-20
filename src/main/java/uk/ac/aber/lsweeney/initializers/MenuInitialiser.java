@@ -169,19 +169,19 @@ public class MenuInitialiser {
                 com.fazecast.jSerialComm.SerialPort[] serialPorts = com.fazecast.jSerialComm.SerialPort.getCommPorts();
 
                 if (serialPorts.length > 0) {
-                    for (com.fazecast.jSerialComm.SerialPort sP : serialPorts) {
 
-                        serialHandler.setSerialPort(sP);
+                    for (com.fazecast.jSerialComm.SerialPort s : serialPorts) {
+                        serialPortPicker.getItems().add(s.getSystemPortName());
+
+                        serialHandler.setSerialPort(s);
                         byte[] tempData = serialHandler.getAllValues();
                         if (tempData.length == 512) {
-                            serialPort = sP;
+                            serialPort = s;
                         }
                     }
 
                     serialHandler.setSerialPort(serialPort);
-                    for (String s : serialPortNameList) {
-                        serialPortPicker.getItems().add(s);
-                    }
+
 
                     if (serialPort == null) {
                         serialPortPicker.getSelectionModel().selectFirst();
@@ -192,7 +192,6 @@ public class MenuInitialiser {
                     serialPortPicker.getSelectionModel().clearSelection();
                     serialPortPicker.getSelectionModel().select(serialPort.getSystemPortName());
                 } else {
-                    serialPort = null;
                     serialPortPicker.setPromptText("NO PORTS");
                 }
 
@@ -200,9 +199,6 @@ public class MenuInitialiser {
 
             }
         }
-
-
-
         updateSerialPickerListener();
     }
 
@@ -496,6 +492,17 @@ public class MenuInitialiser {
                     try {
                         menuEventHandler.onSerialPortSelection(serialPortNameList, serialPortPicker, serialPortJSSC, patchPicker);
                     } catch (SerialPortException | IOException serialPortException) {
+                        serialPortException.printStackTrace();
+                    }
+                });
+            }
+
+            case JSERIALCOMM -> {
+                serialPortPicker.setOnAction(e -> {
+                    try {
+                        menuEventHandler.onSerialPortSelection(com.fazecast.jSerialComm.SerialPort.getCommPorts(), serialPortPicker, serialPortJSerialComm, patchPicker);
+                    }
+                    catch (SerialPortException | IOException serialPortException) {
                         serialPortException.printStackTrace();
                     }
                 });

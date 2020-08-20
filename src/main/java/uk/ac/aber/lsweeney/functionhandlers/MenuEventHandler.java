@@ -86,6 +86,23 @@ public class MenuEventHandler {
     }
 
     /**
+     * When the value of serialPortPicker changes, this method will change the active port to the one selected
+     * VERSION FOR THE JSERIALCOMM LIBRARY
+     */
+    public void onSerialPortSelection(com.fazecast.jSerialComm.SerialPort[] serialPorts, ComboBox<String> serialPortPicker, com.fazecast.jSerialComm.SerialPort serialPort, ComboBox<Integer> patchPicker) throws SerialPortException, IOException {
+        if (serialPort != null && serialPort.isOpen()) {
+            serialPort.closePort();
+        }
+        if (serialPorts.length > 0) {
+            int portIndex = serialPortPicker.getSelectionModel().getSelectedIndex();
+            serialPort = serialPorts[portIndex];
+            serialHandler.setSerialPort(serialPort);
+            setAllIntFieldValues(serialHandler.getAllValues());
+            patchPicker.getSelectionModel().clearSelection();
+        }
+    }
+
+    /**
      * Writes all current parameters to the board
      *
      * @throws SerialPortException

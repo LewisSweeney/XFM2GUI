@@ -64,7 +64,7 @@ public class SerialHandlerBridge {
         }
 
 
-        sendCommand(bytes);
+        sendCommand(bytes,false);
     }
 
     /**
@@ -76,7 +76,8 @@ public class SerialHandlerBridge {
     public byte[] getAllValues() throws SerialPortException, IOException {
         byte[] bytes = new byte[1];
         bytes[0] = 'd';
-        return sendCommand(bytes);
+
+        return sendCommand(bytes, true);
     }
 
     /**
@@ -90,8 +91,8 @@ public class SerialHandlerBridge {
 
         bytes[0] = 'j';
 
-        sendCommand(bytes);
-        sendCommand(values);
+        sendCommand(bytes,false);
+        sendCommand(values,false);
     }
 
     /**
@@ -110,7 +111,7 @@ public class SerialHandlerBridge {
         byte[] bytes = new byte[1];
         bytes[0] = (byte) command;
 
-        sendCommand(bytes);
+        sendCommand(bytes,false);
 
     }
 
@@ -133,7 +134,7 @@ public class SerialHandlerBridge {
         bytes[0] = (byte) firstByte;
         bytes[1] = (byte) secondByte;
         bytes[2] = midiChannel.byteValue();
-        byte[] data = sendCommand(bytes);
+        sendCommand(bytes,true);
         initializeCurrentProgram();
 
     }
@@ -155,14 +156,14 @@ public class SerialHandlerBridge {
             thirdByte = 1;
         }
         bytes[2] = (byte) thirdByte;
-        byte[] data = sendCommand(bytes);
+        byte[] data = sendCommand(bytes,true);
     }
 
     // UNUSED
     public void initializeCurrentProgram() throws SerialPortException, IOException {
         byte[] bytes = new byte[1];
         bytes[0] = 'i';
-        sendCommand(bytes);
+        sendCommand(bytes,false);
     }
 
     /**
@@ -176,7 +177,7 @@ public class SerialHandlerBridge {
             byte[] bytes = new byte[2];
             bytes[0] = 'r';
             bytes[1] = progNum.byteValue();
-            byte[] data = sendCommand(bytes);
+            byte[] data = sendCommand(bytes,true);
 
         }
     }
@@ -196,7 +197,7 @@ public class SerialHandlerBridge {
             byte[] bytes = new byte[2];
             bytes[0] = 'w';
             bytes[1] = progNum.byteValue();
-            byte[] data = sendCommand(bytes);
+            byte[] data = sendCommand(bytes,true);
         }
     }
 
@@ -209,7 +210,7 @@ public class SerialHandlerBridge {
     public void initEeprom() throws SerialPortException, IOException {
         byte[] bytes = new byte[1];
         bytes[0] = '$';
-        sendCommand(bytes);
+        sendCommand(bytes,false);
     }
 
     /**
@@ -220,14 +221,14 @@ public class SerialHandlerBridge {
      * @throws SerialPortException
      * @throws IOException
      */
-    private byte[] sendCommand(byte[] bytes) throws SerialPortException, IOException {
+    private byte[] sendCommand(byte[] bytes, boolean needData) throws SerialPortException, IOException {
         byte[] data = null;
         switch(library_choice){
             case JSSC -> {
                 data = serialHandlerJSSC.sendCommand(bytes);
             }
             case JSERIALCOMM-> {
-                data = serialHandlerJSerialComm.sendCommand(bytes);
+                data = serialHandlerJSerialComm.sendCommand(bytes, needData);
             }
         }
 
