@@ -5,7 +5,8 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.Slider;
 import jssc.SerialPortException;
 import uk.ac.aber.lsweeney.controls.*;
-import uk.ac.aber.lsweeney.serial.other.SerialHandlerOther;
+import uk.ac.aber.lsweeney.serial.SerialHandlerBridge;
+import uk.ac.aber.lsweeney.serial.other.SerialHandlerJSSC;
 
 import java.io.IOException;
 
@@ -14,7 +15,7 @@ import java.io.IOException;
  * sending commands to the SerialCommandHandler, to be executed if Live Changes are enabled
  */
 public class ParamValueChangeHandler {
-    static SerialHandlerOther serialHandlerOther;
+    static SerialHandlerBridge serialHandler;
     private static OptionsHandler optionsHandler = OptionsHandler.getSingleInstance();
 
     /**
@@ -48,9 +49,9 @@ public class ParamValueChangeHandler {
             sliderChange(c);
         }
 
-        if (serialHandlerOther != null) {
+        if (serialHandler != null) {
             if (optionsHandler.getLiveChanges()) {
-                serialHandlerOther.setIndividualValue(Integer.parseInt(c.getParamField().getId()), c.getParamField().getValue());
+                serialHandler.setIndividualValue(Integer.parseInt(c.getParamField().getId()), c.getParamField().getValue());
             }
         }
     }
@@ -64,7 +65,7 @@ public class ParamValueChangeHandler {
     }
 
     /**
-     * Specifically called when the controllayout being worked on is of BITWISE type
+     * Specifically called when the control layout being worked on is of BITWISE type
      *
      * @param c The ControlLayout being used for inspecting nodes and values
      */
@@ -85,7 +86,6 @@ public class ParamValueChangeHandler {
             }
         }
 
-        System.out.println("Parm Val" + c.getParamField().getValue());
     }
 
     /**
@@ -128,10 +128,10 @@ public class ParamValueChangeHandler {
     /**
      * Used to change the SerialCommandHandler being used to send serial commands
      *
-     * @param serialHandlerOther SerialCommandHandler being passed in for use
+     * @param serialHandler SerialHandlerBridge being passed in for use
      */
-    public static void setSerialHandlerOther(SerialHandlerOther serialHandlerOther) {
-        ParamValueChangeHandler.serialHandlerOther = serialHandlerOther;
+    public static void setSerialHandler(SerialHandlerBridge serialHandler) {
+        ParamValueChangeHandler.serialHandler = serialHandler;
     }
 
 }

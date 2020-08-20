@@ -7,10 +7,12 @@ import javafx.stage.Stage;
 import jssc.SerialPort;
 import jssc.SerialPortException;
 import jssc.SerialPortList;
+import org.apache.commons.lang3.SystemUtils;
 import uk.ac.aber.lsweeney.enums.ALERT_TYPE;
 import uk.ac.aber.lsweeney.functionhandlers.*;
 import uk.ac.aber.lsweeney.initializers.MenuInitialiser;
-import uk.ac.aber.lsweeney.serial.other.SerialHandlerOther;
+import uk.ac.aber.lsweeney.serial.SerialHandlerBridge;
+import uk.ac.aber.lsweeney.serial.other.SerialHandlerJSSC;
 
 import java.io.IOException;
 
@@ -21,7 +23,7 @@ public class Main extends Application {
 
     String[] serialPortNameList = SerialPortList.getPortNames();
     SerialPort serialPort;
-    SerialHandlerOther serialHandlerOther = new SerialHandlerOther(serialPort);
+    SerialHandlerBridge serialHandlerBridge = SerialHandlerBridge.getSINGLE_INSTANCE();
 
     AlertHandler alertHandler = new AlertHandler();
 
@@ -32,13 +34,13 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws IOException, SerialPortException {
 
-        MenuInitialiser menuInitialiser = new MenuInitialiser(serialHandlerOther, serialPort, serialPortNameList);
+        MenuInitialiser menuInitialiser = new MenuInitialiser();
         Scene scene = menuInitialiser.initializeScene();
-        ParamValueChangeHandler.setSerialHandlerOther(serialHandlerOther);
+        ParamValueChangeHandler.setSerialHandler(serialHandlerBridge);
 
 
         optionsHandler.setLiveChanges(false);
-        menuEventHandler.setAllIntFieldValues(serialHandlerOther.getAllValues());
+        menuEventHandler.setAllIntFieldValues(serialHandlerBridge.getAllValues());
         optionsHandler.setLiveChanges(true);
 
         primaryStage.setResizable(false);
@@ -46,9 +48,12 @@ public class Main extends Application {
         primaryStage.setTitle("XFM2GUI");
         primaryStage.show();
 
-        if (serialHandlerOther.getSerialPort() == null) {
+        byte[] data = serialHandlerBridge.getAllValues();
+        System.out.println("DATA LENGTH FROM PORT: " + data.length );
+
+        if (!serialHandlerBridge.isThereASerialPort()) {
             alertHandler.SendAlert(ALERT_TYPE.NO_DEVICE);
-        } else if (serialHandlerOther.getAllValues().length != 512 || serialHandlerOther.getAllValues().length != 287) {
+        } else if (data.length != 512) {
             alertHandler.SendAlert(ALERT_TYPE.NOT_XFM);
         }
 

@@ -16,11 +16,13 @@ import javafx.stage.Stage;
 import jssc.SerialPort;
 import jssc.SerialPortException;
 
+import jssc.SerialPortList;
 import uk.ac.aber.lsweeney.enums.UNIT_NUMBER;
 import uk.ac.aber.lsweeney.externalcode.IntField;
 import uk.ac.aber.lsweeney.functionhandlers.AlertHandler;
 import uk.ac.aber.lsweeney.functionhandlers.MenuEventHandler;
-import uk.ac.aber.lsweeney.serial.other.SerialHandlerOther;
+import uk.ac.aber.lsweeney.serial.SerialHandlerBridge;
+import uk.ac.aber.lsweeney.serial.other.SerialHandlerJSSC;
 import uk.ac.aber.lsweeney.sceneconstructors.AboutSceneConstructor;
 
 import java.io.IOException;
@@ -39,9 +41,15 @@ public class MenuInitialiser {
 
     private final Stage fileStage = new Stage();
 
-    private final SerialHandlerOther serialHandlerOther;
-    private final SerialPort serialPort;
-    private final String[] serialPortNameList;
+
+    private SerialHandlerBridge serialHandler = SerialHandlerBridge.getSINGLE_INSTANCE();
+
+    private String[] serialPortNameList;
+
+    private SerialPort serialPortJSSC;
+
+    private com.fazecast.jSerialComm.SerialPort serialPortJSerialComm;
+
 
     final static ArrayList<IntField> paramFields = new ArrayList<>();
 
@@ -54,15 +62,13 @@ public class MenuInitialiser {
     String style = this.getClass().getResource("/stylesheets/style.css").toExternalForm();
 
 
+    public MenuInitialiser() {
 
-    public MenuInitialiser(SerialHandlerOther serialHandlerOther, SerialPort serialPort, String[] serialPortNameList) {
-        this.serialHandlerOther = serialHandlerOther;
-        this.serialPort = serialPort;
-        this.serialPortNameList = serialPortNameList;
     }
 
     /**
      * Initialises and returns the main BorderPane used for the display
+     *
      * @return BorderPane
      * @throws IOException
      * @throws SerialPortException
@@ -79,7 +85,7 @@ public class MenuInitialiser {
         tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
 
         border.setCenter(tabPane);
-        initPortSelection(serialPort);
+        initPortSelection();
         border.setLeft(getMenuBar());
 
         topBorder.setCenter(border);
@@ -92,7 +98,7 @@ public class MenuInitialiser {
         Scene scene = new Scene(topBorder);
         scene.getStylesheets().add(style);
 
-        menuEventHandler.setParams(serialHandlerOther, paramFields, scene);
+        menuEventHandler.setParams(serialHandler, paramFields, scene);
 
         midiChZeroPicker.getSelectionModel().selectFirst();
         int val = midiChZeroPicker.getSelectionModel().getSelectedIndex();
@@ -118,47 +124,91 @@ public class MenuInitialiser {
     /**
      * Initialises the port picker that allows user to change the active serial port
      * NOTE: The program will attempt to automatically choose an XFM2 device as the default active port
-     * @param serialPort The serialport being worked with that eventually becomes the selected port
+     *
      * @throws IOException
      * @throws SerialPortException
      */
-    public void initPortSelection(SerialPort serialPort) throws IOException, SerialPortException {
-        if (serialPortNameList.length > 0) {
-            for (String s : serialPortNameList) {
-                SerialPort sP = new SerialPort(s);
-                serialHandlerOther.setSerialPort(sP);
-                System.out.println("Port Name: " + s);
-                byte[] tempData = serialHandlerOther.getAllValues();
-                System.out.println("DATA LENGTH " + tempData.length);
-                if (tempData.length == 512) {
-                    serialPort = sP;
+    public void initPortSelection() throws IOException, SerialPortException {
+
+        switch (serialHandler.getLibrary_choice()) {
+            case JSSC -> {
+                serialPortNameList = SerialPortList.getPortNames();
+
+                if (serialPortNameList.length > 0) {
+                    for (String s : serialPortNameList) {
+                        SerialPort sP = new SerialPort(s);
+                        serialHandler.setSerialPort(sP);
+                        byte[] tempData = serialHandler.getAllValues();
+                        if (tempData.length == 512) {
+                            serialPortJSSC = sP;
+                        }
+                    }
+
+                    serialHandler.setSerialPort(serialPortJSSC);
+                    for (String s : serialPortNameList) {
+                        serialPortPicker.getItems().add(s);
+                    }
+
+                    if (serialPortJSSC == null) {
+                        serialPortPicker.getSelectionModel().selectFirst();
+                        serialPortJSSC = new SerialPort(serialPortPicker.getValue());
+                        serialHandler.setSerialPort(serialPortJSSC);
+                    }
+
+                    serialPortPicker.getSelectionModel().clearSelection();
+                    serialPortPicker.getSelectionModel().select(serialPortJSSC.getPortName());
+
+                } else {
+                    serialPortJSSC = null;
+                    serialPortPicker.setPromptText("NO PORTS");
                 }
             }
 
-            serialHandlerOther.setSerialPort(serialPort);
-            for (String s : serialPortNameList) {
-                serialPortPicker.getItems().add(s);
-            }
+            case JSERIALCOMM -> {
+                com.fazecast.jSerialComm.SerialPort serialPort = null;
+                com.fazecast.jSerialComm.SerialPort[] serialPorts = com.fazecast.jSerialComm.SerialPort.getCommPorts();
 
-            if(serialPort == null){
-                serialPortPicker.getSelectionModel().selectFirst();
-                serialPort = new SerialPort(serialPortPicker.getValue());
-                serialHandlerOther.setSerialPort(serialPort);
-            }
+                if (serialPorts.length > 0) {
+                    for (com.fazecast.jSerialComm.SerialPort sP : serialPorts) {
 
-            serialPortPicker.getSelectionModel().clearSelection();
-            serialPortPicker.getSelectionModel().select(serialPort.getPortName());
-        } else {
-            System.out.println("SETTING NULL ANYWAY FOR SOME REASON");
-            serialPort = null;
-            serialPortPicker.setPromptText("NO PORTS");
+                        serialHandler.setSerialPort(sP);
+                        byte[] tempData = serialHandler.getAllValues();
+                        if (tempData.length == 512) {
+                            serialPort = sP;
+                        }
+                    }
+
+                    serialHandler.setSerialPort(serialPort);
+                    for (String s : serialPortNameList) {
+                        serialPortPicker.getItems().add(s);
+                    }
+
+                    if (serialPort == null) {
+                        serialPortPicker.getSelectionModel().selectFirst();
+                        serialPort = serialPorts[serialPortPicker.getSelectionModel().getSelectedIndex()];
+                        serialHandler.setSerialPort(serialPort);
+                    }
+
+                    serialPortPicker.getSelectionModel().clearSelection();
+                    serialPortPicker.getSelectionModel().select(serialPort.getSystemPortName());
+                } else {
+                    serialPort = null;
+                    serialPortPicker.setPromptText("NO PORTS");
+                }
+
+                serialPortJSerialComm = serialPort;
+
+            }
         }
+
+
 
         updateSerialPickerListener();
     }
 
     /**
      * Creates and initialises each tab through the TabInit class
+     *
      * @return ArrayList of tabs that are all ready for use
      */
     public ArrayList<Tab> initTabs() {
@@ -169,6 +219,7 @@ public class MenuInitialiser {
     /**
      * Creates the menu bar for the program, calling various methods to create buttons, comboboxes etc.
      * Sets all action events
+     *
      * @return The menu for the left part of the main BorderPane
      * TODO: Seperate into smaller sub-methods.
      */
@@ -237,9 +288,9 @@ public class MenuInitialiser {
 
         // Creates each subsection being added to menuLayout
         serialPortSelection = new VBox(serialPortLabel, serialPortPicker);
-        HBox xfmButtonBox = new HBox(menuButtons[0],menuButtons[1]);
+        HBox xfmButtonBox = new HBox(menuButtons[0], menuButtons[1]);
         xfmControls.getChildren().addAll(xfmButtonsLabel, xfmButtonBox, patchControl, menuButtons[2], getUnitControls());
-        HBox localButtonHBox = new HBox(menuButtons[3],menuButtons[4]);
+        HBox localButtonHBox = new HBox(menuButtons[3], menuButtons[4]);
         localControls.getChildren().addAll(localButtonsLabel, localButtonHBox, liveChanges);
 
         // Assigns style classes for each required node.
@@ -267,6 +318,7 @@ public class MenuInitialiser {
 
     /**
      * Constructs the Unit subsection of the left-hand menu
+     *
      * @return VBox containing the required nodes
      */
     private VBox getUnitControls() {
@@ -274,10 +326,10 @@ public class MenuInitialiser {
         Label midiTitle = new Label("Unit and MIDI Controls:");
         ToggleGroup unitGroup = new ToggleGroup();
 
-        GridPane midiConOne = getIndividualMidiControl(midiChZeroPicker,UNIT_NUMBER.ZERO,unitGroup);
+        GridPane midiConOne = getIndividualMidiControl(midiChZeroPicker, UNIT_NUMBER.ZERO, unitGroup);
         midiConOne.getStyleClass().add("picker-set");
 
-        GridPane midiConTwo = getIndividualMidiControl(midiChOnePicker, UNIT_NUMBER.ONE,unitGroup);
+        GridPane midiConTwo = getIndividualMidiControl(midiChOnePicker, UNIT_NUMBER.ONE, unitGroup);
         midiConTwo.getStyleClass().add("picker-set");
 
         VBox midiCons = new VBox(midiConOne, midiConTwo);
@@ -303,6 +355,7 @@ public class MenuInitialiser {
     /**
      * Creates an individual unit control, containing a combobox, label, and radio button
      * Initialises the action events for each necessary node
+     *
      * @return a VBox containing the required nodes
      */
     private GridPane getIndividualMidiControl(ComboBox<String> midiPicker, UNIT_NUMBER unit_number, ToggleGroup toggleGroup) {
@@ -344,7 +397,7 @@ public class MenuInitialiser {
         Label controlLabel = new Label("Unit 1:");
         Tooltip midiTooltip = new Tooltip("Set the MIDI channel for Unit 1 on the device");
 
-        if(unit_number == UNIT_NUMBER.ZERO){
+        if (unit_number == UNIT_NUMBER.ZERO) {
             unit.setSelected(true);
             controlLabel.setText("Unit 0:");
             midiTooltip.setText("Set the MIDI channel for Unit 0 on the device");
@@ -354,13 +407,14 @@ public class MenuInitialiser {
         midiPicker.getSelectionModel().selectFirst();
 
         GridPane gridPane = new GridPane();
-        gridPane.addRow(3,controlLabel,unit,midiPicker);
+        gridPane.addRow(3, controlLabel, unit, midiPicker);
 
         return gridPane;
     }
 
     /**
      * Creates all buttons required for the menu, assigning tooltips and action event handlers for each
+     *
      * @return Button[] containing each required button
      */
     private Button[] getMenuButtons() {
@@ -436,12 +490,17 @@ public class MenuInitialiser {
      * Currently only used once, may move back to relevant method
      */
     public void updateSerialPickerListener() {
-        serialPortPicker.setOnAction(e -> {
-            try {
-                menuEventHandler.onSerialPortSelection(serialPortNameList, serialPortPicker, serialPort, patchPicker);
-            } catch (SerialPortException | IOException serialPortException) {
-                serialPortException.printStackTrace();
+        switch (serialHandler.getLibrary_choice()){
+            case JSSC -> {
+                serialPortPicker.setOnAction(e -> {
+                    try {
+                        menuEventHandler.onSerialPortSelection(serialPortNameList, serialPortPicker, serialPortJSSC, patchPicker);
+                    } catch (SerialPortException | IOException serialPortException) {
+                        serialPortException.printStackTrace();
+                    }
+                });
             }
-        });
+        }
+
     }
 }
