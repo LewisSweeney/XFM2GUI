@@ -26,20 +26,21 @@ public class SerialHandlerBridge {
     SerialHandlerJSSC serialHandlerJSSC = new SerialHandlerJSSC(null);
     SerialHandlerJSerialComm serialHandlerJSerialComm = new SerialHandlerJSerialComm(null);
 
-    private SerialHandlerBridge(){
-       String os = SystemUtils.OS_NAME.toLowerCase();
+    private SerialHandlerBridge() {
+        String os = SystemUtils.OS_NAME.toLowerCase();
 
-       if(os.contains("mac")){
-           library_choice = LIBRARY_CHOICE.JSSC;
-       }
+        if (os.contains("mac")) {
+            library_choice = LIBRARY_CHOICE.JSSC;
+        }
     }
 
 
     /**
      * Used for setting an individual value on the XFM2.
      * Happens when program is in "Live Changes" mode
+     *
      * @param paramNeeded The ID of the param being changed
-     * @param value The value the param is being set to
+     * @param value       The value the param is being set to
      * @throws SerialPortException
      * @throws InterruptedException
      * @throws IOException
@@ -64,11 +65,12 @@ public class SerialHandlerBridge {
         }
 
 
-        sendCommand(bytes,0);
+        sendCommand(bytes, 0);
     }
 
     /**
      * Returns all current parameter values as a byte[512]
+     *
      * @return
      * @throws SerialPortException
      * @throws IOException
@@ -82,6 +84,7 @@ public class SerialHandlerBridge {
 
     /**
      * Takes values from all parameter fields, inserts them into a byte[512] and sends them to the board
+     *
      * @param values The values from the parameter fields
      * @throws IOException
      * @throws SerialPortException
@@ -91,12 +94,13 @@ public class SerialHandlerBridge {
 
         bytes[0] = 'j';
 
-        sendCommand(bytes,0);
-        sendCommand(values,0);
+        sendCommand(bytes, 0);
+        sendCommand(values, 0);
     }
 
     /**
      * Changes the synthesizer unit being worked on depending on user selection
+     *
      * @param unit_number
      * @throws SerialPortException
      * @throws IOException
@@ -111,12 +115,13 @@ public class SerialHandlerBridge {
         byte[] bytes = new byte[1];
         bytes[0] = (byte) command;
 
-        sendCommand(bytes,0);
+        sendCommand(bytes, 0);
 
     }
 
     /**
      * Sets the MIDI channel paramter value for the unit (unit_number) to the value sent (midiChannel)
+     *
      * @param unit_number Enum for choosing unit ZERO or ONE
      * @param midiChannel int 0-16, where 0 = omni setting on the device, and 1-16 correspond to channel numbers
      * @throws SerialPortException
@@ -134,13 +139,14 @@ public class SerialHandlerBridge {
         bytes[0] = (byte) firstByte;
         bytes[1] = (byte) secondByte;
         bytes[2] = midiChannel.byteValue();
-        sendCommand(bytes,0);
+        sendCommand(bytes, 0);
         initializeCurrentProgram();
 
     }
 
     /**
      * Sets the MIDI Layering parameter to 0 or 1 depending on the passed boolean
+     *
      * @param layering boolean that corresponds to numerical value which is sent ot board
      * @throws SerialPortException
      * @throws IOException
@@ -156,18 +162,19 @@ public class SerialHandlerBridge {
             thirdByte = 1;
         }
         bytes[2] = (byte) thirdByte;
-        byte[] data = sendCommand(bytes,0);
+        byte[] data = sendCommand(bytes, 0);
     }
 
     // UNUSED
     public void initializeCurrentProgram() throws SerialPortException, IOException {
         byte[] bytes = new byte[1];
         bytes[0] = 'i';
-        sendCommand(bytes,0);
+        sendCommand(bytes, 0);
     }
 
     /**
      * Changes the program currently loaded into XFM memory to the one selected from the menu
+     *
      * @param progNum Program number to be set
      * @throws SerialPortException
      * @throws IOException
@@ -177,18 +184,19 @@ public class SerialHandlerBridge {
             byte[] bytes = new byte[2];
             bytes[0] = 'r';
             bytes[1] = progNum.byteValue();
-            byte[] data = sendCommand(bytes,0);
+            byte[] data = sendCommand(bytes, 0);
         }
     }
 
     /**
      * Takes all parameters within the application, writes them to the board, and then saves to the specified program
+     *
      * @param progNum Program number to be saved over
      * @throws SerialPortException
      * @throws IOException
      */
     public void writeProgram(Integer progNum) throws SerialPortException, IOException {
-        if(progNum == null){
+        if (progNum == null) {
             alertHandler.SendAlert(ALERT_TYPE.NO_PATCH_CHOSEN);
             return;
         }
@@ -197,77 +205,123 @@ public class SerialHandlerBridge {
             byte[] bytes = new byte[2];
             bytes[0] = 'w';
             bytes[1] = progNum.byteValue();
-            sendCommand(bytes,0);
+            sendCommand(bytes, 0);
         }
     }
 
     /**
      * -UNUSED-
      * Deletes all programs from the eeprom, setting all parameter values to zero
+     *
      * @throws SerialPortException
      * @throws IOException
      */
     public void initEeprom() throws SerialPortException, IOException {
         byte[] bytes = new byte[1];
         bytes[0] = '$';
-        sendCommand(bytes,0);
+        sendCommand(bytes, 0);
     }
 
     /**
      * Generic method that sends the given bytes to the board
      * Used for all command methods
+     *
      * @param bytes byte[] that contains the bytes to be sent to the board
      * @return returns any data that the board replies with
      * @throws SerialPortException
      * @throws IOException
      */
     private byte[] sendCommand(byte[] bytes, int expectedDataBits) throws SerialPortException, IOException {
-        byte[] data = null;
-        switch(library_choice){
+        byte[][] data = {null};
+        switch (library_choice) {
             case JSSC -> {
-                data = serialHandlerJSSC.sendCommand(bytes);
-            }
-            case JSERIALCOMM-> {
-                data = serialHandlerJSerialComm.sendCommand(bytes, expectedDataBits);
-            }
-        }
 
-        return data;
-    }
+                data[0] = serialHandlerJSSC.sendCommand(bytes);
 
-    public void setSerialPort(SerialPort newPort){
-        serialHandlerJSSC.setSerialPort(newPort);
-    }
 
-    public void setSerialPort(com.fazecast.jSerialComm.SerialPort newPort){
-        serialHandlerJSerialComm.setSerialPort(newPort);
-    }
-
-    public LIBRARY_CHOICE getLibrary_choice(){
-        return library_choice;
-    }
-
-    public static SerialHandlerBridge getSINGLE_INSTANCE(){
-        return SINGLE_INSTANCE;
-    }
-
-    public boolean isThereASerialPort(){
-
-        boolean serialPortExist = false;
-
-        switch (library_choice){
-            case JSSC ->{
-                if(serialHandlerJSSC.getSerialPort() != null){
-                    serialPortExist = true;
-                }
             }
             case JSERIALCOMM -> {
-                if(serialHandlerJSerialComm.getSerialPort() != null){
-                    serialPortExist = true;
-                }
+
+                data[0] = serialHandlerJSerialComm.sendCommand(bytes, expectedDataBits);
+
             }
         }
-        return serialPortExist;
-    }
+            return data[0];
+        }
 
-}
+        /**
+         * Generic method that sends the given bytes to the board
+         * Used for all command methods
+         * @param bytes byte[] that contains the bytes to be sent to the board
+         * @return returns any data that the board replies with
+         * @throws SerialPortException
+         * @throws IOException
+         */
+        private byte[] sendAsyncCommand ( byte[] bytes, int expectedDataBits) throws SerialPortException, IOException {
+            final byte[][] data = {null};
+            switch (library_choice) {
+                case JSSC -> {
+                    Runnable r = new Runnable() {
+                        public void run() {
+                            try {
+                                data[0] = serialHandlerJSSC.sendCommand(bytes);
+                            } catch (SerialPortException | IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    };
+
+                }
+                case JSERIALCOMM -> {
+                    Runnable r = new Runnable() {
+                        public void run() {
+                            try {
+                                data[0] = serialHandlerJSerialComm.sendCommand(bytes, expectedDataBits);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    };
+                }
+            }
+
+            return data[0];
+        }
+
+
+        public void setSerialPort (SerialPort newPort){
+            serialHandlerJSSC.setSerialPort(newPort);
+        }
+
+        public void setSerialPort (com.fazecast.jSerialComm.SerialPort newPort){
+            serialHandlerJSerialComm.setSerialPort(newPort);
+        }
+
+        public LIBRARY_CHOICE getLibrary_choice () {
+            return library_choice;
+        }
+
+        public static SerialHandlerBridge getSINGLE_INSTANCE () {
+            return SINGLE_INSTANCE;
+        }
+
+        public boolean isThereASerialPort () {
+
+            boolean serialPortExist = false;
+
+            switch (library_choice) {
+                case JSSC -> {
+                    if (serialHandlerJSSC.getSerialPort() != null) {
+                        serialPortExist = true;
+                    }
+                }
+                case JSERIALCOMM -> {
+                    if (serialHandlerJSerialComm.getSerialPort() != null) {
+                        serialPortExist = true;
+                    }
+                }
+            }
+            return serialPortExist;
+        }
+
+    }

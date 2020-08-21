@@ -1,6 +1,7 @@
 package uk.ac.aber.lsweeney.functionhandlers;
 
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Slider;
 import jssc.SerialPortException;
@@ -15,6 +16,9 @@ import java.io.IOException;
  * sending commands to the SerialCommandHandler, to be executed if Live Changes are enabled
  */
 public class ParamValueChangeHandler {
+
+    int waveVal = 0;
+
     static SerialHandlerBridge serialHandler;
     private static OptionsHandler optionsHandler = OptionsHandler.getSingleInstance();
 
@@ -39,21 +43,33 @@ public class ParamValueChangeHandler {
     public static void onFieldChange(ParameterControl c) throws SerialPortException, InterruptedException, IOException {
 
 
-        if (c instanceof BitwiseControl) {
-            bitwiseChange(c);
-        } else if (c instanceof WaveControl) {
-            waveChange(c);
-        } else if (c instanceof ToggleControl) {
-            toggleChange(c);
-        } else if (c instanceof SliderControl) {
-            sliderChange(c);
-        }
+                if (c instanceof BitwiseControl) {
+                    bitwiseChange(c);
+                } else if (c instanceof WaveControl) {
+                    waveChange(c, c.getWaves());
+                } else if (c instanceof ToggleControl) {
+                    toggleChange(c);
+                } else if (c instanceof SliderControl) {
+                    sliderChange(c);
+                }
 
-        if (serialHandler != null) {
-            if (optionsHandler.getLiveChanges()) {
-                serialHandler.setIndividualValue(Integer.parseInt(c.getParamField().getId()), c.getParamField().getValue());
+        Runnable r = new Runnable() {
+            public void run() {
+                if (serialHandler != null) {
+                    if (optionsHandler.getLiveChanges()) {
+                        try {
+                            serialHandler.setIndividualValue(Integer.parseInt(c.getParamField().getId()), c.getParamField().getValue());
+                        } catch (SerialPortException | InterruptedException | IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
             }
-        }
+        };
+
+        new Thread(r).start();
+
+
     }
 
     private static void sliderChange(ParameterControl c) {
@@ -93,7 +109,7 @@ public class ParamValueChangeHandler {
      *
      * @param c The ControlLayout being used for inspecting nodes and values
      */
-    private static void waveChange(ParameterControl c) {
+    private static void waveChange(ParameterControl c, ComboBox waves) {
         int val = c.getParamField().getValue();
 
         if (val < 0) {
@@ -102,7 +118,7 @@ public class ParamValueChangeHandler {
             val = 7;
         }
         if (c.getWaves() != null) {
-            c.getWaves().getSelectionModel().select(val);
+            waves.getSelectionModel().select(val);
             c.setWaveImage(c.getWaves().getSelectionModel().getSelectedIndex());
         }
     }
