@@ -35,7 +35,10 @@ public class SerialHandlerJSSC {
     public byte[] sendCommand(byte[] bytes) throws SerialPortException, IOException {
         if(serialPort != null) {
             try {
-                serialPort.openPort();
+                if(!serialPort.isOpened()){
+                    serialPort.openPort();
+                }
+
 
                 serialPort.setParams(BAUD_RATE,
                         SerialPort.DATABITS_8,
@@ -44,11 +47,12 @@ public class SerialHandlerJSSC {
 
                 serialPort.setFlowControlMode(SerialPort.FLOWCONTROL_NONE);
 
-                Thread.sleep(10);
+                Thread.sleep(1);
                 serialPort.writeBytes(bytes);
             } catch (SerialPortException | InterruptedException ex) {
                 System.out.println("There are an error on writing string to port т: " + ex);
             }
+
             byte[] data = getData();
             if(data == null){
                 alertHandler.SendAlert(ALERT_TYPE.NOT_XFM);
@@ -69,6 +73,7 @@ public class SerialHandlerJSSC {
      * @throws IOException
      */
     byte[] getData() throws SerialPortException, IOException {
+
         if(serialPort == null){
             return null;
         }
@@ -76,10 +81,11 @@ public class SerialHandlerJSSC {
         byte[] b;
 
         try {
+            Thread.sleep(1);
             while ((b = serialPort.readBytes(1, 100)) != null) {
                 byteArrayOutputStream.write(b);
             }
-        } catch (SerialPortTimeoutException ex) {
+        } catch (SerialPortTimeoutException | InterruptedException ex) {
 
         }
         return byteArrayOutputStream.toByteArray();

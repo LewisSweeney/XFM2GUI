@@ -25,7 +25,7 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="XFM2GUI" options="--add-exports javafx.graphics/com.sun.javafx.application=uk.ac.aber.lsweeney" />
+      <module name="XFM2GUI" options="" />
     </option>
   </component>
 </project>

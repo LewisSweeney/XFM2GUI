@@ -21,6 +21,8 @@ public class AlertHandler {
             case NOT_XFM -> ShowAlert(Alert.AlertType.WARNING,"No XFM2 device", "There doesn't seem to be an XFM2 compatible device connected.\n\nPlease ensure that your XFM2 is connected and not in MidiScope mode.");
             case NO_DEVICE -> ShowAlert(Alert.AlertType.WARNING,"No Serial Devices", "There are no serial devices available.\n\nYou may still edit and save patches locally, but any changes made cannot be applied to your XFM2.\n\nPlease ensure your device is plugged in and restart this program.");
             case NO_PATCH_CHOSEN -> ShowAlert(Alert.AlertType.WARNING,"No Patch Chosen", "No patch number selected.\nPlease select a patch number if you'd like to save your patch.\n\n(You may want to save your current program locally first)");
+            case LINUX -> ShowAlert(Alert.AlertType.INFORMATION,"Linux Serial Permissions","The app can't seem to find any serial devices.\nIf you're on Linux you may not have the necessary privileges to communicate with serial devices.\n\n");
+
         }
     }
 

@@ -2,8 +2,6 @@ package uk.ac.aber.lsweeney;
 
 import javafx.application.Application;
 
-import static com.sun.javafx.application.LauncherImpl.launchApplication;
-
 /**
  * Class used for bypassing JFX path issues
  * Simply runs the Main class' main method

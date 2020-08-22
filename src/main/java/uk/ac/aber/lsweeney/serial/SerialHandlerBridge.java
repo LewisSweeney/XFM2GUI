@@ -27,9 +27,9 @@ public class SerialHandlerBridge {
     SerialHandlerJSerialComm serialHandlerJSerialComm = new SerialHandlerJSerialComm(null);
 
     private SerialHandlerBridge() {
-        String os = SystemUtils.OS_NAME.toLowerCase();
 
-        if (os.contains("mac")) {
+        if (SystemUtils.IS_OS_MAC || SystemUtils.IS_OS_LINUX) {
+            System.out.println("JSSC");
             library_choice = LIBRARY_CHOICE.JSSC;
         }
     }

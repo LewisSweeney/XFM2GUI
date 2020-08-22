@@ -132,7 +132,12 @@ public class MenuInitialiser {
 
         switch (serialHandler.getLibrary_choice()) {
             case JSSC -> {
+
                 serialPortNameList = SerialPortList.getPortNames();
+
+                for(String s:SerialPortList.getPortNames()){
+                    System.out.println(s);
+                }
 
                 if (serialPortNameList.length > 0) {
                     for (String s : serialPortNameList) {
@@ -165,6 +170,9 @@ public class MenuInitialiser {
             }
 
             case JSERIALCOMM -> {
+
+                System.out.println("GETTING JSSC PORTS");
+
                 com.fazecast.jSerialComm.SerialPort serialPort = null;
                 com.fazecast.jSerialComm.SerialPort[] serialPorts = com.fazecast.jSerialComm.SerialPort.getCommPorts();
 
@@ -173,6 +181,7 @@ public class MenuInitialiser {
                     for (com.fazecast.jSerialComm.SerialPort s : serialPorts) {
                         serialPortPicker.getItems().add(s.getSystemPortName());
 
+                        System.out.println(s.getDescriptivePortName());
                         serialHandler.setSerialPort(s);
                         byte[] tempData = serialHandler.getAllValues();
                         if (tempData.length == 512) {

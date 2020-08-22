@@ -62,6 +62,9 @@ public class Main extends Application {
         System.out.println("DATA LENGTH FROM PORT: " + data.length );
 
         if (!serialHandlerBridge.isThereASerialPort()) {
+            if(SystemUtils.IS_OS_LINUX){
+                alertHandler.SendAlert(ALERT_TYPE.LINUX);
+            }
             alertHandler.SendAlert(ALERT_TYPE.NO_DEVICE);
         } else if (data.length != 512) {
             alertHandler.SendAlert(ALERT_TYPE.NOT_XFM);
