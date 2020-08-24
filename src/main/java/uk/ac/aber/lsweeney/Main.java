@@ -14,7 +14,6 @@ import javafx.stage.StageStyle;
 import jssc.SerialPort;
 import jssc.SerialPortException;
 import jssc.SerialPortList;
-import org.apache.commons.lang3.SystemUtils;
 import uk.ac.aber.lsweeney.enums.ALERT_TYPE;
 import uk.ac.aber.lsweeney.functionhandlers.*;
 import uk.ac.aber.lsweeney.initializers.MenuInitialiser;
@@ -62,7 +61,7 @@ public class Main extends Application {
         System.out.println("DATA LENGTH FROM PORT: " + data.length );
 
         if (!serialHandlerBridge.isThereASerialPort()) {
-            if(SystemUtils.IS_OS_LINUX){
+            if(!System.getProperty("os.name").toLowerCase().contains("windows") || !System.getProperty("os.name").toLowerCase().contains("mac")){
                 alertHandler.SendAlert(ALERT_TYPE.LINUX);
             }
             alertHandler.SendAlert(ALERT_TYPE.NO_DEVICE);

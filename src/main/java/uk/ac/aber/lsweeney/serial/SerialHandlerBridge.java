@@ -3,7 +3,6 @@ package uk.ac.aber.lsweeney.serial;
 import jssc.SerialPort;
 import jssc.SerialPortException;
 import jssc.SerialPortTimeoutException;
-import org.apache.commons.lang3.SystemUtils;
 import uk.ac.aber.lsweeney.enums.ALERT_TYPE;
 import uk.ac.aber.lsweeney.enums.LIBRARY_CHOICE;
 import uk.ac.aber.lsweeney.enums.UNIT_NUMBER;
@@ -28,7 +27,7 @@ public class SerialHandlerBridge {
 
     private SerialHandlerBridge() {
 
-        if (SystemUtils.IS_OS_MAC || SystemUtils.IS_OS_LINUX) {
+        if (!System.getProperty("os.name").toLowerCase().contains("windows")) {
             System.out.println("JSSC");
             library_choice = LIBRARY_CHOICE.JSSC;
         }

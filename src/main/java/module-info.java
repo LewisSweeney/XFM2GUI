@@ -1,6 +1,5 @@
 module uk.ac.aber.lsweeney {
 
-    requires org.apache.commons.lang3;
     requires com.fazecast.jSerialComm;
     requires java.desktop;
     requires javafx.graphics;
