@@ -1,5 +1,13 @@
 package uk.ac.aber.lsweeney.serial;
 
+import javafx.application.Platform;
+import javafx.geometry.Pos;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
+import javafx.scene.control.ProgressIndicator;
+import javafx.scene.layout.VBox;
+import javafx.stage.StageStyle;
 import jssc.SerialPort;
 import jssc.SerialPortException;
 import uk.ac.aber.lsweeney.enums.ALERT_TYPE;
@@ -19,6 +27,9 @@ public class SerialHandlerBridge {
     static SerialHandlerBridge SINGLE_INSTANCE = new SerialHandlerBridge();
 
     AlertHandler alertHandler = new AlertHandler();
+
+    ProgressIndicator progress = new ProgressIndicator(-1);
+    Label progressLabel = new Label("Erasing Flash...");
 
     SerialHandlerJSSC serialHandlerJSSC = new SerialHandlerJSSC(null);
     SerialHandlerJSerialComm serialHandlerJSerialComm = new SerialHandlerJSerialComm(null);
@@ -46,7 +57,7 @@ public class SerialHandlerBridge {
      */
     public void setIndividualValue(int paramNeeded, Integer value) throws SerialPortException, InterruptedException, IOException {
         byte[] bytes;
-        Thread.sleep(10);
+        Thread.sleep(5);
         if (paramNeeded > 255) {
             int secondByte = 255;
             int thirdByte = paramNeeded - 256;
@@ -222,13 +233,26 @@ public class SerialHandlerBridge {
     }
 
     public void writeTunings(File file) throws IOException, SerialPortException {
+
+        loadingBox().show();
+
         writeFile('#', 't', file, 512);
+
+        while (progress.getProgress() < 1) {
+
+        }
+
+        while (progress.getProgress() >= 1.0) {
+            loadingBox().close();
+            return;
+        }
+
     }
 
     public void writeBank(File file) throws IOException, SerialPortException {
         FileInputStream fs;
 
-        if(file != null){
+        if (file != null) {
             fs = new FileInputStream(file);
         } else {
             System.out.println("FILE ERROR");
@@ -252,13 +276,13 @@ public class SerialHandlerBridge {
         } catch (IOException ex) {
         }
 
-        if(fp != 65536){
+        if (fp != 65536) {
             return;
         }
 
-        for(int i = 0;i < 128;i++){
+        for (int i = 0; i < 128; i++) {
             byte[] prog = new byte[512];
-            for(int j = 0;j < 512;j++){
+            for (int j = 0; j < 512; j++) {
                 prog[j] = filebuf[j + i * 512];
             }
             setAllValues(prog);
@@ -273,7 +297,7 @@ public class SerialHandlerBridge {
 
         FileInputStream fs;
 
-        if(file != null){
+        if (file != null) {
             fs = new FileInputStream(file);
         } else {
             System.out.println("FILE ERROR");
@@ -281,25 +305,22 @@ public class SerialHandlerBridge {
         }
 
         bytes[0] = (byte) init;
+        byte[] flash = new byte[1];
 
-        System.out.println("ERASING FLASH");
 
-        byte[] flash = sendCommand(bytes, 1, true);
+        flash = sendCommand(bytes, 1, true);
 
-        if(flash[0] != 0){
+        if (flash[0] != 0) {
             System.out.println("ERROR ON FLASH");
             return;
-        } else{
+        } else {
             System.out.println("FLASH ERASED");
         }
-
-
-
-
 
         bytes[0] = (byte) start;
 
         sendCommand(bytes, 0, false);
+
 
         int FILE_SIZE = bufferSize * 256;
         byte[] filebuf = new byte[FILE_SIZE];
@@ -320,29 +341,25 @@ public class SerialHandlerBridge {
         byte[] expected = new byte[1];
         expected[0] = -1;
 
-        System.out.println("FILE SIZE = " + bufferSize*256);
-
-
         for (int i = 0; i < bufferSize; ++i) {
 
             byte[] send = new byte[256];
 
-            for(int j = 0; j < 256; j++){
+            for (int j = 0; j < 256; j++) {
                 send[j] = filebuf[j + i * 256];
-                System.out.println(send[j]);
             }
-
-            System.out.println("BUFFER " + i);
 
             if (i == bufferSize - 1) {
+
                 expected = sendCommand(send, 1, true);
+
+            } else {
+                sendCommand(send, 0, false);
             }
-            else{
-                sendCommand(send,0, false);
-            }
+
         }
 
-        if(expected[0] != 0){
+        if (expected[0] != 0) {
             System.out.println("ERROR ON WRITING FILE");
         }
 
@@ -445,5 +462,17 @@ public class SerialHandlerBridge {
         }
         return serialPortExist;
     }
+
+    private Alert loadingBox() {
+
+        VBox progBox = new VBox(progressLabel, progress);
+        progBox.setAlignment(Pos.CENTER);
+
+        Alert loading = new Alert(Alert.AlertType.NONE);
+        loading.initStyle(StageStyle.UNDECORATED);
+        loading.setGraphic(progBox);
+        return loading;
+    }
+
 
 }
