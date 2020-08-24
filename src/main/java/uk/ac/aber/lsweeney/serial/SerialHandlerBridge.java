@@ -27,7 +27,9 @@ public class SerialHandlerBridge {
 
     private SerialHandlerBridge() {
 
-        if (!System.getProperty("os.name").toLowerCase().contains("windows")) {
+        String test = System.getProperty("os.name").toLowerCase();
+
+        if (!test.contains("windows")) {
             System.out.println("JSSC");
             library_choice = LIBRARY_CHOICE.JSSC;
         }

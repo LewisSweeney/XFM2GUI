@@ -58,10 +58,9 @@ public class Main extends Application {
 
 
         byte[] data = serialHandlerBridge.getAllValues();
-        System.out.println("DATA LENGTH FROM PORT: " + data.length );
 
         if (!serialHandlerBridge.isThereASerialPort()) {
-            if(!System.getProperty("os.name").toLowerCase().contains("windows") || !System.getProperty("os.name").toLowerCase().contains("mac")){
+            if(!System.getProperty("os.name").toLowerCase().contains("windows") && !System.getProperty("os.name").toLowerCase().contains("mac")){
                 alertHandler.SendAlert(ALERT_TYPE.LINUX);
             }
             alertHandler.SendAlert(ALERT_TYPE.NO_DEVICE);

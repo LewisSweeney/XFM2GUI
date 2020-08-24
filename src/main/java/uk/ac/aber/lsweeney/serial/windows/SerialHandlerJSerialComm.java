@@ -28,8 +28,6 @@ public class SerialHandlerJSerialComm {
     public byte[] sendCommand(byte[] bytes, int expectedDataBits) throws IOException {
         if (serialPort != null) {
 
-            System.out.println("SENDING COMMAND");
-
             if (!serialPort.isOpen()) {
                 serialPort.openPort();
             }
@@ -60,10 +58,7 @@ public class SerialHandlerJSerialComm {
             return null;
         }
 
-        int waitIter = 0;
-
-        while (serialPort.bytesAvailable() < expectedDataBits && waitIter < 100) {
-            waitIter++;
+        while (serialPort.bytesAvailable() < expectedDataBits) {
         }
 
 
