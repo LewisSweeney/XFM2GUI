@@ -3,6 +3,7 @@ package uk.ac.aber.lsweeney.initializers;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -35,13 +36,16 @@ import java.util.ArrayList;
  */
 public class MenuInitialiser {
 
+    ArrayList<ComboBox> allNodes = new ArrayList<>();
+
     private final ComboBox<String> serialPortPicker = new ComboBox<>();
     private final ComboBox<Integer> patchPicker = new ComboBox<>();
     private final ComboBox<String> midiChZeroPicker = new ComboBox<>();
     private final ComboBox<String> midiChOnePicker = new ComboBox<>();
 
-    private final Stage fileStage = new Stage();
+    BorderPane border = null;
 
+    private final Stage fileStage = new Stage();
 
     private SerialHandlerBridge serialHandler = SerialHandlerBridge.getSINGLE_INSTANCE();
 
@@ -50,7 +54,6 @@ public class MenuInitialiser {
     private SerialPort serialPortJSSC;
 
     private com.fazecast.jSerialComm.SerialPort serialPortJSerialComm;
-
 
     final static ArrayList<IntField> paramFields = new ArrayList<>();
 
@@ -77,7 +80,7 @@ public class MenuInitialiser {
     public Scene initializeScene() throws IOException, SerialPortException {
 
         BorderPane topBorder = new BorderPane();
-        BorderPane border = new BorderPane();
+        border = new BorderPane();
         TabPane tabPane = new TabPane();
 
         tabPane.setTabMinWidth(55);
@@ -118,6 +121,8 @@ public class MenuInitialiser {
         }
 
         return scene;
+
+
 
     }
 
@@ -216,8 +221,10 @@ public class MenuInitialiser {
      */
     public ArrayList<Tab> initTabs() {
         TabInit tabInit = new TabInit();
-        return tabInit.getTabs(paramFields);
+        return tabInit.getTabs(paramFields, border);
     }
+
+
 
     /**
      * Creates the menu bar for the program, calling various methods to create buttons, comboboxes etc.
@@ -464,7 +471,7 @@ public class MenuInitialiser {
         menuButtons[2].setOnAction(actionEvent -> {
             try {
                 menuEventHandler.onSaveToXFMPress(patchPicker);
-            } catch (IOException | SerialPortException e) {
+            } catch (IOException | SerialPortException | InterruptedException e) {
                 e.printStackTrace();
             }
         });

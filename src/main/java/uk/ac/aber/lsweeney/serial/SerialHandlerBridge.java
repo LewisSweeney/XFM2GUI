@@ -2,7 +2,6 @@ package uk.ac.aber.lsweeney.serial;
 
 import jssc.SerialPort;
 import jssc.SerialPortException;
-import jssc.SerialPortTimeoutException;
 import uk.ac.aber.lsweeney.enums.ALERT_TYPE;
 import uk.ac.aber.lsweeney.enums.LIBRARY_CHOICE;
 import uk.ac.aber.lsweeney.enums.UNIT_NUMBER;
@@ -10,8 +9,7 @@ import uk.ac.aber.lsweeney.functionhandlers.AlertHandler;
 import uk.ac.aber.lsweeney.serial.other.SerialHandlerJSSC;
 import uk.ac.aber.lsweeney.serial.windows.SerialHandlerJSerialComm;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import java.io.*;
 
 public class SerialHandlerBridge {
 
@@ -66,7 +64,7 @@ public class SerialHandlerBridge {
         }
 
 
-        sendCommand(bytes, 0);
+        sendCommand(bytes, 0, false);
     }
 
     /**
@@ -80,7 +78,7 @@ public class SerialHandlerBridge {
         byte[] bytes = new byte[1];
         bytes[0] = 'd';
 
-        return sendCommand(bytes, 512);
+        return sendCommand(bytes, 512, false);
     }
 
     /**
@@ -95,8 +93,8 @@ public class SerialHandlerBridge {
 
         bytes[0] = 'j';
 
-        sendCommand(bytes, 0);
-        sendCommand(values, 0);
+        sendCommand(bytes, 0, false);
+        sendCommand(values, 0, false);
     }
 
     /**
@@ -116,7 +114,7 @@ public class SerialHandlerBridge {
         byte[] bytes = new byte[1];
         bytes[0] = (byte) command;
 
-        sendCommand(bytes, 0);
+        sendCommand(bytes, 0, false);
 
     }
 
@@ -140,7 +138,7 @@ public class SerialHandlerBridge {
         bytes[0] = (byte) firstByte;
         bytes[1] = (byte) secondByte;
         bytes[2] = midiChannel.byteValue();
-        sendCommand(bytes, 0);
+        sendCommand(bytes, 0, false);
         initializeCurrentProgram();
 
     }
@@ -163,14 +161,14 @@ public class SerialHandlerBridge {
             thirdByte = 1;
         }
         bytes[2] = (byte) thirdByte;
-        byte[] data = sendCommand(bytes, 0);
+        byte[] data = sendCommand(bytes, 0, false);
     }
 
     // UNUSED
     public void initializeCurrentProgram() throws SerialPortException, IOException {
         byte[] bytes = new byte[1];
         bytes[0] = 'i';
-        sendCommand(bytes, 0);
+        sendCommand(bytes, 0, false);
     }
 
     /**
@@ -185,7 +183,7 @@ public class SerialHandlerBridge {
             byte[] bytes = new byte[2];
             bytes[0] = 'r';
             bytes[1] = progNum.byteValue();
-            byte[] data = sendCommand(bytes, 0);
+            byte[] data = sendCommand(bytes, 0, false);
         }
     }
 
@@ -198,7 +196,7 @@ public class SerialHandlerBridge {
      */
     public void writeProgram(Integer progNum) throws SerialPortException, IOException {
         if (progNum == null) {
-            alertHandler.SendAlert(ALERT_TYPE.NO_PATCH_CHOSEN);
+            alertHandler.sendAlert(ALERT_TYPE.NO_PATCH_CHOSEN);
             return;
         }
         if (progNum > 0 && progNum < 128) {
@@ -206,7 +204,7 @@ public class SerialHandlerBridge {
             byte[] bytes = new byte[2];
             bytes[0] = 'w';
             bytes[1] = progNum.byteValue();
-            sendCommand(bytes, 0);
+            sendCommand(bytes, 0, false);
         }
     }
 
@@ -220,7 +218,134 @@ public class SerialHandlerBridge {
     public void initEeprom() throws SerialPortException, IOException {
         byte[] bytes = new byte[1];
         bytes[0] = '$';
-        sendCommand(bytes, 0);
+        sendCommand(bytes, 0, false);
+    }
+
+    public void writeTunings(File file) throws IOException, SerialPortException {
+        writeFile('#', 't', file, 512);
+    }
+
+    public void writeBank(File file) throws IOException, SerialPortException {
+        FileInputStream fs;
+
+        if(file != null){
+            fs = new FileInputStream(file);
+        } else {
+            System.out.println("FILE ERROR");
+            return;
+        }
+
+        byte[] filebuf = new byte[65536];
+
+        for (int f = 0; f < 65536; f++) {
+            filebuf[f] = 0;
+        }
+
+        int fp = 0;
+        try {
+            while (fs.available() > 0) {
+                int test = fs.read();
+                System.out.println("Int value = " + test);
+                filebuf[fp] = (byte) test;
+                fp++;
+            }
+        } catch (IOException ex) {
+        }
+
+        if(fp != 65536){
+            return;
+        }
+
+        for(int i = 0;i < 128;i++){
+            byte[] prog = new byte[512];
+            for(int j = 0;j < 512;j++){
+                prog[j] = filebuf[j + i * 512];
+            }
+            setAllValues(prog);
+            writeProgram(i);
+        }
+
+
+    }
+
+    private void writeFile(char init, char start, File file, int bufferSize) throws IOException, SerialPortException {
+        byte[] bytes = new byte[1];
+
+        FileInputStream fs;
+
+        if(file != null){
+            fs = new FileInputStream(file);
+        } else {
+            System.out.println("FILE ERROR");
+            return;
+        }
+
+        bytes[0] = (byte) init;
+
+        System.out.println("ERASING FLASH");
+
+        byte[] flash = sendCommand(bytes, 1, true);
+
+        if(flash[0] != 0){
+            System.out.println("ERROR ON FLASH");
+            return;
+        } else{
+            System.out.println("FLASH ERASED");
+        }
+
+
+
+
+
+        bytes[0] = (byte) start;
+
+        sendCommand(bytes, 0, false);
+
+        int FILE_SIZE = bufferSize * 256;
+        byte[] filebuf = new byte[FILE_SIZE];
+
+        for (int f = 0; f < FILE_SIZE; f++) {
+            filebuf[f] = 0;
+        }
+
+        int fp = 0;
+        try {
+            while (fs.available() > 0) {
+                filebuf[fp] = (byte) fs.read();
+                fp++;
+            }
+        } catch (IOException ex) {
+        }
+
+        byte[] expected = new byte[1];
+        expected[0] = -1;
+
+        System.out.println("FILE SIZE = " + bufferSize*256);
+
+
+        for (int i = 0; i < bufferSize; ++i) {
+
+            byte[] send = new byte[256];
+
+            for(int j = 0; j < 256; j++){
+                send[j] = filebuf[j + i * 256];
+                System.out.println(send[j]);
+            }
+
+            System.out.println("BUFFER " + i);
+
+            if (i == bufferSize - 1) {
+                expected = sendCommand(send, 1, true);
+            }
+            else{
+                sendCommand(send,0, false);
+            }
+        }
+
+        if(expected[0] != 0){
+            System.out.println("ERROR ON WRITING FILE");
+        }
+
     }
 
     /**
@@ -232,97 +357,93 @@ public class SerialHandlerBridge {
      * @throws SerialPortException
      * @throws IOException
      */
-    private byte[] sendCommand(byte[] bytes, int expectedDataBits) throws SerialPortException, IOException {
+    private byte[] sendCommand(byte[] bytes, int expectedDataBits, boolean finalByte) throws SerialPortException, IOException {
         byte[][] data = {null};
         switch (library_choice) {
             case JSSC -> {
+                data[0] = serialHandlerJSSC.sendCommand(bytes, finalByte);
+            }
+            case JSERIALCOMM -> {
+                data[0] = serialHandlerJSerialComm.sendCommand(bytes, expectedDataBits);
+            }
+        }
+        return data[0];
+    }
 
-                data[0] = serialHandlerJSSC.sendCommand(bytes);
-
+    /**
+     * Generic method that sends the given bytes to the board
+     * Used for all command methods
+     *
+     * @param bytes byte[] that contains the bytes to be sent to the board
+     * @return returns any data that the board replies with
+     * @throws SerialPortException
+     * @throws IOException
+     */
+    private byte[] sendAsyncCommand(byte[] bytes, int expectedDataBits) throws SerialPortException, IOException {
+        final byte[][] data = {null};
+        switch (library_choice) {
+            case JSSC -> {
+                Runnable r = new Runnable() {
+                    public void run() {
+                        try {
+                            data[0] = serialHandlerJSSC.sendCommand(bytes, false);
+                        } catch (SerialPortException | IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                };
 
             }
             case JSERIALCOMM -> {
-
-                data[0] = serialHandlerJSerialComm.sendCommand(bytes, expectedDataBits);
-
-            }
-        }
-            return data[0];
-        }
-
-        /**
-         * Generic method that sends the given bytes to the board
-         * Used for all command methods
-         * @param bytes byte[] that contains the bytes to be sent to the board
-         * @return returns any data that the board replies with
-         * @throws SerialPortException
-         * @throws IOException
-         */
-        private byte[] sendAsyncCommand ( byte[] bytes, int expectedDataBits) throws SerialPortException, IOException {
-            final byte[][] data = {null};
-            switch (library_choice) {
-                case JSSC -> {
-                    Runnable r = new Runnable() {
-                        public void run() {
-                            try {
-                                data[0] = serialHandlerJSSC.sendCommand(bytes);
-                            } catch (SerialPortException | IOException e) {
-                                e.printStackTrace();
-                            }
+                Runnable r = new Runnable() {
+                    public void run() {
+                        try {
+                            data[0] = serialHandlerJSerialComm.sendCommand(bytes, expectedDataBits);
+                        } catch (IOException e) {
+                            e.printStackTrace();
                         }
-                    };
-
-                }
-                case JSERIALCOMM -> {
-                    Runnable r = new Runnable() {
-                        public void run() {
-                            try {
-                                data[0] = serialHandlerJSerialComm.sendCommand(bytes, expectedDataBits);
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    };
-                }
-            }
-
-            return data[0];
-        }
-
-
-        public void setSerialPort (SerialPort newPort){
-            serialHandlerJSSC.setSerialPort(newPort);
-        }
-
-        public void setSerialPort (com.fazecast.jSerialComm.SerialPort newPort){
-            serialHandlerJSerialComm.setSerialPort(newPort);
-        }
-
-        public LIBRARY_CHOICE getLibrary_choice () {
-            return library_choice;
-        }
-
-        public static SerialHandlerBridge getSINGLE_INSTANCE () {
-            return SINGLE_INSTANCE;
-        }
-
-        public boolean isThereASerialPort () {
-
-            boolean serialPortExist = false;
-
-            switch (library_choice) {
-                case JSSC -> {
-                    if (serialHandlerJSSC.getSerialPort() != null) {
-                        serialPortExist = true;
                     }
-                }
-                case JSERIALCOMM -> {
-                    if (serialHandlerJSerialComm.getSerialPort() != null) {
-                        serialPortExist = true;
-                    }
-                }
+                };
             }
-            return serialPortExist;
         }
 
+        return data[0];
     }
+
+
+    public void setSerialPort(SerialPort newPort) {
+        serialHandlerJSSC.setSerialPort(newPort);
+    }
+
+    public void setSerialPort(com.fazecast.jSerialComm.SerialPort newPort) {
+        serialHandlerJSerialComm.setSerialPort(newPort);
+    }
+
+    public LIBRARY_CHOICE getLibrary_choice() {
+        return library_choice;
+    }
+
+    public static SerialHandlerBridge getSINGLE_INSTANCE() {
+        return SINGLE_INSTANCE;
+    }
+
+    public boolean isThereASerialPort() {
+
+        boolean serialPortExist = false;
+
+        switch (library_choice) {
+            case JSSC -> {
+                if (serialHandlerJSSC.getSerialPort() != null) {
+                    serialPortExist = true;
+                }
+            }
+            case JSERIALCOMM -> {
+                if (serialHandlerJSerialComm.getSerialPort() != null) {
+                    serialPortExist = true;
+                }
+            }
+        }
+        return serialPortExist;
+    }
+
+}

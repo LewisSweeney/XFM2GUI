@@ -28,6 +28,9 @@ public class MenuEventHandler {
     private Scene scene;
    // static SerialPort serialPort;
 
+    FileLoader loader = new FileLoader();
+    PatchSaver saver = new PatchSaver();
+
     public static MenuEventHandler getSingleInstance(){
         return SINGLE_INSTANCE;
     }
@@ -139,8 +142,7 @@ public class MenuEventHandler {
      */
     public void onLoadButtonPress(Stage fileStage) throws IOException, InterruptedException, SerialPortException {
         paramFields.sort(Comparator.comparingInt(p -> Integer.parseInt(p.getId())));
-        PatchLoader loader = new PatchLoader();
-        ArrayList<String> lines = loader.loadFromFile(fileStage);
+        ArrayList<String> lines = loader.loadXFM2FromFile(fileStage);
 
         optionsHandler.setLiveChanges(false);
 
@@ -171,7 +173,6 @@ public class MenuEventHandler {
         for (IntField i : paramFields) {
             lines.add(i.getId() + ":" + i.getValue());
         }
-        PatchSaver saver = new PatchSaver();
         saver.saveToFile(lines, fileStage);
     }
 
@@ -195,7 +196,8 @@ public class MenuEventHandler {
      * @throws IOException
      * @throws SerialPortException
      */
-    public void onSaveToXFMPress(ComboBox<Integer> patchPicker) throws IOException, SerialPortException {
+    public void onSaveToXFMPress(ComboBox<Integer> patchPicker) throws IOException, SerialPortException, InterruptedException {
+        onWriteButtonPress();
         serialHandler.writeProgram(patchPicker.getValue());
     }
 

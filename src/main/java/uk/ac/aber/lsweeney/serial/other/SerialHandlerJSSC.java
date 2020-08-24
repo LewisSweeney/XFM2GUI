@@ -5,7 +5,6 @@ import jssc.SerialPort;
 import jssc.SerialPortException;
 import jssc.SerialPortTimeoutException;
 import uk.ac.aber.lsweeney.enums.ALERT_TYPE;
-import uk.ac.aber.lsweeney.enums.UNIT_NUMBER;
 import uk.ac.aber.lsweeney.functionhandlers.AlertHandler;
 
 import java.io.ByteArrayOutputStream;
@@ -32,7 +31,44 @@ public class SerialHandlerJSSC {
      * @throws SerialPortException
      * @throws IOException
      */
-    public byte[] sendCommand(byte[] bytes) throws SerialPortException, IOException {
+    public byte[] sendCommand(byte[] bytes, boolean finalByte) throws SerialPortException, IOException {
+        if(serialPort != null) {
+            try {
+                if(!serialPort.isOpened()){
+                    serialPort.openPort();
+                }
+
+
+                serialPort.setParams(BAUD_RATE,
+                        SerialPort.DATABITS_8,
+                        SerialPort.STOPBITS_1,
+                        SerialPort.PARITY_NONE);
+
+                serialPort.setFlowControlMode(SerialPort.FLOWCONTROL_NONE);
+
+                serialPort.writeBytes(bytes);
+            } catch (SerialPortException ex) {
+                System.out.println("There are an error on writing string to port т: " + ex);
+            }
+
+            byte[] data = getData();
+            if(finalByte){
+                while(data.length < 1){
+                    data = getData();
+                }
+            }
+            if(data == null){
+                alertHandler.sendAlert(ALERT_TYPE.NOT_XFM);
+            }
+            serialPort.closePort();
+            return data;
+        } else{
+          //  alertHandler.SendAlert(ALERT_TYPE.NO_DEVICE);
+            return new byte[1];
+        }
+    }
+
+    public byte[] sendFileCommand(byte[] bytes, boolean finalByte) throws IOException, SerialPortException {
         if(serialPort != null) {
             try {
                 if(!serialPort.isOpened()){
@@ -54,16 +90,17 @@ public class SerialHandlerJSSC {
             }
 
             byte[] data = getData();
-            if(data == null){
-                alertHandler.SendAlert(ALERT_TYPE.NOT_XFM);
+            if(finalByte){
+                while (data.length < 1){
+                    data = getData();
+                }
             }
             serialPort.closePort();
             return data;
         } else{
-          //  alertHandler.SendAlert(ALERT_TYPE.NO_DEVICE);
+            //  alertHandler.SendAlert(ALERT_TYPE.NO_DEVICE);
             return new byte[1];
         }
-
     }
 
     /**

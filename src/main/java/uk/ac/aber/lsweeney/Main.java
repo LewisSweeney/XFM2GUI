@@ -2,15 +2,9 @@ package uk.ac.aber.lsweeney;
 
 
 import javafx.application.Application;
-import javafx.application.Preloader;
 import javafx.scene.Scene;
-import javafx.scene.control.ProgressIndicator;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import jssc.SerialPort;
 import jssc.SerialPortException;
 import jssc.SerialPortList;
@@ -18,7 +12,6 @@ import uk.ac.aber.lsweeney.enums.ALERT_TYPE;
 import uk.ac.aber.lsweeney.functionhandlers.*;
 import uk.ac.aber.lsweeney.initializers.MenuInitialiser;
 import uk.ac.aber.lsweeney.serial.SerialHandlerBridge;
-import uk.ac.aber.lsweeney.serial.other.SerialHandlerJSSC;
 
 import java.io.IOException;
 
@@ -61,11 +54,11 @@ public class Main extends Application {
 
         if (!serialHandlerBridge.isThereASerialPort()) {
             if(!System.getProperty("os.name").toLowerCase().contains("windows") && !System.getProperty("os.name").toLowerCase().contains("mac")){
-                alertHandler.SendAlert(ALERT_TYPE.LINUX);
+                alertHandler.sendAlert(ALERT_TYPE.LINUX);
             }
-            alertHandler.SendAlert(ALERT_TYPE.NO_DEVICE);
+            alertHandler.sendAlert(ALERT_TYPE.NO_DEVICE);
         } else if (data.length != 512) {
-            alertHandler.SendAlert(ALERT_TYPE.NOT_XFM);
+            alertHandler.sendAlert(ALERT_TYPE.NOT_XFM);
         }
 
     }

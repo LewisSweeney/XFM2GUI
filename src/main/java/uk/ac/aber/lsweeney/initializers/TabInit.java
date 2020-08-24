@@ -3,7 +3,9 @@ package uk.ac.aber.lsweeney.initializers;
 import javafx.scene.control.Tab;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
 import uk.ac.aber.lsweeney.externalcode.IntField;
+import uk.ac.aber.lsweeney.sceneconstructors.OptionsTabConstructor;
 import uk.ac.aber.lsweeney.sceneconstructors.TabConstructor;
 import uk.ac.aber.lsweeney.enums.OPERATOR_NUM;
 import uk.ac.aber.lsweeney.enums.REQUIRED_TAB;
@@ -142,7 +144,7 @@ public class TabInit {
      * @param paramFields IntField arraylist
      * @return ArrayList of tabs ready for use
      */
-    public ArrayList<Tab> getTabs(ArrayList<IntField> paramFields){
+    public ArrayList<Tab> getTabs(ArrayList<IntField> paramFields, BorderPane border){
 
 
         ArrayList<Tab> tabs = new ArrayList<>();
@@ -165,6 +167,7 @@ public class TabInit {
         cog.setFitWidth(20);
 
         TabConstructor tabConstructor = new TabConstructor();
+        OptionsTabConstructor optionsTabConstructor = new OptionsTabConstructor(border);
 
         tabs.get(0).setContent(tabConstructor.getLayout(getOp1FilePaths(), getTabGroupValues(REQUIRED_TAB.op), OPERATOR_NUM.op1));
         tabs.get(1).setContent(tabConstructor.getLayout(getOp2FilePaths(), getTabGroupValues(REQUIRED_TAB.op), OPERATOR_NUM.op2));
@@ -175,7 +178,7 @@ public class TabInit {
         tabs.get(6).setContent(tabConstructor.getLayout(getProgFilePaths(), getTabGroupValues(REQUIRED_TAB.prog), OPERATOR_NUM.no));
         tabs.get(7).setContent(tabConstructor.getLayout(getModulationFilePaths(), getTabGroupValues(REQUIRED_TAB.mod), OPERATOR_NUM.no));
         tabs.get(8).setContent(tabConstructor.getLayout(getEffectsFilePaths(), getTabGroupValues(REQUIRED_TAB.fx), OPERATOR_NUM.no));
-        tabs.get(9).setContent(null);
+        tabs.get(9).setContent(optionsTabConstructor.getLayout());
 
         paramFields.addAll(tabConstructor.getIntFields());
 
