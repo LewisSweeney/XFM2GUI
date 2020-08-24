@@ -5,11 +5,12 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
-import jssc.SerialPort;
 import jssc.SerialPortException;
-import jssc.SerialPortList;
 import uk.ac.aber.lsweeney.enums.ALERT_TYPE;
-import uk.ac.aber.lsweeney.functionhandlers.*;
+import uk.ac.aber.lsweeney.functionhandlers.AlertHandler;
+import uk.ac.aber.lsweeney.functionhandlers.MenuEventHandler;
+import uk.ac.aber.lsweeney.functionhandlers.OptionsHandler;
+import uk.ac.aber.lsweeney.functionhandlers.ParamValueChangeHandler;
 import uk.ac.aber.lsweeney.initializers.MenuInitialiser;
 import uk.ac.aber.lsweeney.serial.SerialHandlerBridge;
 
@@ -20,8 +21,6 @@ import java.io.IOException;
  */
 public class Main extends Application {
 
-    String[] serialPortNameList = SerialPortList.getPortNames();
-    SerialPort serialPort;
     SerialHandlerBridge serialHandlerBridge = SerialHandlerBridge.getSINGLE_INSTANCE();
 
     AlertHandler alertHandler = new AlertHandler();
@@ -31,7 +30,7 @@ public class Main extends Application {
 
 
     @Override
-    public void start(Stage primaryStage) throws IOException, SerialPortException, InterruptedException {
+    public void start(Stage primaryStage) throws IOException, SerialPortException {
 
         Image logo = new Image(getClass().getResourceAsStream("/images/logo.png"));
 

@@ -3,8 +3,6 @@ package uk.ac.aber.lsweeney.functionhandlers;
 import javafx.stage.Stage;
 import jssc.SerialPortException;
 import uk.ac.aber.lsweeney.enums.FILE_TYPE;
-import uk.ac.aber.lsweeney.enums.MIDI_CHANNEL;
-import uk.ac.aber.lsweeney.enums.OPERATION_MODE;
 import uk.ac.aber.lsweeney.serial.SerialHandlerBridge;
 
 import java.io.File;
@@ -14,14 +12,8 @@ public class OptionsHandler {
 
     private boolean liveChanges;
     private boolean previousLiveChanges;
-    private boolean midiLayering;
 
-    private OPERATION_MODE opMode;
-
-    private MIDI_CHANNEL unitZeroChannel;
-    private MIDI_CHANNEL unitOneChannel;
-
-    private FileLoader fileLoader = new FileLoader();
+    private final FileLoader fileLoader = new FileLoader();
 
     private final SerialHandlerBridge serialHandlerBridge = SerialHandlerBridge.getSINGLE_INSTANCE();
 

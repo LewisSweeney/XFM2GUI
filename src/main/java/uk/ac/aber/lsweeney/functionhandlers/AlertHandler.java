@@ -10,9 +10,6 @@ import uk.ac.aber.lsweeney.enums.ALERT_TYPE;
  * Handles any alert windows that must be opened by the program, whether for errors or warnings
  */
 public class AlertHandler {
-    Stage stage;
-    Scene scene;
-
     ProgressIndicator loading = new ProgressIndicator(-1);
 
     /**

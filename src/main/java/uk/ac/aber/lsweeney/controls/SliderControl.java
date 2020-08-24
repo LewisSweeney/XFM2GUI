@@ -3,7 +3,6 @@ package uk.ac.aber.lsweeney.controls;
 import javafx.geometry.Pos;
 import javafx.scene.control.Slider;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.VBox;
 import uk.ac.aber.lsweeney.functionhandlers.ParamValueChangeHandler;
 
 public class SliderControl extends ParameterControl {

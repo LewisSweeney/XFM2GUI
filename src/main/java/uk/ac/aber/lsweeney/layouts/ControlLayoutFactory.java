@@ -40,7 +40,7 @@ public class ControlLayoutFactory {
     /**
      * Creates a bitwise control with relevant numbers of checkboxes
      *
-     * @param paramSplit
+     * @param paramSplit The split up parameter string passed into the constructor
      */
     private void bitwiseControl(String[] paramSplit) {
         control = new BitwiseControl(paramSplit[0], paramSplit[1], 255, Integer.parseInt(paramSplit[3]), paramSplit[4]);
@@ -49,7 +49,7 @@ public class ControlLayoutFactory {
     /**
      * Creates a control that has a slider and a visible IntField to control parameter values
      *
-     * @param paramSplit
+     * @param paramSplit The split up parameter string passed into the constructor
      */
     private void sliderControl(String[] paramSplit) {
         if (paramSplit.length > 2) {
@@ -64,10 +64,6 @@ public class ControlLayoutFactory {
      */
     private void switchControl() {
         control = new ToggleControl(paramSplit[0], paramSplit[1], 1);
-    }
-
-    public ParameterControl createControl() {
-        return control;
     }
 
     public static ControlLayoutFactory getSingleInstance(){

@@ -5,6 +5,6 @@ Op. 4
 Op. 5
 Op. 6
 Prog.
+EG
 Mod.
 FX
-Options

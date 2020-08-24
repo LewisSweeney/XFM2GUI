@@ -1,7 +1,6 @@
 package control.bitwise;
 
 import javafx.application.Platform;
-import javafx.embed.swing.JFXPanel;
 import javafx.scene.control.CheckBox;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -15,7 +14,6 @@ public class TestBitwiseSeven {
     @BeforeAll
     public static void initialise(){
         // NEEDED FOR INITIALIZING TOOLKIT
-       // JFXPanel fxPanel = new JFXPanel();
         Platform.startup(() -> {
 
         });

@@ -1,7 +1,6 @@
 package uk.ac.aber.lsweeney.layouts;
 
 import javafx.geometry.Pos;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -9,7 +8,6 @@ import uk.ac.aber.lsweeney.controls.BitwiseControl;
 import uk.ac.aber.lsweeney.controls.ParameterControl;
 import uk.ac.aber.lsweeney.controls.WaveControl;
 import uk.ac.aber.lsweeney.externalcode.IntField;
-import uk.ac.aber.lsweeney.enums.OPERATOR_NUM;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -136,7 +134,7 @@ public class ControlGroupLayoutConstructor {
         return controlGroup;
     }
 
-    public HBox getOperatorLinkBoxes(OPERATOR_NUM opNum) {
+ /*   public HBox getOperatorLinkBoxes(OPERATOR_NUM opNum) {
         VBox layout = new VBox();
         ArrayList<CheckBox> checkBoxes = new ArrayList<>();
         ArrayList<Label> checkBoxLabels = new ArrayList<>();
@@ -181,7 +179,7 @@ public class ControlGroupLayoutConstructor {
 
         layout.getStyleClass().add("check-group");
         return new HBox(layout);
-    }
+    } */
 
     public ArrayList<IntField> getIntFields() {
         ArrayList<IntField> intFields = new ArrayList<>();

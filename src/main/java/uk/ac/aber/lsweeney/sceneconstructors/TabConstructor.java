@@ -5,7 +5,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import uk.ac.aber.lsweeney.externalcode.IntField;
 import uk.ac.aber.lsweeney.layouts.ControlGroupLayoutConstructor;
-import uk.ac.aber.lsweeney.enums.OPERATOR_NUM;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -20,7 +19,7 @@ public class TabConstructor {
     ArrayList<ControlGroupLayoutConstructor> groups;
     ArrayList<HBox> groupsOfGroups;
 
-    public BorderPane getLayout(ArrayList<String> filepaths, ArrayList<String> groupValues, OPERATOR_NUM opNum) {
+    public BorderPane getLayout(ArrayList<String> filepaths, ArrayList<String> groupValues) {
         groups = new ArrayList<>();
         groupsOfGroups = new ArrayList<>();
         VBox internalLayout = new VBox();

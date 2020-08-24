@@ -1,16 +1,12 @@
 package uk.ac.aber.lsweeney.serial.windows;
 
 import com.fazecast.jSerialComm.SerialPort;
-import uk.ac.aber.lsweeney.enums.ALERT_TYPE;
-import uk.ac.aber.lsweeney.functionhandlers.AlertHandler;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 public class SerialHandlerJSerialComm {
     SerialPort serialPort;
     private static final int BAUD_RATE = 500000;
-    AlertHandler alertHandler = new AlertHandler();
 
 
     public SerialHandlerJSerialComm(SerialPort serialPort) {
@@ -23,9 +19,8 @@ public class SerialHandlerJSerialComm {
      *
      * @param bytes byte[] that contains the bytes to be sent to the board
      * @return returns any data that the board replies with
-     * @throws IOException
      */
-    public byte[] sendCommand(byte[] bytes, int expectedDataBits) throws IOException {
+    public byte[] sendCommand(byte[] bytes, int expectedDataBits) {
         if (serialPort != null) {
 
             if (!serialPort.isOpen()) {
@@ -40,7 +35,6 @@ public class SerialHandlerJSerialComm {
             serialPort.closePort();
             return data;
         } else {
-            //  alertHandler.SendAlert(ALERT_TYPE.NO_DEVICE);
             return new byte[1];
         }
 
@@ -51,6 +45,7 @@ public class SerialHandlerJSerialComm {
      *
      * @return byte[] which is translated by the program for display in the GUI
      */
+    @SuppressWarnings("StatementWithEmptyBody")
     byte[] getData(int expectedDataBits) {
         ArrayList<Byte> byteArrayList = new ArrayList<>();
 
@@ -59,6 +54,7 @@ public class SerialHandlerJSerialComm {
         }
 
         while (serialPort.bytesAvailable() < expectedDataBits) {
+            // Empty to wait for data to be available
         }
 
 

@@ -3,7 +3,6 @@ package uk.ac.aber.lsweeney.initializers;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -13,19 +12,15 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-
 import jssc.SerialPort;
 import jssc.SerialPortException;
-
 import jssc.SerialPortList;
 import uk.ac.aber.lsweeney.enums.UNIT_NUMBER;
 import uk.ac.aber.lsweeney.externalcode.IntField;
-import uk.ac.aber.lsweeney.functionhandlers.AlertHandler;
 import uk.ac.aber.lsweeney.functionhandlers.MenuEventHandler;
 import uk.ac.aber.lsweeney.functionhandlers.OptionsHandler;
-import uk.ac.aber.lsweeney.serial.SerialHandlerBridge;
-import uk.ac.aber.lsweeney.serial.other.SerialHandlerJSSC;
 import uk.ac.aber.lsweeney.sceneconstructors.AboutSceneConstructor;
+import uk.ac.aber.lsweeney.serial.SerialHandlerBridge;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -36,8 +31,6 @@ import java.util.ArrayList;
  */
 public class MenuInitialiser {
 
-    ArrayList<ComboBox> allNodes = new ArrayList<>();
-
     private final ComboBox<String> serialPortPicker = new ComboBox<>();
     private final ComboBox<Integer> patchPicker = new ComboBox<>();
     private final ComboBox<String> midiChZeroPicker = new ComboBox<>();
@@ -47,7 +40,7 @@ public class MenuInitialiser {
 
     private final Stage fileStage = new Stage();
 
-    private SerialHandlerBridge serialHandler = SerialHandlerBridge.getSINGLE_INSTANCE();
+    private final SerialHandlerBridge serialHandler = SerialHandlerBridge.getSINGLE_INSTANCE();
 
     private String[] serialPortNameList;
 
@@ -57,25 +50,19 @@ public class MenuInitialiser {
 
     final static ArrayList<IntField> paramFields = new ArrayList<>();
 
-    final static AlertHandler alertHandler = new AlertHandler();
-
     final static MenuEventHandler menuEventHandler = MenuEventHandler.getSingleInstance();
 
     int BUTTON_WIDTH = 150;
 
     String style = this.getClass().getResource("/stylesheets/style.css").toExternalForm();
 
-
-    public MenuInitialiser() {
-
-    }
-
     /**
      * Initialises and returns the main BorderPane used for the display
      *
      * @return BorderPane
-     * @throws IOException
-     * @throws SerialPortException
+     *
+     * @throws SerialPortException Serial port may not be found
+     * @throws IOException Data may fail to be read from device or written to BAOS
      */
     public Scene initializeScene() throws IOException, SerialPortException {
 
@@ -101,7 +88,7 @@ public class MenuInitialiser {
         Scene scene = new Scene(topBorder);
         scene.getStylesheets().add(style);
 
-        menuEventHandler.setParams(serialHandler, paramFields, scene);
+        menuEventHandler.setParams(serialHandler, paramFields);
 
         midiChZeroPicker.getSelectionModel().selectFirst();
         int val = midiChZeroPicker.getSelectionModel().getSelectedIndex();
@@ -130,8 +117,8 @@ public class MenuInitialiser {
      * Initialises the port picker that allows user to change the active serial port
      * NOTE: The program will attempt to automatically choose an XFM2 device as the default active port
      *
-     * @throws IOException
-     * @throws SerialPortException
+     * @throws SerialPortException Serial port may not be found
+     * @throws IOException Data may fail to be read from device or written to BAOS
      */
     public void initPortSelection() throws IOException, SerialPortException {
 
@@ -221,10 +208,8 @@ public class MenuInitialiser {
      */
     public ArrayList<Tab> initTabs() {
         TabInit tabInit = new TabInit();
-        return tabInit.getTabs(paramFields, border);
+        return tabInit.getTabs(paramFields);
     }
-
-
 
     /**
      * Creates the menu bar for the program, calling various methods to create buttons, comboboxes etc.
@@ -370,7 +355,6 @@ public class MenuInitialiser {
      * @return a VBox containing the required nodes
      */
     private GridPane getIndividualMidiControl(ComboBox<String> midiPicker, UNIT_NUMBER unit_number, ToggleGroup toggleGroup) {
-        GridPane grid = new GridPane();
         for (int i = 0; i < 17; i++) {
             if (i == 0) {
                 midiPicker.getItems().add("All");
@@ -463,7 +447,7 @@ public class MenuInitialiser {
         menuButtons[1].setOnAction(actionEvent -> {
             try {
                 menuEventHandler.onWriteButtonPress();
-            } catch (SerialPortException | IOException | InterruptedException e) {
+            } catch (SerialPortException | IOException e) {
                 e.printStackTrace();
             }
         });
@@ -471,7 +455,7 @@ public class MenuInitialiser {
         menuButtons[2].setOnAction(actionEvent -> {
             try {
                 menuEventHandler.onSaveToXFMPress(patchPicker);
-            } catch (IOException | SerialPortException | InterruptedException e) {
+            } catch (IOException | SerialPortException e) {
                 e.printStackTrace();
             }
         });
@@ -488,7 +472,7 @@ public class MenuInitialiser {
         menuButtons[4].setOnAction(actionEvent -> {
             try {
                 menuEventHandler.onLoadButtonPress(fileStage);
-            } catch (SerialPortException | InterruptedException | IOException e) {
+            } catch (SerialPortException | IOException e) {
                 e.printStackTrace();
             }
         });
@@ -502,26 +486,22 @@ public class MenuInitialiser {
      */
     public void updateSerialPickerListener() {
         switch (serialHandler.getLibrary_choice()){
-            case JSSC -> {
-                serialPortPicker.setOnAction(e -> {
-                    try {
-                        menuEventHandler.onSerialPortSelection(serialPortNameList, serialPortPicker, serialPortJSSC, patchPicker);
-                    } catch (SerialPortException | IOException serialPortException) {
-                        serialPortException.printStackTrace();
-                    }
-                });
-            }
+            case JSSC -> serialPortPicker.setOnAction(e -> {
+                try {
+                    menuEventHandler.onSerialPortSelection(serialPortNameList, serialPortPicker, serialPortJSSC, patchPicker);
+                } catch (SerialPortException | IOException serialPortException) {
+                    serialPortException.printStackTrace();
+                }
+            });
 
-            case JSERIALCOMM -> {
-                serialPortPicker.setOnAction(e -> {
-                    try {
-                        menuEventHandler.onSerialPortSelection(com.fazecast.jSerialComm.SerialPort.getCommPorts(), serialPortPicker, serialPortJSerialComm, patchPicker);
-                    }
-                    catch (SerialPortException | IOException serialPortException) {
-                        serialPortException.printStackTrace();
-                    }
-                });
-            }
+            case JSERIALCOMM -> serialPortPicker.setOnAction(e -> {
+                try {
+                    menuEventHandler.onSerialPortSelection(com.fazecast.jSerialComm.SerialPort.getCommPorts(), serialPortPicker, serialPortJSerialComm, patchPicker);
+                }
+                catch (SerialPortException | IOException serialPortException) {
+                    serialPortException.printStackTrace();
+                }
+            });
         }
 
     }

@@ -1,12 +1,11 @@
 package uk.ac.aber.lsweeney.functionhandlers;
 
-import javafx.scene.Scene;
 import javafx.scene.control.ComboBox;
 import javafx.stage.Stage;
 import jssc.SerialPort;
 import jssc.SerialPortException;
-import uk.ac.aber.lsweeney.externalcode.IntField;
 import uk.ac.aber.lsweeney.enums.UNIT_NUMBER;
+import uk.ac.aber.lsweeney.externalcode.IntField;
 import uk.ac.aber.lsweeney.serial.SerialHandlerBridge;
 
 import java.io.FileNotFoundException;
@@ -21,12 +20,10 @@ public class MenuEventHandler {
 
     private static final MenuEventHandler SINGLE_INSTANCE = new MenuEventHandler();
 
-    private OptionsHandler optionsHandler = OptionsHandler.getSingleInstance();
+    private final OptionsHandler optionsHandler = OptionsHandler.getSingleInstance();
 
     private SerialHandlerBridge serialHandler;
     private ArrayList<IntField> paramFields;
-    private Scene scene;
-   // static SerialPort serialPort;
 
     FileLoader loader = new FileLoader();
     PatchSaver saver = new PatchSaver();
@@ -36,9 +33,8 @@ public class MenuEventHandler {
     }
 
 
-    public void setParams(SerialHandlerBridge serialHandler, ArrayList<IntField> paramFields, Scene scene){
+    public void setParams(SerialHandlerBridge serialHandler, ArrayList<IntField> paramFields){
         this.serialHandler = serialHandler;
-        this.scene = scene;
         this.paramFields = paramFields;
     }
 
@@ -73,7 +69,7 @@ public class MenuEventHandler {
     /**
      * When the value of serialPortPicker changes, this method will change the active port to the one selected
      *
-     * @throws SerialPortException
+     * @throws SerialPortException Serial port may not be found
      */
     public void onSerialPortSelection(String[] serialPortNameList, ComboBox<String> serialPortPicker, SerialPort serialPort, ComboBox<Integer> patchPicker) throws SerialPortException, IOException {
         if (serialPort != null && serialPort.isOpened()) {
@@ -108,11 +104,10 @@ public class MenuEventHandler {
     /**
      * Writes all current parameters to the board
      *
-     * @throws SerialPortException
-     * @throws IOException
-     * @throws InterruptedException
+     * @throws SerialPortException Serial port may not be found
+     * @throws IOException Data may not be read from device or written to BAOS
      */
-    public void onWriteButtonPress() throws SerialPortException, IOException, InterruptedException {
+    public void onWriteButtonPress() throws SerialPortException, IOException {
         paramFields.sort(Comparator.comparingInt(p -> Integer.parseInt(p.getId())));
 
         byte[] bytes = new byte[512];
@@ -138,9 +133,9 @@ public class MenuEventHandler {
     /**
      * Handler for load button. Prompts user to load an XFM2 file to be loaded into the program
      *
-     * @throws FileNotFoundException
+     * @throws FileNotFoundException File may not exist - should be fine if resources not meddled with...
      */
-    public void onLoadButtonPress(Stage fileStage) throws IOException, InterruptedException, SerialPortException {
+    public void onLoadButtonPress(Stage fileStage) throws IOException, SerialPortException {
         paramFields.sort(Comparator.comparingInt(p -> Integer.parseInt(p.getId())));
         ArrayList<String> lines = loader.loadXFM2FromFile(fileStage);
 
@@ -165,8 +160,9 @@ public class MenuEventHandler {
     /**
      * Handler for save button. Prompts user to specify save location and file name.
      *
-     * @throws IOException
+     * @throws IOException Never thrown but IntelliJ not happy with removing it
      */
+    @SuppressWarnings("RedundantThrows")
     public void onSaveButtonPress(Stage fileStage) throws IOException {
         paramFields.sort(Comparator.comparingInt(p -> Integer.parseInt(p.getId())));
         ArrayList<String> lines = new ArrayList<>();
@@ -181,8 +177,8 @@ public class MenuEventHandler {
      * Only particularly useful if live updates are not enabled, as otherwise values
      * are likely to be the same.
      *
-     * @throws SerialPortException
-     * @throws IOException
+     * @throws SerialPortException Serial port may not be found
+     * @throws IOException Data may not be read from device or written to BAOS
      */
     public void onReadButtonPress() throws SerialPortException, IOException {
         byte[] dump = serialHandler.getAllValues();
@@ -193,10 +189,10 @@ public class MenuEventHandler {
      * Saves the current preset to the selected XFM2 patch number.
      * TODO: Fix bug with 0th patch not doing anything...
      *
-     * @throws IOException
-     * @throws SerialPortException
+     * @throws SerialPortException Serial port may not be found
+     * @throws IOException Data may not be read from device or written to BAOS
      */
-    public void onSaveToXFMPress(ComboBox<Integer> patchPicker) throws IOException, SerialPortException, InterruptedException {
+    public void onSaveToXFMPress(ComboBox<Integer> patchPicker) throws IOException, SerialPortException {
         onWriteButtonPress();
         serialHandler.writeProgram(patchPicker.getValue());
     }
@@ -204,9 +200,10 @@ public class MenuEventHandler {
     /**
      * Activates when user changes patch from the drop down menu
      *
-     * @param value
-     * @throws SerialPortException
-     * @throws IOException
+     * @param value The value of the patchpicker when chosen - used to determine which patch is loaded
+     *
+     * @throws SerialPortException Serial port may not be found
+     * @throws IOException Data may not be read from device or written to BAOS
      */
     public void onPatchPicked(int value) throws SerialPortException, IOException {
         optionsHandler.setLiveChanges(false);
@@ -218,9 +215,10 @@ public class MenuEventHandler {
     /**
      * Changes the midi channel for the relevant unit_number to the one selected by the user
      * @param unit_number Enum, either ZERO or ONE
-     * @param channel
-     * @throws IOException
-     * @throws SerialPortException
+     * @param channel Midi Channel chosen from combobox
+     *
+     * @throws SerialPortException Serial port may not be found
+     * @throws IOException Data may not be read from device or written to BAOS
      */
     public void onMidiChannelChange(UNIT_NUMBER unit_number, int channel) throws IOException, SerialPortException {
         serialHandler.setMidiChannel(unit_number, channel);
@@ -245,8 +243,9 @@ public class MenuEventHandler {
     /**
      * Changes the active unit to the one selected from the unit radio buttons
      * @param unit_number Enum that determines whether unit ZERO or ONE is active
-     * @throws IOException
-     * @throws SerialPortException
+     *
+     * @throws SerialPortException Serial port may not be found
+     * @throws IOException Data may not be read from device or written to BAOS
      */
     public void setUnit(UNIT_NUMBER unit_number) throws IOException, SerialPortException {
         serialHandler.setUnit(unit_number);
@@ -258,7 +257,7 @@ public class MenuEventHandler {
 
     /**
      * Handles the changing of the state of the liveChanges checkbox
-     * @param live
+     * @param live Boolean to determine whether live changes is on or off
      */
     public void onLiveChanged(boolean live){
         optionsHandler.setLiveChanges(live);

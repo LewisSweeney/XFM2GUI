@@ -1,44 +1,45 @@
 package uk.ac.aber.lsweeney.sceneconstructors;
 
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import jssc.SerialPortException;
 import uk.ac.aber.lsweeney.enums.FILE_TYPE;
-import uk.ac.aber.lsweeney.functionhandlers.FileLoader;
 import uk.ac.aber.lsweeney.functionhandlers.OptionsHandler;
 
 import java.io.IOException;
 
+/**
+ * UNUSED
+ * Class to construct the Options tab
+ */
+@SuppressWarnings("unused")
 public class OptionsTabConstructor {
     private final BorderPane border;
     Stage stage;
     Scene scene;
     VBox testOption = new VBox();
-    CheckBox darkMode;
 
     String style = this.getClass().getResource("/stylesheets/style.css").toExternalForm();
-    String dark =  this.getClass().getResource("/stylesheets/darkmode.css").toExternalForm();
-
-    FileLoader fileLoader = new FileLoader();
 
     OptionsHandler optionsHandler = OptionsHandler.getSingleInstance();
 
+    /**
+     * UNUSED
+     * @param border BorderPane to be used for creating an options screen
+     */
     public OptionsTabConstructor(BorderPane border){
 
         this.border = border;
-        darkMode = new CheckBox("Dark Mode");
-        darkMode.setOnAction(actionEvent -> onDarkModeToggle());
         testOption.getChildren().add(writeOptions());
     }
 
+    /**
+     * Creates the option buttons for the file writing actions
+     * @return VBox containing these buttons
+     */
     private VBox writeOptions(){
 
         Button writeTuning = new Button("Write Tuning File");
@@ -72,13 +73,4 @@ public class OptionsTabConstructor {
         return testOption;
     }
 
-    private void onDarkModeToggle(){
-        scene.getStylesheets().removeAll();
-        if(darkMode.isSelected()){
-            scene.getStylesheets().addAll(style,dark);
-        } else{
-            scene.getStylesheets().add(style);
-        }
-        stage.setScene(scene);
-    }
 }

@@ -24,16 +24,12 @@ public abstract class ParameterControl {
         this.paramField.textProperty().addListener((observable, oldValue, newValue) -> {
             try {
                 ParamValueChangeHandler.onFieldChange(this);
-            } catch (SerialPortException | InterruptedException | IOException e) {
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         });
 
         paramName.getStyleClass().add("param-label");
-    }
-
-    private void constructLayout(){
-        borderPane.setTop(paramName);
     }
 
     public IntField getParamField(){

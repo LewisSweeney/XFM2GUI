@@ -25,11 +25,15 @@ public class SerialHandlerJSSC {
 
     /**
      * Generic method that sends the given bytes to the board
-     * Used for all command methods
-     * @param bytes byte[] that contains the bytes to be sent to the board
-     * @return returns any data that the board replies with
-     * @throws SerialPortException
-     * @throws IOException
+     * Used for most command methods (not file writing)
+     *
+     * @param bytes The bytes to be sent to the device
+     * @param finalByte Whether this is the final byte being sent - used to get data if necessary
+     *
+     * @return Returns gotten data from getData method if required, or empty, one long byte array if not
+     *
+     * @throws IOException IO can fail when writing to BAOS in getData method
+     * @throws SerialPortException Serial port may not be found
      */
     public byte[] sendCommand(byte[] bytes, boolean finalByte) throws SerialPortException, IOException {
         if(serialPort != null) {
@@ -68,6 +72,18 @@ public class SerialHandlerJSSC {
         }
     }
 
+    /**
+     * -UNUSED-
+     *
+     * @param bytes The bytes to be sent to the device
+     * @param finalByte Whether this is the final byte being sent - used to get data if necessary
+     *
+     * @return Returns gotten data from getData method if required, or empty, one long byte array if not
+     *
+     * @throws IOException IO can fail when writing to BAOS in getData method
+     * @throws SerialPortException Serial port may not be found
+     */
+    @SuppressWarnings("unused")
     public byte[] sendFileCommand(byte[] bytes, boolean finalByte) throws IOException, SerialPortException {
         if(serialPort != null) {
             try {
@@ -106,8 +122,8 @@ public class SerialHandlerJSSC {
     /**
      * Method used to get data from the device once a command has been sent to the board
      * @return byte[] which is translated by the program for display in the GUI
-     * @throws SerialPortException
-     * @throws IOException
+     * @throws SerialPortException Serial Port may not be found
+     * @throws IOException Byte Array Output Stream can fail to be written to
      */
     byte[] getData() throws SerialPortException, IOException {
 
@@ -122,8 +138,7 @@ public class SerialHandlerJSSC {
             while ((b = serialPort.readBytes(1, 100)) != null) {
                 byteArrayOutputStream.write(b);
             }
-        } catch (SerialPortTimeoutException | InterruptedException ex) {
-
+        } catch (SerialPortTimeoutException | InterruptedException ignored) {
         }
         return byteArrayOutputStream.toByteArray();
     }

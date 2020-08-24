@@ -5,9 +5,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import uk.ac.aber.lsweeney.externalcode.IntField;
-import uk.ac.aber.lsweeney.sceneconstructors.OptionsTabConstructor;
 import uk.ac.aber.lsweeney.sceneconstructors.TabConstructor;
-import uk.ac.aber.lsweeney.enums.OPERATOR_NUM;
 import uk.ac.aber.lsweeney.enums.REQUIRED_TAB;
 
 import java.io.BufferedReader;
@@ -27,6 +25,7 @@ public class TabInit {
     ArrayList<String> op5FilePaths = new ArrayList<>();
     ArrayList<String> op6FilePaths = new ArrayList<>();
     ArrayList<String> progFilePaths = new ArrayList<>();
+    ArrayList<String> egFilePaths = new ArrayList<>();
     ArrayList<String> effectsFilePaths = new ArrayList<>();
     ArrayList<String> modulationFilePaths = new ArrayList<>();
 
@@ -44,9 +43,11 @@ public class TabInit {
         op6FilePaths.add("/xfm2/parameters/operators/op6.txt");
 
         progFilePaths.add("/xfm2/parameters/program/lfo.txt");
-        progFilePaths.add("/xfm2/parameters/program/pitcheg.txt");
         progFilePaths.add("/xfm2/parameters/program/other.txt");
-        progFilePaths.add("/xfm2/parameters/program/amplitudeeg.txt");
+
+
+        egFilePaths.add("/xfm2/parameters/program/pitcheg.txt");
+        egFilePaths.add("/xfm2/parameters/program/amplitudeeg.txt");
 
         effectsFilePaths.add("/xfm2/parameters/effects/am.txt");
         effectsFilePaths.add("/xfm2/parameters/effects/bitcrusher.txt");
@@ -144,7 +145,7 @@ public class TabInit {
      * @param paramFields IntField arraylist
      * @return ArrayList of tabs ready for use
      */
-    public ArrayList<Tab> getTabs(ArrayList<IntField> paramFields, BorderPane border){
+    public ArrayList<Tab> getTabs(ArrayList<IntField> paramFields){
 
 
         ArrayList<Tab> tabs = new ArrayList<>();
@@ -162,23 +163,18 @@ public class TabInit {
             ioException.printStackTrace();
         }
 
-        ImageView cog = new ImageView(new Image (this.getClass().getResourceAsStream("/images/cogwheel.png")));
-        cog.setFitHeight(20);
-        cog.setFitWidth(20);
-
         TabConstructor tabConstructor = new TabConstructor();
-        OptionsTabConstructor optionsTabConstructor = new OptionsTabConstructor(border);
 
-        tabs.get(0).setContent(tabConstructor.getLayout(getOp1FilePaths(), getTabGroupValues(REQUIRED_TAB.op), OPERATOR_NUM.op1));
-        tabs.get(1).setContent(tabConstructor.getLayout(getOp2FilePaths(), getTabGroupValues(REQUIRED_TAB.op), OPERATOR_NUM.op2));
-        tabs.get(2).setContent(tabConstructor.getLayout(getOp3FilePaths(), getTabGroupValues(REQUIRED_TAB.op), OPERATOR_NUM.op3));
-        tabs.get(3).setContent(tabConstructor.getLayout(getOp4FilePaths(), getTabGroupValues(REQUIRED_TAB.op), OPERATOR_NUM.op4));
-        tabs.get(4).setContent(tabConstructor.getLayout(getOp5FilePaths(), getTabGroupValues(REQUIRED_TAB.op), OPERATOR_NUM.op5));
-        tabs.get(5).setContent(tabConstructor.getLayout(getOp6FilePaths(), getTabGroupValues(REQUIRED_TAB.op), OPERATOR_NUM.op6));
-        tabs.get(6).setContent(tabConstructor.getLayout(getProgFilePaths(), getTabGroupValues(REQUIRED_TAB.prog), OPERATOR_NUM.no));
-        tabs.get(7).setContent(tabConstructor.getLayout(getModulationFilePaths(), getTabGroupValues(REQUIRED_TAB.mod), OPERATOR_NUM.no));
-        tabs.get(8).setContent(tabConstructor.getLayout(getEffectsFilePaths(), getTabGroupValues(REQUIRED_TAB.fx), OPERATOR_NUM.no));
-        tabs.get(9).setContent(optionsTabConstructor.getLayout());
+        tabs.get(0).setContent(tabConstructor.getLayout(getOp1FilePaths(), getTabGroupValues(REQUIRED_TAB.op)));
+        tabs.get(1).setContent(tabConstructor.getLayout(getOp2FilePaths(), getTabGroupValues(REQUIRED_TAB.op)));
+        tabs.get(2).setContent(tabConstructor.getLayout(getOp3FilePaths(), getTabGroupValues(REQUIRED_TAB.op)));
+        tabs.get(3).setContent(tabConstructor.getLayout(getOp4FilePaths(), getTabGroupValues(REQUIRED_TAB.op)));
+        tabs.get(4).setContent(tabConstructor.getLayout(getOp5FilePaths(), getTabGroupValues(REQUIRED_TAB.op)));
+        tabs.get(5).setContent(tabConstructor.getLayout(getOp6FilePaths(), getTabGroupValues(REQUIRED_TAB.op)));
+        tabs.get(6).setContent(tabConstructor.getLayout(getProgFilePaths(), getTabGroupValues(REQUIRED_TAB.prog)));
+        tabs.get(7).setContent(tabConstructor.getLayout(egFilePaths,getTabGroupValues(REQUIRED_TAB.eg)));
+        tabs.get(8).setContent(tabConstructor.getLayout(getModulationFilePaths(), getTabGroupValues(REQUIRED_TAB.mod)));
+        tabs.get(9).setContent(tabConstructor.getLayout(getEffectsFilePaths(), getTabGroupValues(REQUIRED_TAB.fx)));
 
         paramFields.addAll(tabConstructor.getIntFields());
 
@@ -199,6 +195,7 @@ public class TabInit {
             case fx -> "/xfm2/parameters/groupValues/effects.txt";
             case mod -> "/xfm2/parameters/groupValues/modulation.txt";
             case prog -> "/xfm2/parameters/groupValues/program.txt";
+            case eg -> "/xfm2/parameters/groupValues/eg.txt";
         };
 
         BufferedReader bReader = new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream(filepath)));

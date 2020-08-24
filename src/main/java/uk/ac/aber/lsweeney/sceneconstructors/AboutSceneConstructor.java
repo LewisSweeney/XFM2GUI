@@ -28,12 +28,6 @@ public class AboutSceneConstructor {
 
     private Scene sceneConstruction(){
 
-
-        VBox contact = new VBox();
-        Label contactLabel = new Label("Contact Me");
-
-        VBox thirdParty = new VBox();
-        Label thirdPartyLabel = new Label("Third-Party Code");
         VBox box = new VBox(getAboutSection(),getThirdPartySection());
 
         return new Scene(box);
@@ -56,6 +50,7 @@ public class AboutSceneConstructor {
         return about;
     }
 
+    /*
     private VBox getContactSection(){
         VBox about = new VBox();
         Label aboutTitle = new Label("About This App");
@@ -72,6 +67,7 @@ public class AboutSceneConstructor {
         about.getStyleClass().add("about");
         return about;
     }
+    */
 
     private VBox getThirdPartySection(){
         VBox box = new VBox();

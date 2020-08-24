@@ -7,7 +7,6 @@ import javafx.scene.control.Slider;
 import jssc.SerialPortException;
 import uk.ac.aber.lsweeney.controls.*;
 import uk.ac.aber.lsweeney.serial.SerialHandlerBridge;
-import uk.ac.aber.lsweeney.serial.other.SerialHandlerJSSC;
 
 import java.io.IOException;
 
@@ -17,10 +16,9 @@ import java.io.IOException;
  */
 public class ParamValueChangeHandler {
 
-    int waveVal = 0;
 
     static SerialHandlerBridge serialHandler;
-    private static OptionsHandler optionsHandler = OptionsHandler.getSingleInstance();
+    private static final OptionsHandler optionsHandler = OptionsHandler.getSingleInstance();
 
     /**
      * When the slider value is changed this method ensures the parameter IntField is also updated
@@ -36,11 +34,11 @@ public class ParamValueChangeHandler {
      * sending command to the SerialCommandHandler
      *
      * @param c The ControlLayout being used for inspecting nodes and values
-     * @throws SerialPortException
-     * @throws InterruptedException
-     * @throws IOException
+
+     * @throws IOException Never thrown but IntelliJ keeps threatening me whenever I try to remove it
      */
-    public static void onFieldChange(ParameterControl c) throws SerialPortException, InterruptedException, IOException {
+    @SuppressWarnings("RedundantThrows")
+    public static void onFieldChange(ParameterControl c) throws IOException {
 
 
                 if (c instanceof BitwiseControl) {
@@ -53,15 +51,13 @@ public class ParamValueChangeHandler {
                     sliderChange(c);
                 }
 
-        Runnable r = new Runnable() {
-            public void run() {
-                if (serialHandler != null) {
-                    if (optionsHandler.getLiveChanges()) {
-                        try {
-                            serialHandler.setIndividualValue(Integer.parseInt(c.getParamField().getId()), c.getParamField().getValue());
-                        } catch (SerialPortException | InterruptedException | IOException e) {
-                            e.printStackTrace();
-                        }
+        Runnable r = () -> {
+            if (serialHandler != null) {
+                if (optionsHandler.getLiveChanges()) {
+                    try {
+                        serialHandler.setIndividualValue(Integer.parseInt(c.getParamField().getId()), c.getParamField().getValue());
+                    } catch (SerialPortException | InterruptedException | IOException e) {
+                        e.printStackTrace();
                     }
                 }
             }
@@ -97,7 +93,7 @@ public class ParamValueChangeHandler {
 
             String s1 = String.format("%8s", Integer.toBinaryString(c.getParamField().getValue() & 0xFF)).replace(' ', '0');
 
-            for (int k = 0; j < 8; j++) {
+            for (; j < 8; j++) {
                 bitwiseCheck[j - sub].setSelected(s1.charAt(j) != '0');
             }
         }
@@ -109,7 +105,7 @@ public class ParamValueChangeHandler {
      *
      * @param c The ControlLayout being used for inspecting nodes and values
      */
-    private static void waveChange(ParameterControl c, ComboBox waves) {
+    private static void waveChange(ParameterControl c, ComboBox<String> waves) {
         int val = c.getParamField().getValue();
 
         if (val < 0) {
