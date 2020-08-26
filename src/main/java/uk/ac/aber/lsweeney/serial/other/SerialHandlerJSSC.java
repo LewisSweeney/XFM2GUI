@@ -16,7 +16,7 @@ import java.io.IOException;
 public class SerialHandlerJSSC {
     private static SerialPort serialPort;
     private static final int BAUD_RATE = 500000;
-    AlertHandler alertHandler = new AlertHandler();
+
 
 
     public SerialHandlerJSSC(SerialPort serialPort) {
@@ -62,6 +62,7 @@ public class SerialHandlerJSSC {
                 }
             }
             if(data == null){
+                AlertHandler alertHandler = new AlertHandler();
                 alertHandler.sendAlert(ALERT_TYPE.NOT_XFM);
             }
             serialPort.closePort();

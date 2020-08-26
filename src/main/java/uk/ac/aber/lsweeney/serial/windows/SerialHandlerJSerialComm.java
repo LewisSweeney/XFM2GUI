@@ -54,9 +54,8 @@ public class SerialHandlerJSerialComm {
         }
 
         while (serialPort.bytesAvailable() < expectedDataBits) {
-            // Empty to wait for data to be available
+            // Empty to wait fodata to be available
         }
-
 
         while (serialPort.bytesAvailable() > 0) {
          // try {

@@ -16,8 +16,6 @@ public class SerialHandlerBridge {
     LIBRARY_CHOICE library_choice = LIBRARY_CHOICE.JSERIALCOMM;
     static SerialHandlerBridge SINGLE_INSTANCE = new SerialHandlerBridge();
 
-    AlertHandler alertHandler = new AlertHandler();
-
     SerialHandlerJSSC serialHandlerJSSC = new SerialHandlerJSSC(null);
     SerialHandlerJSerialComm serialHandlerJSerialComm = new SerialHandlerJSerialComm(null);
 
@@ -45,21 +43,21 @@ public class SerialHandlerBridge {
      */
     public void setIndividualValue(int paramNeeded, Integer value) throws SerialPortException, InterruptedException, IOException {
         byte[] bytes;
-        Thread.sleep(10);
-        if (paramNeeded > 255) {
+        Thread.sleep(4);
+        if (paramNeeded > 254) {
             int secondByte = 255;
-            int thirdByte = paramNeeded - 256;
+            int thirdByte = paramNeeded - 255;
             bytes = new byte[4];
             bytes[0] = 's';
             bytes[1] = (byte) secondByte;
             bytes[2] = (byte) thirdByte;
             bytes[3] = value.byteValue();
         } else {
-            bytes = new byte[3];
+            bytes = new byte[4];
             bytes[0] = 's';
             bytes[1] = (byte) paramNeeded;
             bytes[2] = value.byteValue();
-            //bytes[3] = 0;
+            bytes[3] = 0;
         }
 
 
@@ -201,7 +199,9 @@ public class SerialHandlerBridge {
      * @throws IOException Data may fail to be read from device or written to BAOS
      */
     public void writeProgram(Integer progNum) throws SerialPortException, IOException {
+
         if (progNum == null) {
+            AlertHandler alertHandler = new AlertHandler();
             alertHandler.sendAlert(ALERT_TYPE.NO_PATCH_CHOSEN);
             return;
         }

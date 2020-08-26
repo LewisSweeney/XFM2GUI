@@ -1,4 +1,4 @@
-package serial;
+package serial.jSerialComm;
 
 public class TestSavePatch {
 }

@@ -1,10 +1,14 @@
 package uk.ac.aber.lsweeney;
 
 
+import javafx.animation.FadeTransition;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import jssc.SerialPortException;
 import uk.ac.aber.lsweeney.enums.ALERT_TYPE;
 import uk.ac.aber.lsweeney.functionhandlers.AlertHandler;
@@ -37,7 +41,6 @@ public class Main extends Application {
         MenuInitialiser menuInitialiser = new MenuInitialiser();
         Scene scene = menuInitialiser.initializeScene();
         ParamValueChangeHandler.setSerialHandler(serialHandlerBridge);
-
         optionsHandler.setLiveChanges(false);
         menuEventHandler.setAllIntFieldValues(serialHandlerBridge.getAllValues());
 

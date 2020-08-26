@@ -1,9 +1,6 @@
 package uk.ac.aber.lsweeney.initializers;
 
 import javafx.scene.control.Tab;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.BorderPane;
 import uk.ac.aber.lsweeney.externalcode.IntField;
 import uk.ac.aber.lsweeney.sceneconstructors.TabConstructor;
 import uk.ac.aber.lsweeney.enums.REQUIRED_TAB;
@@ -30,41 +27,41 @@ public class TabInit {
     ArrayList<String> modulationFilePaths = new ArrayList<>();
 
     public TabInit(){
-        op1FilePaths.add("/xfm2/parameters/operators/op1.txt");
+        op1FilePaths.add("/data/parameters/operators/op1.txt");
 
-        op2FilePaths.add("/xfm2/parameters/operators/op2.txt");
+        op2FilePaths.add("/data/parameters/operators/op2.txt");
 
-        op3FilePaths.add("/xfm2/parameters/operators/op3.txt");
+        op3FilePaths.add("/data/parameters/operators/op3.txt");
 
-        op4FilePaths.add("/xfm2/parameters/operators/op4.txt");
+        op4FilePaths.add("/data/parameters/operators/op4.txt");
 
-        op5FilePaths.add("/xfm2/parameters/operators/op5.txt");
+        op5FilePaths.add("/data/parameters/operators/op5.txt");
 
-        op6FilePaths.add("/xfm2/parameters/operators/op6.txt");
+        op6FilePaths.add("/data/parameters/operators/op6.txt");
 
-        progFilePaths.add("/xfm2/parameters/program/lfo.txt");
-        progFilePaths.add("/xfm2/parameters/program/other.txt");
+        progFilePaths.add("/data/parameters/program/lfo.txt");
+        progFilePaths.add("/data/parameters/program/other.txt");
 
 
-        egFilePaths.add("/xfm2/parameters/program/pitcheg.txt");
-        egFilePaths.add("/xfm2/parameters/program/amplitudeeg.txt");
+        egFilePaths.add("/data/parameters/program/pitcheg.txt");
+        egFilePaths.add("/data/parameters/program/amplitudeeg.txt");
 
-        effectsFilePaths.add("/xfm2/parameters/effects/am.txt");
-        effectsFilePaths.add("/xfm2/parameters/effects/bitcrusher.txt");
-        effectsFilePaths.add("/xfm2/parameters/effects/chorusflanger.txt");
-        effectsFilePaths.add("/xfm2/parameters/effects/decimator.txt");
-        effectsFilePaths.add("/xfm2/parameters/effects/delay.txt");
-        effectsFilePaths.add("/xfm2/parameters/effects/fxrouting.txt");
-        effectsFilePaths.add("/xfm2/parameters/effects/phaser.txt");
-        effectsFilePaths.add("/xfm2/parameters/effects/reverb.txt");
-        effectsFilePaths.add("/xfm2/parameters/effects/filter.txt");
+        effectsFilePaths.add("/data/parameters/effects/am.txt");
+        effectsFilePaths.add("/data/parameters/effects/bitcrusher.txt");
+        effectsFilePaths.add("/data/parameters/effects/chorusflanger.txt");
+        effectsFilePaths.add("/data/parameters/effects/decimator.txt");
+        effectsFilePaths.add("/data/parameters/effects/delay.txt");
+        effectsFilePaths.add("/data/parameters/effects/fxrouting.txt");
+        effectsFilePaths.add("/data/parameters/effects/phaser.txt");
+        effectsFilePaths.add("/data/parameters/effects/reverb.txt");
+        effectsFilePaths.add("/data/parameters/effects/filter.txt");
 
-        modulationFilePaths.add("/xfm2/parameters/modulation/amplfo.txt");
-        modulationFilePaths.add("/xfm2/parameters/modulation/arpeggiator.txt");
-        modulationFilePaths.add("/xfm2/parameters/modulation/egbias.txt");
-        modulationFilePaths.add("/xfm2/parameters/modulation/perfcontrols.txt");
-        modulationFilePaths.add("/xfm2/parameters/modulation/pitch.txt");
-        modulationFilePaths.add("/xfm2/parameters/modulation/pitchlfo.txt");
+        modulationFilePaths.add("/data/parameters/modulation/amplfo.txt");
+        modulationFilePaths.add("/data/parameters/modulation/arpeggiator.txt");
+        modulationFilePaths.add("/data/parameters/modulation/egbias.txt");
+        modulationFilePaths.add("/data/parameters/modulation/perfcontrols.txt");
+        modulationFilePaths.add("/data/parameters/modulation/pitch.txt");
+        modulationFilePaths.add("/data/parameters/modulation/pitchlfo.txt");
 
     }
 
@@ -149,7 +146,7 @@ public class TabInit {
 
 
         ArrayList<Tab> tabs = new ArrayList<>();
-        BufferedReader bReader = new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream("/xfm2/parameters/tablist.txt")));
+        BufferedReader bReader = new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream("/data/parameters/tablist.txt")));
         try {
             String line = bReader.readLine();
             while (line != null) {
@@ -190,12 +187,12 @@ public class TabInit {
     public ArrayList<String> getTabGroupValues(REQUIRED_TAB r) {
 
         String filepath = switch (r) {
-            case op1 -> "/xfm2/parameters/groupValues/operator1.txt";
-            case op -> "/xfm2/parameters/groupValues/operator.txt";
-            case fx -> "/xfm2/parameters/groupValues/effects.txt";
-            case mod -> "/xfm2/parameters/groupValues/modulation.txt";
-            case prog -> "/xfm2/parameters/groupValues/program.txt";
-            case eg -> "/xfm2/parameters/groupValues/eg.txt";
+            case op1 -> "/data/parameters/groupValues/operator1.txt";
+            case op -> "/data/parameters/groupValues/operator.txt";
+            case fx -> "/data/parameters/groupValues/effects.txt";
+            case mod -> "/data/parameters/groupValues/modulation.txt";
+            case prog -> "/data/parameters/groupValues/program.txt";
+            case eg -> "/data/parameters/groupValues/eg.txt";
         };
 
         BufferedReader bReader = new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream(filepath)));
