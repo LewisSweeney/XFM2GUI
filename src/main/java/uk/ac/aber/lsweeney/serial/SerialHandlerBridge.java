@@ -9,7 +9,9 @@ import uk.ac.aber.lsweeney.functionhandlers.AlertHandler;
 import uk.ac.aber.lsweeney.serial.other.SerialHandlerJSSC;
 import uk.ac.aber.lsweeney.serial.windows.SerialHandlerJSerialComm;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 
 public class SerialHandlerBridge {
 
@@ -36,10 +38,9 @@ public class SerialHandlerBridge {
      *
      * @param paramNeeded The ID of the param being changed
      * @param value       The value the param is being set to
-     *
-     * @throws SerialPortException Serial port may not be found
+     * @throws SerialPortException  Serial port may not be found
      * @throws InterruptedException When thread sleeps it may be interrupted
-     * @throws IOException Data may fail to be read from device or written to BAOS
+     * @throws IOException          Data may fail to be read from device or written to BAOS
      */
     public void setIndividualValue(int paramNeeded, Integer value) throws SerialPortException, InterruptedException, IOException {
         byte[] bytes;
@@ -68,9 +69,8 @@ public class SerialHandlerBridge {
      * Returns all current parameter values as a byte[512]
      *
      * @return byte array from the device
-     *
      * @throws SerialPortException Serial port may not be found
-     * @throws IOException Data may fail to be read from device or written to BAOS
+     * @throws IOException         Data may fail to be read from device or written to BAOS
      */
     public byte[] getAllValues() throws SerialPortException, IOException {
         byte[] bytes = new byte[1];
@@ -83,26 +83,26 @@ public class SerialHandlerBridge {
      * Takes values from all parameter fields, inserts them into a byte[512] and sends them to the board
      *
      * @param values The values from the parameter fields
-     *
      * @throws SerialPortException Serial port may not be found
-     * @throws IOException Data may fail to be read from device or written to BAOS
+     * @throws IOException         Data may fail to be read from device or written to BAOS
      */
     public void setAllValues(byte[] values) throws IOException, SerialPortException {
-        byte[] bytes = new byte[1];
+        if (values.length == 512) {
+            byte[] bytes = new byte[1];
 
-        bytes[0] = 'j';
+            bytes[0] = 'j';
 
-        sendCommand(bytes, 0, false);
-        sendCommand(values, 0, false);
+            sendCommand(bytes, 0, false);
+            sendCommand(values, 0, false);
+        }
     }
 
     /**
      * Changes the synthesizer unit being worked on depending on user selection
      *
      * @param unit_number Unit number zero or one, corresponds to unit number on device
-     *
      * @throws SerialPortException Serial port may not be found
-     * @throws IOException Data may fail to be read from device or written to BAOS
+     * @throws IOException         Data may fail to be read from device or written to BAOS
      */
     public void setUnit(UNIT_NUMBER unit_number) throws SerialPortException, IOException {
         int command;
@@ -123,9 +123,8 @@ public class SerialHandlerBridge {
      *
      * @param unit_number Enum for choosing unit ZERO or ONE
      * @param midiChannel int 0-16, where 0 = omni setting on the device, and 1-16 correspond to channel numbers
-     *
      * @throws SerialPortException Serial port may not be found
-     * @throws IOException Data may fail to be read from device or written to BAOS
+     * @throws IOException         Data may fail to be read from device or written to BAOS
      */
     public void setMidiChannel(UNIT_NUMBER unit_number, Integer midiChannel) throws SerialPortException, IOException {
         int firstByte = '*';
@@ -148,9 +147,8 @@ public class SerialHandlerBridge {
      * Sets the MIDI Layering parameter to 0 or 1 depending on the passed boolean
      *
      * @param layering boolean that corresponds to numerical value which is sent to board
-     *
      * @throws SerialPortException Serial port may not be found
-     * @throws IOException Data may fail to be read from device or written to BAOS
+     * @throws IOException         Data may fail to be read from device or written to BAOS
      */
     public void setMidiLayering(boolean layering) throws SerialPortException, IOException {
         int firstByte = 42;
@@ -177,9 +175,8 @@ public class SerialHandlerBridge {
      * Changes the program currently loaded into XFM memory to the one selected from the menu
      *
      * @param progNum Program number to be set
-     *
      * @throws SerialPortException Serial port may not be found
-     * @throws IOException Data may fail to be read from device or written to BAOS
+     * @throws IOException         Data may fail to be read from device or written to BAOS
      */
     public void readProgram(Integer progNum) throws SerialPortException, IOException {
         if (progNum > 0 && progNum < 128) {
@@ -194,9 +191,8 @@ public class SerialHandlerBridge {
      * Takes all parameters within the application, writes them to the board, and then saves to the specified program
      *
      * @param progNum Program number to be saved over
-     *
      * @throws SerialPortException Serial port may not be found
-     * @throws IOException Data may fail to be read from device or written to BAOS
+     * @throws IOException         Data may fail to be read from device or written to BAOS
      */
     public void writeProgram(Integer progNum) throws SerialPortException, IOException {
 
@@ -219,7 +215,7 @@ public class SerialHandlerBridge {
      * Deletes all programs from the eeprom, setting all parameter values to zero
      *
      * @throws SerialPortException Serial port may not be found
-     * @throws IOException Data may fail to be read from device or written to BAOS
+     * @throws IOException         Data may fail to be read from device or written to BAOS
      */
     @SuppressWarnings("unused")
     public void initEeprom() throws SerialPortException, IOException {
@@ -230,9 +226,8 @@ public class SerialHandlerBridge {
 
     /**
      * @param file The file to be written to board
-     *
      * @throws SerialPortException Serial port may not be found
-     * @throws IOException Data may fail to be read from device or written to BAOS
+     * @throws IOException         Data may fail to be read from device or written to BAOS
      */
     public void writeTunings(File file) throws IOException, SerialPortException {
         writeFile('#', 't', file, 512);
@@ -240,14 +235,13 @@ public class SerialHandlerBridge {
 
     /**
      * @param file The file to be written to board
-     *
      * @throws SerialPortException Serial port may not be found
-     * @throws IOException Data may fail to be read from device or written to BAOS
+     * @throws IOException         Data may fail to be read from device or written to BAOS
      */
     public void writeBank(File file) throws IOException, SerialPortException {
         FileInputStream fs;
 
-        if(file != null){
+        if (file != null) {
             fs = new FileInputStream(file);
         } else {
             System.out.println("FILE ERROR");
@@ -271,11 +265,11 @@ public class SerialHandlerBridge {
         } catch (IOException ignored) {
         }
 
-        if(fp != 65536){
+        if (fp != 65536) {
             return;
         }
 
-        for(int i = 0;i < 128;i++){
+        for (int i = 0; i < 128; i++) {
             byte[] prog = new byte[512];
 
             System.arraycopy(filebuf, i * 512, prog, 0, 512);
@@ -288,9 +282,8 @@ public class SerialHandlerBridge {
 
     /**
      * @param file The file to be written to board
-     *
      * @throws SerialPortException Serial port may not be found
-     * @throws IOException Data may fail to be read from device or written to BAOS
+     * @throws IOException         Data may fail to be read from device or written to BAOS
      */
     @SuppressWarnings("SameParameterValue")
     private void writeFile(char init, char start, File file, int bufferSize) throws IOException, SerialPortException {
@@ -298,7 +291,7 @@ public class SerialHandlerBridge {
 
         FileInputStream fs;
 
-        if(file != null){
+        if (file != null) {
             fs = new FileInputStream(file);
         } else {
             System.out.println("FILE ERROR");
@@ -311,10 +304,10 @@ public class SerialHandlerBridge {
 
         byte[] flash = sendCommand(bytes, 1, true);
 
-        if(flash[0] != 0){
+        if (flash[0] != 0) {
             System.out.println("ERROR ON FLASH");
             return;
-        } else{
+        } else {
             System.out.println("FLASH ERASED");
         }
 
@@ -341,14 +334,14 @@ public class SerialHandlerBridge {
         byte[] expected = new byte[1];
         expected[0] = -1;
 
-        System.out.println("FILE SIZE = " + bufferSize*256);
+        System.out.println("FILE SIZE = " + bufferSize * 256);
 
 
         for (int i = 0; i < bufferSize; ++i) {
 
             byte[] send = new byte[256];
 
-            for(int j = 0; j < 256; j++){
+            for (int j = 0; j < 256; j++) {
                 send[j] = filebuf[j + i * 256];
                 System.out.println(send[j]);
             }
@@ -357,13 +350,12 @@ public class SerialHandlerBridge {
 
             if (i == bufferSize - 1) {
                 expected = sendCommand(send, 1, true);
-            }
-            else{
-                sendCommand(send,0, false);
+            } else {
+                sendCommand(send, 0, false);
             }
         }
 
-        if(expected[0] != 0){
+        if (expected[0] != 0) {
             System.out.println("ERROR ON WRITING FILE");
         }
 
@@ -373,14 +365,12 @@ public class SerialHandlerBridge {
      * Generic method that sends the given bytes to the board, using the appropriate library
      * Used for all command methods
      *
-     * @param bytes byte[] that contains the bytes to be sent to the board
+     * @param bytes            byte[] that contains the bytes to be sent to the board
      * @param expectedDataBits Integer that dictates how long the method should hang to find relevant data from board (jSerialComm)
-     * @param finalByte Whether or not this is the final byte being sent as part of a chain of commands (JSSC)
-     *
+     * @param finalByte        Whether or not this is the final byte being sent as part of a chain of commands (JSSC)
      * @return returns any data that the board replies with
-     *
      * @throws SerialPortException Serial port may not be found
-     * @throws IOException Data may fail to be read from device or written to BAOS
+     * @throws IOException         Data may fail to be read from device or written to BAOS
      */
     private byte[] sendCommand(byte[] bytes, int expectedDataBits, boolean finalByte) throws SerialPortException, IOException {
         byte[] data = null;
@@ -393,15 +383,13 @@ public class SerialHandlerBridge {
 
     /**
      * -UNUSED-
-     *
+     * <p>
      * Intended to be used to make all commands async, but caused GUI update issues
      * Would have been used for all command methods
      *
-     * @param bytes byte[] that contains the bytes to be sent to the board
+     * @param bytes            byte[] that contains the bytes to be sent to the board
      * @param expectedDataBits The number of bits the method that called it is expecting back (used mainly with jSerialComm)
-     *
      * @return returns any data that the board replies with
-     *
      */
     @SuppressWarnings("unused")
     private byte[] sendAsyncCommand(byte[] bytes, int expectedDataBits) {

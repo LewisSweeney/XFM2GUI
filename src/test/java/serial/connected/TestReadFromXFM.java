@@ -1,4 +1,4 @@
-package serial.JSSC;
+package serial.connected;
 
 import javafx.application.Platform;
 import jssc.SerialPort;
@@ -14,20 +14,31 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TestReadFromXFM {
     static String os = System.getProperty("os.name").toLowerCase();
 
-    static SerialPort serialPort;
+    static SerialPort jsscSerialPort;
+    static com.fazecast.jSerialComm.SerialPort jSerialCommPort;
     static SerialHandlerBridge serialHandlerBridge = SerialHandlerBridge.getSINGLE_INSTANCE();
 
     @BeforeAll
-    public static void initialise(){
+    public static void initialise() {
 
-        if(os.contains("mac")){
+        // Gets the correct serial port depending on platform
+        // This is tested this way to avoid unnecessary failing tests on different platforms
+        if (os.contains("mac") || os.contains("darwin")) {
             // Direct reference to the XFM2 device I am using - would need changing on another machine
-            serialPort = new SerialPort("/dev/tty.usbserial-210328AD3A891");
+            jsscSerialPort = new SerialPort("/dev/tty.usbserial-210328AD3A891");
+        } else if (os.contains("win")){
+            com.fazecast.jSerialComm.SerialPort[] jSerialComms = com.fazecast.jSerialComm.SerialPort.getCommPorts();
+            for(com.fazecast.jSerialComm.SerialPort port:jSerialComms){
+                if(port.getSystemPortName().equals("COM6")){
+                    jSerialCommPort = port;
+                }
+            }
         } else{
             // Again, direct reference, although more likely to be correct if only one device is connected...
-            serialPort = new SerialPort("/dev/ttyUSB1");
+            jsscSerialPort = new SerialPort("/dev/ttyUSB1");
         }
-        serialHandlerBridge.setSerialPort(serialPort);
+        serialHandlerBridge.setSerialPort(jsscSerialPort);
+
     }
 
     @Test

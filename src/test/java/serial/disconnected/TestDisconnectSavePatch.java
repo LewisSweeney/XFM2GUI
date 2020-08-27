@@ -1,4 +1,4 @@
-package serial.JSSC;
+package serial.disconnected;
 
 import jssc.SerialPort;
 import jssc.SerialPortException;
@@ -12,30 +12,13 @@ import java.util.Random;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-public class TestSavePatch {
-    static String os = System.getProperty("os.name").toLowerCase();
-
-    static SerialPort serialPort;
+public class TestDisconnectSavePatch { static SerialPort serialPort;
     static SerialHandlerBridge serialHandlerBridge = SerialHandlerBridge.getSINGLE_INSTANCE();
 
     Random random = new Random();
 
-    @BeforeAll
-    public static void initialise(){
-
-        if(os.contains("mac")){
-            // Direct reference to the XFM2 device I am using - would need changing on another machine
-            serialPort = new SerialPort("/dev/tty.usbserial-210328AD3A891");
-        } else{
-            // Again, direct reference, although more likely to be correct if only one device is connected...
-            serialPort = new SerialPort("/dev/ttyUSB1");
-        }
-        serialHandlerBridge.setSerialPort(serialPort);
-
-    }
-
     @Test
-    public void ChangingAllParametersRandomlyThenSavingThemToAPatchWillWriteThemToXFM2Memory() throws IOException, SerialPortException {
+    public void Saving512RandomValuesToNonConnectedDeviceShouldResultInNoChange() throws IOException, SerialPortException {
 
         // Ensures program starts on program 1
         serialHandlerBridge.readProgram(1);
@@ -54,11 +37,9 @@ public class TestSavePatch {
         serialHandlerBridge.readProgram(12);
         byte[] programData = serialHandlerBridge.getAllValues();
 
-        assertNotEquals(tempData,programData);
-
         // Super minimal chance this will fail...
-        for(int i = 0; i<512;i++){
-            assertEquals(generatedData[i],programData[i], "Generated data should be equal to data from program 12");
+        for(int i = 0; i<tempData.length;i++){
+            assertEquals(tempData[i],programData[i], "Data should be equal as all calls should return -1");
         }
 
     }
