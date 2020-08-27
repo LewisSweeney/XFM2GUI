@@ -53,8 +53,20 @@ public class SerialHandlerJSerialComm {
             return null;
         }
 
-        while (serialPort.bytesAvailable() < expectedDataBits) {
+        int iter = 0;
+        int prevBytesAvailable = 0;
+        while (serialPort.bytesAvailable() < expectedDataBits && iter<25) {
             // Empty to wait for data to be available
+
+            if(prevBytesAvailable == serialPort.bytesAvailable()){
+                iter++;
+            }
+            prevBytesAvailable = serialPort.bytesAvailable();
+            try {
+                Thread.sleep(1);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
 
         while (serialPort.bytesAvailable() > 0) {

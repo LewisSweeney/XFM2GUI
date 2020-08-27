@@ -29,6 +29,7 @@ public class TestSavePatch {
         if (os.contains("mac") || os.contains("darwin")) {
             // Direct reference to the XFM2 device I am using - would need changing on another machine
             jsscSerialPort = new SerialPort("/dev/tty.usbserial-210328AD3A891");
+            serialHandlerBridge.setSerialPort(jsscSerialPort);
         } else if (os.contains("win")){
             com.fazecast.jSerialComm.SerialPort[] jSerialComms = com.fazecast.jSerialComm.SerialPort.getCommPorts();
             for(com.fazecast.jSerialComm.SerialPort port:jSerialComms){
@@ -36,12 +37,12 @@ public class TestSavePatch {
                     jSerialCommPort = port;
                 }
             }
+            serialHandlerBridge.setSerialPort(jSerialCommPort);
         } else{
             // Again, direct reference, although more likely to be correct if only one device is connected...
             jsscSerialPort = new SerialPort("/dev/ttyUSB1");
+            serialHandlerBridge.setSerialPort(jsscSerialPort);
         }
-        serialHandlerBridge.setSerialPort(jsscSerialPort);
-
     }
 
     @Test

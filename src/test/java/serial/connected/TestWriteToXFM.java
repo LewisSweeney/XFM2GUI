@@ -28,6 +28,7 @@ public class TestWriteToXFM {
         if (os.contains("mac") || os.contains("darwin")) {
             // Direct reference to the XFM2 device I am using - would need changing on another machine
             jsscSerialPort = new SerialPort("/dev/tty.usbserial-210328AD3A891");
+            serialHandlerBridge.setSerialPort(jsscSerialPort);
         } else if (os.contains("win")){
             com.fazecast.jSerialComm.SerialPort[] jSerialComms = com.fazecast.jSerialComm.SerialPort.getCommPorts();
             for(com.fazecast.jSerialComm.SerialPort port:jSerialComms){
@@ -35,11 +36,12 @@ public class TestWriteToXFM {
                     jSerialCommPort = port;
                 }
             }
+            serialHandlerBridge.setSerialPort(jSerialCommPort);
         } else{
             // Again, direct reference, although more likely to be correct if only one device is connected...
             jsscSerialPort = new SerialPort("/dev/ttyUSB1");
+            serialHandlerBridge.setSerialPort(jsscSerialPort);
         }
-        serialHandlerBridge.setSerialPort(jsscSerialPort);
     }
 
     @Test
@@ -59,9 +61,7 @@ public class TestWriteToXFM {
         }
 
         byte[] postWriteData = serialHandlerBridge.getAllValues();
-        System.out.println("IND WRITE DATA");
         for (int i = 0; i < 512; i++) {
-                System.out.println(i + " " + generatedData[i] + " " + (postWriteData[i] & 0xff));
                 assertEquals(generatedData[i], (int) postWriteData[i] & 0xff, "Values should be equal due to being set individually");
         }
 
@@ -82,9 +82,7 @@ public class TestWriteToXFM {
 
         byte[] postWriteData = serialHandlerBridge.getAllValues();
 
-        System.out.println("MASS WRITE DATA");
         for (int i = 0; i < 512; i++) {
-            System.out.println(i + " " + generatedData[i] + " " + postWriteData[i]);
             assertEquals(generatedData[i], postWriteData[i], "Values should be equal due to being set in one go");
         }
 

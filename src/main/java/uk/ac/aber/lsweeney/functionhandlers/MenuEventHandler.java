@@ -76,6 +76,7 @@ public class MenuEventHandler {
             serialPort.closePort();
         }
         if (serialPortNameList.length > 0) {
+            System.out.println("GETTING PORT");
             String portName = serialPortPicker.getValue();
             serialPort = new SerialPort(portName);
             serialHandler.setSerialPort(serialPort);
@@ -232,6 +233,7 @@ public class MenuEventHandler {
      */
     public void setAllIntFieldValues(byte[] dump) {
         // int offset = 48;
+        assert(dump != null);
         if (dump.length == 512) {
             for (IntField intField : paramFields) {
                 // int paramAddress = Integer.parseInt(intField.getId()) + offset;

@@ -42,7 +42,8 @@ public class Main extends Application {
         Scene scene = menuInitialiser.initializeScene();
         ParamValueChangeHandler.setSerialHandler(serialHandlerBridge);
         optionsHandler.setLiveChanges(false);
-        menuEventHandler.setAllIntFieldValues(serialHandlerBridge.getAllValues());
+        byte[] data = menuInitialiser.getReadData();
+        menuEventHandler.setAllIntFieldValues(data);
 
         primaryStage.setResizable(false);
         primaryStage.setScene(scene);
@@ -52,14 +53,14 @@ public class Main extends Application {
         primaryStage.show();
 
 
-        byte[] data = serialHandlerBridge.getAllValues();
+
 
         if (!serialHandlerBridge.isThereASerialPort()) {
             if(!System.getProperty("os.name").toLowerCase().contains("windows") && !System.getProperty("os.name").toLowerCase().contains("mac")){
                 alertHandler.sendAlert(ALERT_TYPE.LINUX);
             }
             alertHandler.sendAlert(ALERT_TYPE.NO_DEVICE);
-        } else if (data.length != 512) {
+        } else if (data == null || data.length != 512) {
             alertHandler.sendAlert(ALERT_TYPE.NOT_XFM);
         }
 

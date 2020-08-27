@@ -54,6 +54,8 @@ public class MenuInitialiser {
 
     int BUTTON_WIDTH = 150;
 
+    static byte[] readData = null;
+
     String style = this.getClass().getResource("/stylesheets/style.css").toExternalForm();
 
     /**
@@ -138,6 +140,7 @@ public class MenuInitialiser {
                         byte[] tempData = serialHandler.getAllValues();
                         if (tempData.length == 512) {
                             serialPortJSSC = sP;
+                            readData = tempData;
                         }
                     }
 
@@ -175,12 +178,12 @@ public class MenuInitialiser {
                         byte[] tempData = serialHandler.getAllValues();
                         if (tempData.length == 512) {
                             serialPort = s;
+                            readData = tempData;
                             break;
                         }
                     }
 
                     serialHandler.setSerialPort(serialPort);
-
 
                     if (serialPort == null) {
                         serialPortPicker.getSelectionModel().selectFirst();
@@ -226,6 +229,26 @@ public class MenuInitialiser {
         Label xfmPatch = new Label("Program #:");
 
         Button[] menuButtons = getMenuButtons();
+        Button serialRefresh = new Button("Reload Port");
+
+        switch (serialHandler.getLibrary_choice()){
+            case JSSC -> serialRefresh.setOnAction(e -> {
+                try {
+                    menuEventHandler.onSerialPortSelection(serialPortNameList, serialPortPicker, serialPortJSSC, patchPicker);
+                } catch (SerialPortException | IOException serialPortException) {
+                    serialPortException.printStackTrace();
+                }
+            });
+
+            case JSERIALCOMM -> serialRefresh.setOnAction(e -> {
+                try {
+                    menuEventHandler.onSerialPortSelection(com.fazecast.jSerialComm.SerialPort.getCommPorts(), serialPortPicker, serialPortJSerialComm, patchPicker);
+                }
+                catch (SerialPortException | IOException serialPortException) {
+                    serialPortException.printStackTrace();
+                }
+            });
+        }
 
         ArrayList<Integer> vals = new ArrayList<>();
         for (int i = 1; i <= 127; i++) {
@@ -273,17 +296,20 @@ public class MenuInitialiser {
         Label localButtonsLabel = new Label("Local Controls");
         localButtonsLabel.getStyleClass().add("button-group-title");
 
-        Label subtitle = new Label("By Lewis Sweeney");
+        //Label subtitle = new Label("By Lewis Sweeney");
 
         // Sets preferred width of the serialPort Picker
         // TODO: Change this to CSS.
         serialPortPicker.setPrefWidth(BUTTON_WIDTH);
 
+        serialRefresh.setMinWidth(80);
+
         // Creates new sub-sub-section for the patch control
         VBox patchControl = new VBox(xfmPatch, patchPicker);
 
+
         // Creates each subsection being added to menuLayout
-        serialPortSelection = new VBox(serialPortLabel, serialPortPicker);
+        serialPortSelection = new VBox(serialPortLabel, serialPortPicker, serialRefresh);
         HBox xfmButtonBox = new HBox(menuButtons[0], menuButtons[1]);
         xfmControls.getChildren().addAll(xfmButtonsLabel, xfmButtonBox, patchControl, menuButtons[2], getUnitControls());
         HBox localButtonHBox = new HBox(menuButtons[3], menuButtons[4]);
@@ -296,7 +322,6 @@ public class MenuInitialiser {
         localButtonHBox.getStyleClass().add("button-box");
         xfmButtonBox.getStyleClass().add("button-box");
         localControls.getStyleClass().add("button-row");
-        subtitle.getStyleClass().add("app-subtitle");
 
         Hyperlink about = new Hyperlink("About");
         about.setOnAction(actionEvent -> {
@@ -504,5 +529,9 @@ public class MenuInitialiser {
             });
         }
 
+    }
+
+    public byte[] getReadData(){
+        return readData;
     }
 }

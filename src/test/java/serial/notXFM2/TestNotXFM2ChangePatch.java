@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TestNotXFM2ChangePatch {
 
@@ -29,6 +30,8 @@ public class TestNotXFM2ChangePatch {
         if (os.contains("mac") || os.contains("darwin")) {
             // Direct reference to the XFM2 device I am using - would need changing on another machine
             jsscSerialPort = new SerialPort("/dev/tty.usbmodem14201");
+            serialHandlerBridge.setSerialPort(jsscSerialPort);
+            assertNotNull(jsscSerialPort);
         } else if (os.contains("win")){
             com.fazecast.jSerialComm.SerialPort[] jSerialComms = com.fazecast.jSerialComm.SerialPort.getCommPorts();
             for(com.fazecast.jSerialComm.SerialPort port:jSerialComms){
@@ -36,11 +39,14 @@ public class TestNotXFM2ChangePatch {
                     jSerialCommPort = port;
                 }
             }
+            serialHandlerBridge.setSerialPort(jSerialCommPort);
+            assertNotNull(jSerialCommPort);
         } else{
             // Again, direct reference, although more likely to be correct if only one device is connected...
             jsscSerialPort = new SerialPort("/dev/ttyACM0");
+            serialHandlerBridge.setSerialPort(jsscSerialPort);
+            assertNotNull(jsscSerialPort);
         }
-        serialHandlerBridge.setSerialPort(jsscSerialPort);
     }
 
     @Test
