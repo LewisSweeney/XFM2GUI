@@ -59,7 +59,10 @@ public class Main extends Application {
 
     String style = this.getClass().getResource("/stylesheets/splash.css").toExternalForm();
 
-
+    /*
+    Runs initialization code when started
+    Adapted from jewelsea's code
+     */
     @Override
     public void start(final Stage initStage) {
         final Task<ObservableList<String>> splashTask = new Task<>() {
@@ -91,6 +94,10 @@ public class Main extends Application {
         new Thread(splashTask).start();
     }
 
+    /*
+    Displays Primary Stage
+    Adapted from jewelsea's code
+     */
     private void showPrimaryStage(ReadOnlyObjectProperty<ObservableList<String>> friends) throws IOException, SerialPortException {
 
         Stage primaryStage = new Stage(StageStyle.UTILITY);
@@ -113,6 +120,10 @@ public class Main extends Application {
         }
     }
 
+    /*
+    Displays Splash Screen
+    Adapted from jewelsea's code
+     */
     private void showSplash(
             final Stage initStage,
             Task<?> task,
