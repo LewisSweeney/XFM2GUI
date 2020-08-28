@@ -7,11 +7,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
@@ -45,6 +43,8 @@ public class Main extends Application {
     private ProgressBar loadProgress;
     private static final int SPLASH_WIDTH = 256;
     private static final int SPLASH_HEIGHT = 256;
+    private static final int MAIN_WIDTH = 1000;
+    private static final int MAIN_HEIGHT = 750;
 
     SerialHandlerBridge serialHandlerBridge = SerialHandlerBridge.getSINGLE_INSTANCE();
 
@@ -57,7 +57,34 @@ public class Main extends Application {
     Scene scene;
     byte[] data;
 
-    String style = this.getClass().getResource("/stylesheets/splash.css").toExternalForm();
+    String style = this.getClass().getResource("/stylesheets/style.css").toExternalForm();
+    String splashStyle = this.getClass().getResource("/stylesheets/splash.css").toExternalForm();
+
+    final Rectangle2D bounds = Screen.getPrimary().getBounds();
+
+
+    @Override
+    public void init() {
+
+        if(bounds.getWidth() < 1200 || bounds.getHeight()< 900){
+            style = this.getClass().getResource("/stylesheets/lowres/lowresstyle.css").toExternalForm();
+            splashStyle = this.getClass().getResource("/stylesheets/lowres/lowressplash.css").toExternalForm();
+        }
+
+        loadProgress = new ProgressBar();
+
+        ImageView splash = new ImageView(logo);
+        splash.setFitHeight(256);
+        splash.setFitWidth(256);
+
+        splashLayout = new BorderPane();
+        splashLayout.getStyleClass().add("splash-layout");
+        loadProgress.getStyleClass().add("load-bar");
+        splashLayout.setCenter(splash);
+        splashLayout.setBottom(loadProgress);
+        BorderPane.setAlignment(loadProgress,Pos.CENTER);
+        splashLayout.setEffect(new DropShadow());
+    }
 
     /*
     Runs initialization code when started
@@ -100,13 +127,18 @@ public class Main extends Application {
      */
     private void showPrimaryStage(ReadOnlyObjectProperty<ObservableList<String>> friends) throws IOException, SerialPortException {
 
-        Stage primaryStage = new Stage(StageStyle.UTILITY);
-        primaryStage.setResizable(false);
+        Stage primaryStage = new Stage(StageStyle.DECORATED);
+
         primaryStage.setScene(scene);
         primaryStage.setTitle("XFM2GUI");
-        primaryStage.setMaxWidth(950);
-        primaryStage.setMaxHeight(700);
-
+        if(bounds.getWidth() < 1200 || bounds.getHeight()< 900){
+            primaryStage.setMaxHeight(MAIN_WIDTH / 2);
+            primaryStage.setMaxWidth(MAIN_WIDTH / 2 + 100);
+        } else{
+            primaryStage.setMaxHeight(MAIN_HEIGHT);
+            primaryStage.setMaxWidth(MAIN_WIDTH);
+        }
+        primaryStage.setResizable(false);
         primaryStage.getIcons().add(logo);
         primaryStage.show();
 
@@ -144,8 +176,7 @@ public class Main extends Application {
         });
 
         Scene splashScene = new Scene(splashLayout);
-        final Rectangle2D bounds = Screen.getPrimary().getBounds();
-        splashScene.getStylesheets().add(style);
+        splashScene.getStylesheets().add(splashStyle);
         initStage.setScene(splashScene);
         initStage.setX(bounds.getMinX() + bounds.getWidth() / 2 - SPLASH_WIDTH / 2);
         initStage.setY(bounds.getMinY() + bounds.getHeight() / 2 - SPLASH_HEIGHT / 2);
@@ -154,22 +185,7 @@ public class Main extends Application {
         initStage.show();
     }
 
-    @Override
-    public void init() {
-        loadProgress = new ProgressBar();
 
-        ImageView splash = new ImageView(logo);
-        splash.setFitHeight(256);
-        splash.setFitWidth(256);
-
-        splashLayout = new BorderPane();
-        splashLayout.getStyleClass().add("splash-layout");
-        loadProgress.getStyleClass().add("load-bar");
-        splashLayout.setCenter(splash);
-        splashLayout.setBottom(loadProgress);
-        BorderPane.setAlignment(loadProgress,Pos.CENTER);
-        splashLayout.setEffect(new DropShadow());
-    }
 
     public interface InitCompletionHandler {
         void complete();

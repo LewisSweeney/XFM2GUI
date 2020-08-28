@@ -3,6 +3,7 @@ package uk.ac.aber.lsweeney.initializers;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -11,6 +12,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import jssc.SerialPort;
 import jssc.SerialPortException;
@@ -56,6 +58,9 @@ public class MenuInitialiser {
 
     static byte[] readData = null;
 
+    int LOGO_DIM = 100;
+    int TAB_WIDTH = 55;
+
     String style = this.getClass().getResource("/stylesheets/style.css").toExternalForm();
 
     /**
@@ -67,13 +72,20 @@ public class MenuInitialiser {
      * @throws IOException Data may fail to be read from device or written to BAOS
      */
     public Scene initializeScene() throws IOException, SerialPortException {
-
+        Rectangle2D screenBounds = Screen.getPrimary().getBounds();
+        if(screenBounds.getWidth() < 1200 || screenBounds.getHeight()< 900){
+            System.out.println(screenBounds);
+            LOGO_DIM = LOGO_DIM / 2;
+            TAB_WIDTH = TAB_WIDTH / 2;
+            BUTTON_WIDTH = BUTTON_WIDTH / 2;
+            style = this.getClass().getResource("/stylesheets/lowres/lowresstyle.css").toExternalForm();
+        }
         BorderPane topBorder = new BorderPane();
         border = new BorderPane();
         TabPane tabPane = new TabPane();
 
-        tabPane.setTabMinWidth(55);
-        tabPane.setTabMaxWidth(55);
+        tabPane.setTabMinWidth(TAB_WIDTH);
+        tabPane.setTabMaxWidth(TAB_WIDTH);
         tabPane.getTabs().addAll(initTabs());
         tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
 
@@ -82,8 +94,7 @@ public class MenuInitialiser {
         border.setLeft(getMenuBar());
 
         topBorder.setCenter(border);
-        topBorder.setPrefWidth(950);
-        topBorder.setPrefHeight(700);
+        topBorder.getStyleClass().add("window-size");
 
         BorderPane.setAlignment(tabPane, Pos.CENTER);
 
@@ -227,6 +238,7 @@ public class MenuInitialiser {
         VBox serialPortSelection;
 
         Label xfmPatch = new Label("Program #:");
+        xfmPatch.getStyleClass().add("menu-label");
 
         Button[] menuButtons = getMenuButtons();
         Button serialRefresh = new Button("Reload Port");
@@ -255,6 +267,7 @@ public class MenuInitialiser {
             vals.add(i);
         }
 
+        patchPicker.getStyleClass().add("channel-combo");
         patchPicker.getItems().addAll(vals);
         patchPicker.setOnAction(e -> {
             try {
@@ -271,6 +284,7 @@ public class MenuInitialiser {
 
 
         CheckBox liveChanges = new CheckBox("Live Changes");
+        liveChanges.getStyleClass().add("menu-check-layout");
         EventHandler<ActionEvent> actionEventEventHandler = actionEvent -> menuEventHandler.onLiveChanged(liveChanges.isSelected());
         liveChanges.setOnAction(actionEventEventHandler);
         liveChanges.setSelected(false);
@@ -285,8 +299,8 @@ public class MenuInitialiser {
 
         Image logo = new Image(String.valueOf(getClass().getResource("/images/logo.png")));
         ImageView logoView = new ImageView(logo);
-        logoView.setFitHeight(100);
-        logoView.setFitWidth(100);
+        logoView.setFitHeight(LOGO_DIM);
+        logoView.setFitWidth(LOGO_DIM);
 
         Label xfmButtonsLabel = new Label("Device Controls");
 
@@ -344,6 +358,7 @@ public class MenuInitialiser {
     private VBox getUnitControls() {
 
         Label midiTitle = new Label("Unit and MIDI Controls:");
+        midiTitle.getStyleClass().add("menu-label");
         ToggleGroup unitGroup = new ToggleGroup();
 
         GridPane midiConOne = getIndividualMidiControl(midiChZeroPicker, UNIT_NUMBER.ZERO, unitGroup);
@@ -357,6 +372,7 @@ public class MenuInitialiser {
         CheckBox layering = new CheckBox("Layering");
         Tooltip layeringTooltip = new Tooltip("Toggle layering on the XFM2");
         layering.setTooltip(layeringTooltip);
+        layering.getStyleClass().add("menu-check-layout");
         layering.setOnAction(e -> {
             try {
                 menuEventHandler.setLayering(layering.isSelected());
@@ -414,6 +430,7 @@ public class MenuInitialiser {
         unit.setToggleGroup(toggleGroup);
 
         Label controlLabel = new Label("Unit 1:");
+        controlLabel.getStyleClass().add("menu-label");
         Tooltip midiTooltip = new Tooltip("Set the MIDI channel for Unit 1 on the device");
 
         if (unit_number == UNIT_NUMBER.ZERO) {
