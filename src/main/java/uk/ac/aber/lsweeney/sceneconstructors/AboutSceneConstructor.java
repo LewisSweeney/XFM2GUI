@@ -38,7 +38,7 @@ public class AboutSceneConstructor {
         Label aboutTitle = new Label("About This App");
         aboutTitle.getStyleClass().add("about-section-title");
         Label aboutText = new Label("This application has been developed as part of my MSc dissertation. The app is intended for use with the XFM2 synthesizer module created by futur3soundz. " +
-                "The aim of the project was to create a platform independent application to program the device using its USB-over-uk.ac.aber.les35.serial capabilities.\n" +
+                "The aim of the project was to create a platform independent application to program the device using its USB-over-serial capabilities.\n" +
                 "\n" +
                 "The application can change all of the parameters and patches of your XFM2 device, as well as save and load programs locally.\n" +
                 "Unfortunately, the device will still need access to a windows machine to install the initial program.\n" +
@@ -76,7 +76,7 @@ public class AboutSceneConstructor {
                 "Below is a list of these 3rd-party pieces and links to where to find them.\n\n");
 
         Label jsscTitle = new Label("JSSC");
-        Label jsscText = new Label("Used for uk.ac.aber.les35.serial communication. Helped keep uk.ac.aber.les35.serial comms consistent across platforms.");
+        Label jsscText = new Label("Used for serial communication. Helped keep serial comms consistent across platforms.");
         Hyperlink jsscLink = new Hyperlink("Find it on GitHub");
 
         javafx.event.EventHandler<? super MouseEvent> jsscEventHandler = (EventHandler<MouseEvent>) mouseEvent -> {

@@ -1,0 +1,12 @@
+.splash-layout {
+    -fx-padding: 5;
+    -fx-background-color: white;
+    -fx-border-width: 5;
+    -fx-border-color: darkslategrey;
+}
+
+.load-bar {
+    -fx-alignment: center;
+    -fx-pref-width: 200;
+    -fx-padding: 10 0 0 0;
+}
