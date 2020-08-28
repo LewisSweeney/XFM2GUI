@@ -19,6 +19,7 @@ public class ParamValueChangeHandler {
 
     static SerialHandlerBridge serialHandler;
     private static final OptionsHandler optionsHandler = OptionsHandler.getSingleInstance();
+    private static final MenuEventHandler menuEventHandler = MenuEventHandler.getSingleInstance();
 
     /**
      * When the slider value is changed this method ensures the parameter IntField is also updated
@@ -55,8 +56,8 @@ public class ParamValueChangeHandler {
             if (serialHandler != null) {
                 if (optionsHandler.getLiveChanges()) {
                     try {
-                        serialHandler.setIndividualValue(Integer.parseInt(c.getParamField().getId()), c.getParamField().getValue());
-                    } catch (SerialPortException | InterruptedException | IOException e) {
+                        menuEventHandler.onWriteButtonPress();
+                    } catch (SerialPortException | IOException e) {
                         e.printStackTrace();
                     }
                 }

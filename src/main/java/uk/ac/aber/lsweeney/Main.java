@@ -18,7 +18,9 @@ import uk.ac.aber.lsweeney.functionhandlers.ParamValueChangeHandler;
 import uk.ac.aber.lsweeney.initializers.MenuInitialiser;
 import uk.ac.aber.lsweeney.serial.SerialHandlerBridge;
 
+import java.awt.*;
 import java.io.IOException;
+import java.net.URL;
 
 /**
  * Starts the program, constructing the GUI and readying the system for XFM communication
@@ -46,14 +48,10 @@ public class Main extends Application {
         menuEventHandler.setAllIntFieldValues(data);
 
         primaryStage.setResizable(false);
-        primaryStage.setScene(scene);
         primaryStage.setTitle("XFM2GUI");
-
         primaryStage.getIcons().add(logo);
+        primaryStage.setScene(scene);
         primaryStage.show();
-
-
-
 
         if (!serialHandlerBridge.isThereASerialPort()) {
             if(!System.getProperty("os.name").toLowerCase().contains("windows") && !System.getProperty("os.name").toLowerCase().contains("mac")){

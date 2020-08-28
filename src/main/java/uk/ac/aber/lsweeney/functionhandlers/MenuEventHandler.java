@@ -109,26 +109,28 @@ public class MenuEventHandler {
      * @throws IOException         Data may not be read from device or written to BAOS
      */
     public void onWriteButtonPress() throws SerialPortException, IOException {
-        paramFields.sort(Comparator.comparingInt(p -> Integer.parseInt(p.getId())));
 
-        byte[] bytes = new byte[512];
+        Runnable r = () -> {
+            if (serialHandler != null) {
+                if (optionsHandler.getLiveChanges()) {
+                    try {
+                        Thread.sleep(1);
+                        paramFields.sort(Comparator.comparingInt(p -> Integer.parseInt(p.getId())));
 
-        for (IntField p : paramFields) {
-            bytes[Integer.parseInt(p.getId())] = (byte) p.getValue();
-        }
+                        byte[] bytes = new byte[512];
 
-        serialHandler.setAllValues(bytes);
+                        for (IntField p : paramFields) {
+                            bytes[Integer.parseInt(p.getId())] = (byte) p.getValue();
+                        }
 
-        //byte[] oldBytes = serialCommandHandler.getAllValues();
-       /* if (oldBytes.length == 512) {
-            for (IntField intField : paramFields) {
-                int paramNum = Integer.parseInt(intField.getId());
-                if (oldBytes[paramNum] != intField.getValue()) {
-                    serialCommandHandler.setIndividualValue(Integer.parseInt(intField.getId()), intField.getValue());
+                        serialHandler.setAllValues(bytes);
+                    } catch (SerialPortException | IOException | InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
-        }
-        */
+        };
+
     }
 
     /**
