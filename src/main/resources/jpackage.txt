@@ -1,0 +1,2 @@
+$JAVA_HOME/bin/jpackage --runtime-image target/XFM2GUI --module uk.ac.aber.lsweeney/uk.ac.aber.lsweeney.GUIStarter --icon target/logo.icns --name XFM2GUI
+WARNING: Using incubator modules: jdk.incubator.jpackage

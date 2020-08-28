@@ -43,7 +43,7 @@ public class TestReadFromXFM {
     }
 
     @Test
-    public void readingXFM2IntoEmptyByteArrayWillGet512BytesOfData() throws IOException, SerialPortException {
+    public void ReadingXFM2IntoEmptyByteArrayWillGet512BytesOfData() throws IOException, SerialPortException {
         byte[] data = serialHandlerBridge.getAllValues();
         assertEquals(data.length,512,"Data received from connected device should be 512 bytes long");
     }

@@ -9,8 +9,7 @@ import uk.ac.aber.lsweeney.serial.SerialHandlerBridge;
 import java.io.IOException;
 import java.util.Random;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestNotXFM2ChangePatch {
 
@@ -50,24 +49,14 @@ public class TestNotXFM2ChangePatch {
     }
 
     @Test
-    public void ReadingProgramsWhenDisconnectedResultsInNoChange() throws IOException, SerialPortException {
+    public void ReadingProgramsWhenNonXFM2ConnectedResultsInNoChange() throws IOException, SerialPortException {
 
         serialHandlerBridge.readProgram(1);
         byte[] initData = serialHandlerBridge.getAllValues();
         serialHandlerBridge.readProgram(12);
         byte[] newData = serialHandlerBridge.getAllValues();
 
-        boolean differenceBetweenTwoDataSets = false;
-        for(int i = 0;i < initData.length;i++){
-            if(differenceBetweenTwoDataSets){
-                break;
-            } else{
-                if(initData[i] != newData[i]){
-                    differenceBetweenTwoDataSets = true;
-                }
-            }
-        }
 
-        assertFalse(differenceBetweenTwoDataSets, "There should be no difference between the datasets");
+        assertArrayEquals(initData,newData, "There should be no difference between the datasets");
     }
 }

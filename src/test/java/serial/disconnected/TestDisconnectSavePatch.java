@@ -9,10 +9,10 @@ import uk.ac.aber.lsweeney.serial.SerialHandlerBridge;
 import java.io.IOException;
 import java.util.Random;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
-public class TestDisconnectSavePatch { static SerialPort serialPort;
+public class TestDisconnectSavePatch {
+    static SerialPort serialPort;
     static SerialHandlerBridge serialHandlerBridge = SerialHandlerBridge.getSINGLE_INSTANCE();
 
     Random random = new Random();
@@ -37,10 +37,8 @@ public class TestDisconnectSavePatch { static SerialPort serialPort;
         serialHandlerBridge.readProgram(12);
         byte[] programData = serialHandlerBridge.getAllValues();
 
-        // Super minimal chance this will fail...
-        for(int i = 0; i<tempData.length;i++){
-            assertEquals(tempData[i],programData[i], "Data should be equal as all calls should return -1");
-        }
+        assertArrayEquals(tempData, programData, "Data should be equal as all calls should return -1");
+
 
     }
 

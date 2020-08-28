@@ -9,10 +9,10 @@ import uk.ac.aber.lsweeney.serial.SerialHandlerBridge;
 import java.io.IOException;
 import java.util.Random;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
-public class TestNotXFM2SavePatch { static SerialPort serialPort;
+public class TestNotXFM2SavePatch {
+    static SerialPort serialPort;
 
     static String os = System.getProperty("os.name").toLowerCase();
 
@@ -32,16 +32,16 @@ public class TestNotXFM2SavePatch { static SerialPort serialPort;
             jsscSerialPort = new SerialPort("/dev/tty.usbmodem14201");
             serialHandlerBridge.setSerialPort(jsscSerialPort);
             assertNotNull(jsscSerialPort);
-        } else if (os.contains("win")){
+        } else if (os.contains("win")) {
             com.fazecast.jSerialComm.SerialPort[] jSerialComms = com.fazecast.jSerialComm.SerialPort.getCommPorts();
-            for(com.fazecast.jSerialComm.SerialPort port:jSerialComms){
-                if(port.getSystemPortName().equals("COM3")){
+            for (com.fazecast.jSerialComm.SerialPort port : jSerialComms) {
+                if (port.getSystemPortName().equals("COM3")) {
                     jSerialCommPort = port;
                 }
             }
             serialHandlerBridge.setSerialPort(jSerialCommPort);
             assertNotNull(jSerialCommPort);
-        } else{
+        } else {
             // Again, direct reference, although more likely to be correct if only one device is connected...
             jsscSerialPort = new SerialPort("/dev/ttyACM0");
             serialHandlerBridge.setSerialPort(jsscSerialPort);
@@ -70,10 +70,8 @@ public class TestNotXFM2SavePatch { static SerialPort serialPort;
         serialHandlerBridge.readProgram(12);
         byte[] programData = serialHandlerBridge.getAllValues();
 
-        // Super minimal chance this will fail...
-        for(int i = 0; i<tempData.length;i++){
-            assertEquals(tempData[i],programData[i], "Data should be equal as all calls should return -1");
-        }
+        assertArrayEquals(tempData, programData, "Data should be equal as all calls should return -1");
+
 
     }
 

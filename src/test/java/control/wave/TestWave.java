@@ -18,9 +18,9 @@ public class TestWave {
     @BeforeAll
     public static void initialise(){
         // NEEDED FOR INITIALIZING TOOLKIT
-        Platform.startup(() -> {
+      Platform.startup(() -> {
 
-        });
+      });
     }
 
     @Test

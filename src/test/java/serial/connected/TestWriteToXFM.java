@@ -134,5 +134,43 @@ public class TestWriteToXFM {
 
     }
 
+    @Test
+    public void SendingLettersAsBytesWillSetTheValuesToTheByteValueOfTheLetter() throws IOException, SerialPortException {
+        serialHandlerBridge.readProgram(12);
+        byte[] initData = serialHandlerBridge.getAllValues();
+        byte[] lettersAsBytes = new byte[512];
+
+        for(int i = 0;i<512;i++){
+            lettersAsBytes[i] = 'f';
+        }
+
+        serialHandlerBridge.setAllValues(lettersAsBytes);
+
+        byte[] postWriteData = serialHandlerBridge.getAllValues();
+
+
+        assertArrayEquals(postWriteData,lettersAsBytes, "Arrays should be equal as the byte value of f is sent");
+
+    }
+
+    @Test
+    public void SendingSpecialCharsAsBytesWillSetTheValuesToTheByteValueOfTheSpecialChar() throws IOException, SerialPortException {
+        serialHandlerBridge.readProgram(12);
+        byte[] initData = serialHandlerBridge.getAllValues();
+        byte[] lettersAsBytes = new byte[512];
+
+        for(int i = 0;i<512;i++){
+            lettersAsBytes[i] = '\n';
+        }
+
+        serialHandlerBridge.setAllValues(lettersAsBytes);
+
+        byte[] postWriteData = serialHandlerBridge.getAllValues();
+
+
+        assertArrayEquals(postWriteData,lettersAsBytes, "Arrays should be equal as the byte value of f is sent");
+
+    }
+
 
 }

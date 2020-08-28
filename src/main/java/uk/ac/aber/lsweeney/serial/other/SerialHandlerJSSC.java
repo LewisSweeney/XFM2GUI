@@ -61,14 +61,10 @@ public class SerialHandlerJSSC {
                     data = getData();
                 }
             }
-            if(data == null){
-                AlertHandler alertHandler = new AlertHandler();
-                alertHandler.sendAlert(ALERT_TYPE.NOT_XFM);
-            }
+
             serialPort.closePort();
             return data;
         } else{
-          //  alertHandler.SendAlert(ALERT_TYPE.NO_DEVICE);
             return new byte[1];
         }
     }
@@ -128,9 +124,10 @@ public class SerialHandlerJSSC {
      */
     byte[] getData() throws SerialPortException, IOException {
 
-        if(serialPort == null){
+        if(serialPort == null || !serialPort.isOpened()){
             return null;
         }
+
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         byte[] b;
 

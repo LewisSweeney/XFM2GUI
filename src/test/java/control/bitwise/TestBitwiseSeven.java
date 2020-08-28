@@ -36,20 +36,14 @@ public class TestBitwiseSeven {
         ParameterControl tester = controlLayoutFactory.createControl(testString);
 
         assertEquals(0, tester.getParamField().getValue(), "Initial value of ParamField should be 0");
-        assertFalse(tester.getBitwiseCheckboxes()[0].isSelected(), "Box 0 should not be ticked");
-        assertFalse(tester.getBitwiseCheckboxes()[1].isSelected(), "Box 1 should not be ticked");
-        assertFalse(tester.getBitwiseCheckboxes()[2].isSelected(), "Box 2 should not be ticked");
-        assertFalse(tester.getBitwiseCheckboxes()[3].isSelected(), "Box 3 should not be ticked");
-        assertFalse(tester.getBitwiseCheckboxes()[4].isSelected(), "Box 4 should not be ticked");
-        assertFalse(tester.getBitwiseCheckboxes()[5].isSelected(), "Box 5 should not be ticked");
-        assertFalse(tester.getBitwiseCheckboxes()[6].isSelected(), "Box 6 should not be ticked");
+        for(int i = 0;i<7;i++){
+            assertFalse(tester.getBitwiseCheckboxes()[i].isSelected(), "Box " + i + " should not be ticked");
+        }
         tester.getParamField().setValue(3);
         assertEquals(3,tester.getParamField().getValue(), "ParamField val should now be 3");
-        assertFalse(tester.getBitwiseCheckboxes()[0].isSelected(), "Box 0 should not be ticked");
-        assertFalse(tester.getBitwiseCheckboxes()[1].isSelected(), "Box 1 should not be ticked");
-        assertFalse(tester.getBitwiseCheckboxes()[2].isSelected(), "Box 2 should not be ticked");
-        assertFalse(tester.getBitwiseCheckboxes()[3].isSelected(), "Box 3 should not be ticked");
-        assertFalse(tester.getBitwiseCheckboxes()[4].isSelected(), "Box 4 should not be ticked");
+        for(int i = 0;i<5;i++){
+            assertFalse(tester.getBitwiseCheckboxes()[i].isSelected(), "Box " + i + " should not be ticked");
+        }
         assertTrue(tester.getBitwiseCheckboxes()[5].isSelected(), "Box 5 should now be ticked");
         assertTrue(tester.getBitwiseCheckboxes()[6].isSelected(), "Box 6 should now be ticked");
     }
@@ -72,21 +66,15 @@ public class TestBitwiseSeven {
         ParameterControl tester = controlLayoutFactory.createControl(testString);
 
         assertEquals(0, tester.getParamField().getValue(),"Paramfield val should be 0 intially");
-        assertFalse(tester.getBitwiseCheckboxes()[0].isSelected(), "Box 0 should not be ticked");
-        assertFalse(tester.getBitwiseCheckboxes()[1].isSelected(), "Box 1 should not be ticked");
-        assertFalse(tester.getBitwiseCheckboxes()[2].isSelected(), "Box 2 should not be ticked");
-        assertFalse(tester.getBitwiseCheckboxes()[3].isSelected(), "Box 3 should not be ticked");
-        assertFalse(tester.getBitwiseCheckboxes()[4].isSelected(), "Box 4 should not be ticked");
-        assertFalse(tester.getBitwiseCheckboxes()[5].isSelected(), "Box 5 should not be ticked");
-        assertFalse(tester.getBitwiseCheckboxes()[6].isSelected(), "Box 6 should not be ticked");
+        for(int i = 0;i<7;i++){
+            assertFalse(tester.getBitwiseCheckboxes()[i].isSelected(), "Box " + i + " should not be ticked");
+        }
         tester.getParamField().setValue(127);
         assertEquals(127,tester.getParamField().getValue(), "Paramfield val should now be 128");
-        assertTrue(tester.getBitwiseCheckboxes()[0].isSelected(), "Box 0 should now be ticked");
-        assertTrue(tester.getBitwiseCheckboxes()[1].isSelected(), "Box 1 should now be ticked");
-        assertTrue(tester.getBitwiseCheckboxes()[2].isSelected(), "Box 2 should now be ticked");
-        assertTrue(tester.getBitwiseCheckboxes()[3].isSelected(), "Box 3 should now be ticked");
-        assertTrue(tester.getBitwiseCheckboxes()[4].isSelected(), "Box 4 should now be ticked");
-        assertTrue(tester.getBitwiseCheckboxes()[5].isSelected(), "Box 5 should now be ticked");
-        assertTrue(tester.getBitwiseCheckboxes()[6].isSelected(), "Box 6 should now be ticked");
+        for(int i = 0;i<7;i++){
+            assertTrue(tester.getBitwiseCheckboxes()[i].isSelected(), "Box " + i + " should be ticked");
+        }
     }
+
+
 }

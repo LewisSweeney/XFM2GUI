@@ -9,8 +9,7 @@ import uk.ac.aber.lsweeney.serial.SerialHandlerBridge;
 import java.io.IOException;
 import java.util.Random;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestDisconnectWriteToXFM {
     static SerialHandlerBridge serialHandlerBridge = SerialHandlerBridge.getSINGLE_INSTANCE();
@@ -32,6 +31,7 @@ public class TestDisconnectWriteToXFM {
         }
 
         byte[] postWriteData = serialHandlerBridge.getAllValues();
+
         for (int i = 0; i < initData.length; i++) {
             assertEquals(initData[i], (int) postWriteData[i] & 0xff, "Values should be equal due to no connected device");
         }
@@ -51,9 +51,9 @@ public class TestDisconnectWriteToXFM {
 
         byte[] postWriteData = serialHandlerBridge.getAllValues();
 
-        for (int i = 0; i < initData.length; i++) {
-            assertEquals(initData[i], postWriteData[i], "Values should be equal due to no connected device");
-        }
+
+        assertArrayEquals(initData, postWriteData, "Values should be equal due to no connected device");
+
 
     }
 

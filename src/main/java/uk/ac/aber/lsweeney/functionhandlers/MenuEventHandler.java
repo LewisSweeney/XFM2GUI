@@ -28,12 +28,12 @@ public class MenuEventHandler {
     FileLoader loader = new FileLoader();
     PatchSaver saver = new PatchSaver();
 
-    public static MenuEventHandler getSingleInstance(){
+    public static MenuEventHandler getSingleInstance() {
         return SINGLE_INSTANCE;
     }
 
 
-    public void setParams(SerialHandlerBridge serialHandler, ArrayList<IntField> paramFields){
+    public void setParams(SerialHandlerBridge serialHandler, ArrayList<IntField> paramFields) {
         this.serialHandler = serialHandler;
         this.paramFields = paramFields;
     }
@@ -106,14 +106,14 @@ public class MenuEventHandler {
      * Writes all current parameters to the board
      *
      * @throws SerialPortException Serial port may not be found
-     * @throws IOException Data may not be read from device or written to BAOS
+     * @throws IOException         Data may not be read from device or written to BAOS
      */
     public void onWriteButtonPress() throws SerialPortException, IOException {
         paramFields.sort(Comparator.comparingInt(p -> Integer.parseInt(p.getId())));
 
         byte[] bytes = new byte[512];
 
-        for(IntField p:paramFields){
+        for (IntField p : paramFields) {
             bytes[Integer.parseInt(p.getId())] = (byte) p.getValue();
         }
 
@@ -179,7 +179,7 @@ public class MenuEventHandler {
      * are likely to be the same.
      *
      * @throws SerialPortException Serial port may not be found
-     * @throws IOException Data may not be read from device or written to BAOS
+     * @throws IOException         Data may not be read from device or written to BAOS
      */
     public void onReadButtonPress() throws SerialPortException, IOException {
         byte[] dump = serialHandler.getAllValues();
@@ -191,7 +191,7 @@ public class MenuEventHandler {
      * TODO: Fix bug with 0th patch not doing anything...
      *
      * @throws SerialPortException Serial port may not be found
-     * @throws IOException Data may not be read from device or written to BAOS
+     * @throws IOException         Data may not be read from device or written to BAOS
      */
     public void onSaveToXFMPress(ComboBox<Integer> patchPicker) throws IOException, SerialPortException {
         onWriteButtonPress();
@@ -202,9 +202,8 @@ public class MenuEventHandler {
      * Activates when user changes patch from the drop down menu
      *
      * @param value The value of the patchpicker when chosen - used to determine which patch is loaded
-     *
      * @throws SerialPortException Serial port may not be found
-     * @throws IOException Data may not be read from device or written to BAOS
+     * @throws IOException         Data may not be read from device or written to BAOS
      */
     public void onPatchPicked(int value) throws SerialPortException, IOException {
         optionsHandler.setLiveChanges(false);
@@ -215,11 +214,11 @@ public class MenuEventHandler {
 
     /**
      * Changes the midi channel for the relevant unit_number to the one selected by the user
-     * @param unit_number Enum, either ZERO or ONE
-     * @param channel Midi Channel chosen from combobox
      *
+     * @param unit_number Enum, either ZERO or ONE
+     * @param channel     Midi Channel chosen from combobox
      * @throws SerialPortException Serial port may not be found
-     * @throws IOException Data may not be read from device or written to BAOS
+     * @throws IOException         Data may not be read from device or written to BAOS
      */
     public void onMidiChannelChange(UNIT_NUMBER unit_number, int channel) throws IOException, SerialPortException {
         serialHandler.setMidiChannel(unit_number, channel);
@@ -233,21 +232,22 @@ public class MenuEventHandler {
      */
     public void setAllIntFieldValues(byte[] dump) {
         // int offset = 48;
-        assert(dump != null);
-        if (dump.length == 512) {
-            for (IntField intField : paramFields) {
-                // int paramAddress = Integer.parseInt(intField.getId()) + offset;
-                intField.setValue(dump[Integer.parseInt(intField.getId())] & 0xff);
+        if (dump != null) {
+            if (dump.length == 512) {
+                for (IntField intField : paramFields) {
+                    // int paramAddress = Integer.parseInt(intField.getId()) + offset;
+                    intField.setValue(dump[Integer.parseInt(intField.getId())] & 0xff);
+                }
             }
         }
     }
 
     /**
      * Changes the active unit to the one selected from the unit radio buttons
-     * @param unit_number Enum that determines whether unit ZERO or ONE is active
      *
+     * @param unit_number Enum that determines whether unit ZERO or ONE is active
      * @throws SerialPortException Serial port may not be found
-     * @throws IOException Data may not be read from device or written to BAOS
+     * @throws IOException         Data may not be read from device or written to BAOS
      */
     public void setUnit(UNIT_NUMBER unit_number) throws IOException, SerialPortException {
         serialHandler.setUnit(unit_number);
@@ -259,9 +259,10 @@ public class MenuEventHandler {
 
     /**
      * Handles the changing of the state of the liveChanges checkbox
+     *
      * @param live Boolean to determine whether live changes is on or off
      */
-    public void onLiveChanged(boolean live){
+    public void onLiveChanged(boolean live) {
         optionsHandler.setLiveChanges(live);
     }
 }

@@ -52,16 +52,32 @@
                 <configuration>
                     <mainClass>uk.ac.aber.lsweeney.GUIStarter</mainClass>
                     <launcher>launch</launcher>
-                    <compress>0</compress>
-                    <jlinkZipName>XFMGUI</jlinkZipName>
-                    <jlinkImageName>XFMGUI</jlinkImageName>
+                    <compress>2</compress>
+                    <jlinkZipName>XFM2GUI</jlinkZipName>
+                    <jlinkImageName>XFM2GUI</jlinkImageName>
                     <noManPages>true</noManPages>
+                    <outputFile>XFM2GUI</outputFile>
                     <noHeaderFiles>true</noHeaderFiles>
                     <source>14</source>
                     <target>14</target>
                     <release>14</release>
                 </configuration>
             </plugin>
+
+            <!--
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.19</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.junit.platform</groupId>
+                        <artifactId>junit-platform-surefire-provider</artifactId>
+                        <version>1.0.0</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+            -->
+
         </plugins>
     </build>
 

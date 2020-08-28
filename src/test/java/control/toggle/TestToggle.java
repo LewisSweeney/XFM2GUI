@@ -62,7 +62,7 @@ public class TestToggle {
     }
 
     @Test
-    public void SettingParamfieldValueTo0SetsRadioButtonOneAsSelected(){
+    public void SettingParamfieldValueTo0SetsRadioButtonOneAsSelected() {
         String testString = "Algo:2:TOGGLE";
         ParameterControl tester = controlLayoutFactory.createControl(testString);
 
@@ -78,7 +78,7 @@ public class TestToggle {
     }
 
     @Test
-    public void SettingParamfieldValueTo1SetsRadioButtonTwoAsSelected(){
+    public void SettingParamfieldValueTo1SetsRadioButtonTwoAsSelected() {
         String testString = "Algo:2:TOGGLE";
         ParameterControl tester = controlLayoutFactory.createControl(testString);
 
@@ -93,7 +93,7 @@ public class TestToggle {
     }
 
     @Test
-    public void SettingParamfieldValueToMoreThan1SetsRadioButtonTwoAsSelected(){
+    public void SettingParamfieldValueToMoreThan1SetsRadioButtonTwoAsSelected() {
         String testString = "Algo:2:TOGGLE";
         ParameterControl tester = controlLayoutFactory.createControl(testString);
 
@@ -107,7 +107,7 @@ public class TestToggle {
     }
 
     @Test
-    public void SettingParamfieldValueToLessThan0SetsRadioButtonOneAsSelected(){
+    public void SettingParamfieldValueToLessThan0SetsRadioButtonOneAsSelected() {
         String testString = "Algo:2:TOGGLE";
         ParameterControl tester = controlLayoutFactory.createControl(testString);
 

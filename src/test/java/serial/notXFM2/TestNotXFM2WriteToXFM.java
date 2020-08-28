@@ -9,8 +9,7 @@ import uk.ac.aber.lsweeney.serial.SerialHandlerBridge;
 import java.io.IOException;
 import java.util.Random;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestNotXFM2WriteToXFM {
     static String os = System.getProperty("os.name").toLowerCase();
@@ -31,16 +30,16 @@ public class TestNotXFM2WriteToXFM {
             jsscSerialPort = new SerialPort("/dev/tty.usbmodem14201");
             serialHandlerBridge.setSerialPort(jsscSerialPort);
             assertNotNull(jsscSerialPort);
-        } else if (os.contains("win")){
+        } else if (os.contains("win")) {
             com.fazecast.jSerialComm.SerialPort[] jSerialComms = com.fazecast.jSerialComm.SerialPort.getCommPorts();
-            for(com.fazecast.jSerialComm.SerialPort port:jSerialComms){
-                if(port.getSystemPortName().equals("COM3")){
+            for (com.fazecast.jSerialComm.SerialPort port : jSerialComms) {
+                if (port.getSystemPortName().equals("COM3")) {
                     jSerialCommPort = port;
                 }
             }
             serialHandlerBridge.setSerialPort(jSerialCommPort);
             assertNotNull(jSerialCommPort);
-        } else{
+        } else {
             // Again, direct reference, although more likely to be correct if only one device is connected...
             jsscSerialPort = new SerialPort("/dev/ttyACM0");
             serialHandlerBridge.setSerialPort(jsscSerialPort);
@@ -64,6 +63,7 @@ public class TestNotXFM2WriteToXFM {
         }
 
         byte[] postWriteData = serialHandlerBridge.getAllValues();
+
         for (int i = 0; i < initData.length; i++) {
             assertEquals(initData[i], (int) postWriteData[i] & 0xff, "Values should be equal due to no connected device");
         }
@@ -83,9 +83,8 @@ public class TestNotXFM2WriteToXFM {
 
         byte[] postWriteData = serialHandlerBridge.getAllValues();
 
-        for (int i = 0; i < initData.length; i++) {
-            assertEquals(initData[i], postWriteData[i], "Values should be equal due to no connected device");
-        }
+        assertArrayEquals(initData, postWriteData, "Values should be equal due to no connected device");
+
 
     }
 

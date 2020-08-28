@@ -265,7 +265,6 @@ public class MenuInitialiser {
                 serialPortException.printStackTrace();
             }
         });
-        patchPicker.getSelectionModel().selectFirst();
 
         //Button reloadTabs = new Button("Refresh Tabs");
         //reloadTabs.setTooltip(reloadTooltip);
@@ -302,7 +301,7 @@ public class MenuInitialiser {
         // TODO: Change this to CSS.
         serialPortPicker.setPrefWidth(BUTTON_WIDTH);
 
-        serialRefresh.setMinWidth(80);
+        serialRefresh.setMinWidth(100);
 
         // Creates new sub-sub-section for the patch control
         VBox patchControl = new VBox(xfmPatch, patchPicker);

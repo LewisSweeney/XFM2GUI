@@ -22,7 +22,6 @@ public class AlertHandler {
             case NO_DEVICE -> showAlert(Alert.AlertType.WARNING,"No Serial Devices", "There are no serial devices available.\n\nYou may still edit and save patches locally, but any changes made cannot be applied to your XFM2.\n\nPlease ensure your device is plugged in and restart this program.");
             case NO_PATCH_CHOSEN -> showAlert(Alert.AlertType.WARNING,"No Patch Chosen", "No patch number selected.\nPlease select a patch number if you'd like to save your patch.\n\n(You may want to save your current program locally first)");
             case LINUX -> showAlert(Alert.AlertType.INFORMATION,"Linux Serial Permissions","The app can't seem to find any serial devices.\nIf you're on Linux you may not have the necessary privileges to communicate with serial devices.\n\n");
-
         }
     }
 

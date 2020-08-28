@@ -49,9 +49,8 @@ public class TestNotXFM2ReadFromXFM {
     }
 
 
-
     @Test
-    public void readingWithNoDeviceResultsInOneLengthDataArray() throws IOException, SerialPortException {
+    public void ReadingWithNoDeviceResultsInOneLengthDataArray() throws IOException, SerialPortException {
         byte[] data = serialHandlerBridge.getAllValues();
         assertNotEquals(data.length,512,"Serial Handler may return an array of data that it gets from the wrongly connected device, but will not be 512 bytes");
     }
