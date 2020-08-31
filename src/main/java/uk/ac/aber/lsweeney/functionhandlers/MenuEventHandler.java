@@ -76,7 +76,6 @@ public class MenuEventHandler {
             serialPort.closePort();
         }
         if (serialPortNameList.length > 0) {
-            System.out.println("GETTING PORT");
             String portName = serialPortPicker.getValue();
             serialPort = new SerialPort(portName);
             serialHandler.setSerialPort(serialPort);
@@ -105,10 +104,9 @@ public class MenuEventHandler {
     /**
      * Writes all current parameters to the board
      *
-     * @throws SerialPortException Serial port may not be found
      * @throws IOException         Data may not be read from device or written to BAOS
      */
-    public void onWriteButtonPress() throws SerialPortException, IOException {
+    public void onWriteButtonPress() throws IOException {
 
         Runnable r = () -> {
             if (serialHandler != null) {

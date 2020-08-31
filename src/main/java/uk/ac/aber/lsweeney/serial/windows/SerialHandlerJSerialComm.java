@@ -45,7 +45,6 @@ public class SerialHandlerJSerialComm {
      *
      * @return byte[] which is translated by the program for display in the GUI
      */
-    @SuppressWarnings("StatementWithEmptyBody")
     byte[] getData(int expectedDataBits) {
         ArrayList<Byte> byteArrayList = new ArrayList<>();
 
@@ -70,9 +69,6 @@ public class SerialHandlerJSerialComm {
         }
 
         while (serialPort.bytesAvailable() > 0) {
-         // try {
-          //    Thread.sleep(1);
-        //  } catch (InterruptedException ex) {}
           byte newByte = readSingleByte();
           byteArrayList.add(newByte);
         }

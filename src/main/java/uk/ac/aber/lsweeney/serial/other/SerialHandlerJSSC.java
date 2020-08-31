@@ -52,7 +52,7 @@ public class SerialHandlerJSSC {
 
                 serialPort.writeBytes(bytes);
             } catch (SerialPortException ex) {
-                System.out.println("There are an error on writing string to port т: " + ex);
+                ex.printStackTrace();
             }
 
             byte[] data = getData();
@@ -99,7 +99,7 @@ public class SerialHandlerJSSC {
                 Thread.sleep(1);
                 serialPort.writeBytes(bytes);
             } catch (SerialPortException | InterruptedException ex) {
-                System.out.println("There are an error on writing string to port т: " + ex);
+                ex.printStackTrace();
             }
 
             byte[] data = getData();
@@ -121,6 +121,7 @@ public class SerialHandlerJSSC {
      * @return byte[] which is translated by the program for display in the GUI
      * @throws SerialPortException Serial Port may not be found
      * @throws IOException Byte Array Output Stream can fail to be written to
+     * Adapted from an answer here: https://stackoverflow.com/questions/27884295/how-to-read-all-available-data-from-serial-connection-when-using-jssc
      */
     byte[] getData() throws SerialPortException, IOException {
 

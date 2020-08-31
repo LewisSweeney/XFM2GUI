@@ -6,7 +6,7 @@
 
     <groupId>groupId</groupId>
     <artifactId>XFM2GUI</artifactId>
-    <version>0.7</version>
+    <version>1.0</version>
     <build>
         <plugins>
             <plugin>
@@ -19,30 +19,6 @@
                     <target>14</target>
                 </configuration>
             </plugin>
-
-         <!--   <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>3.2.4</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                        <configuration>
-                            <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <manifestEntries>
-                                        <Main-Class>uk.ac.aber.lsweeney.GUIStarter</Main-Class>
-                                        <Build-Number>1</Build-Number>
-                                    </manifestEntries>
-                                </transformer>
-                            </transformers>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin> -->
 
             <plugin>
                 <groupId>org.openjfx</groupId>
@@ -63,20 +39,6 @@
                     <release>14</release>
                 </configuration>
             </plugin>
-
-            <!--
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.19</version>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.junit.platform</groupId>
-                        <artifactId>junit-platform-surefire-provider</artifactId>
-                        <version>1.0.0</version>
-                    </dependency>
-                </dependencies>
-            </plugin>
-            -->
 
         </plugins>
     </build>

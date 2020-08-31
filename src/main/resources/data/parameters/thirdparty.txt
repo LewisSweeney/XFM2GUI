@@ -1,0 +1,24 @@
+JSSC
+Used for serial communication on Mac and Linux. Helped keep serial comms consistent across platforms.
+Find it on GitHub
+https://github.com/scream3r/java-simple-serial-connector
+jSerialComm
+Used for serial communication on Windows. Helped keep serial comms consistent across platforms.
+Find it on the Fazecast website
+https://fazecast.github.io/jSerialComm/
+XLoad
+The program found on the futur3soundz website that is used to initialise the device.
+Find it on the futur3soundz website
+https://www.futur3soundz.com/
+IntFields
+An adaptation of the TextField class the takes only numbers in a given range. Adapted from code by jewelsea.
+Find it on GitHub
+https://gist.github.com/jewelsea/1962045
+Splash Screen
+An adaptation of code written by jewelsea. Helped create a splash screen that worked across platforms.
+Find it on GitHub
+https://gist.github.com/jewelsea/2305098
+Save/Load
+An adaption of code written by genuinecoder, used to save and load patches locally.
+Find it on GenuineCoder
+https://www.genuinecoder.com/save-files-javafx-filechooser/

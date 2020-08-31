@@ -26,7 +26,6 @@ public class SerialHandlerBridge {
         String test = System.getProperty("os.name").toLowerCase();
 
         if (!test.contains("windows")) {
-            System.out.println("JSSC");
             library_choice = LIBRARY_CHOICE.JSSC;
         }
     }
@@ -202,7 +201,6 @@ public class SerialHandlerBridge {
             return;
         }
         if (progNum > 0 && progNum < 128) {
-            System.out.println("WRITING PROGRAM");
             byte[] bytes = new byte[2];
             bytes[0] = 'w';
             bytes[1] = progNum.byteValue();
@@ -224,27 +222,20 @@ public class SerialHandlerBridge {
         sendCommand(bytes, 0, false);
     }
 
-    /**
-     * @param file The file to be written to board
-     * @throws SerialPortException Serial port may not be found
-     * @throws IOException         Data may fail to be read from device or written to BAOS
-     */
+    // UNUSED
+    /*
     public void writeTunings(File file) throws IOException, SerialPortException {
         writeFile('#', 't', file, 512);
     }
-
-    /**
-     * @param file The file to be written to board
-     * @throws SerialPortException Serial port may not be found
-     * @throws IOException         Data may fail to be read from device or written to BAOS
      */
+
+    /* UNUSED
     public void writeBank(File file) throws IOException, SerialPortException {
         FileInputStream fs;
 
         if (file != null) {
             fs = new FileInputStream(file);
         } else {
-            System.out.println("FILE ERROR");
             return;
         }
 
@@ -258,7 +249,6 @@ public class SerialHandlerBridge {
         try {
             while (fs.available() > 0) {
                 int test = fs.read();
-                System.out.println("Int value = " + test);
                 filebuf[fp] = (byte) test;
                 fp++;
             }
@@ -279,13 +269,10 @@ public class SerialHandlerBridge {
 
 
     }
-
-    /**
-     * @param file The file to be written to board
-     * @throws SerialPortException Serial port may not be found
-     * @throws IOException         Data may fail to be read from device or written to BAOS
      */
-    @SuppressWarnings("SameParameterValue")
+
+    // UNUSED
+    /*
     private void writeFile(char init, char start, File file, int bufferSize) throws IOException, SerialPortException {
         byte[] bytes = new byte[1];
 
@@ -294,7 +281,6 @@ public class SerialHandlerBridge {
         if (file != null) {
             fs = new FileInputStream(file);
         } else {
-            System.out.println("FILE ERROR");
             return;
         }
 
@@ -305,10 +291,8 @@ public class SerialHandlerBridge {
         byte[] flash = sendCommand(bytes, 1, true);
 
         if (flash[0] != 0) {
-            System.out.println("ERROR ON FLASH");
             return;
         } else {
-            System.out.println("FLASH ERASED");
         }
 
         bytes[0] = (byte) start;
@@ -360,6 +344,7 @@ public class SerialHandlerBridge {
         }
 
     }
+     */
 
     /**
      * Generic method that sends the given bytes to the board, using the appropriate library

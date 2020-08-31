@@ -42,7 +42,6 @@ public class PatchSaver {
                 }
                 writer.close();
             } catch (IOException e) {
-                System.out.println("An error occurred.");
                 e.printStackTrace();
             }
         }

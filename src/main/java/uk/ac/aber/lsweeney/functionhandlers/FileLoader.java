@@ -44,7 +44,6 @@ public class FileLoader {
                     line = reader.readLine();
                 }
             } catch (IOException e) {
-                System.out.println("An error occurred.");
                 e.printStackTrace();
             }
         }
@@ -84,7 +83,6 @@ public class FileLoader {
                     line = reader.readLine();
                 }
             } catch (IOException e) {
-                System.out.println("An error occurred.");
                 e.printStackTrace();
             }
         }

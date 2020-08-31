@@ -74,7 +74,6 @@ public class MenuInitialiser {
     public Scene initializeScene() throws IOException, SerialPortException {
         Rectangle2D screenBounds = Screen.getPrimary().getBounds();
         if(screenBounds.getWidth() < 1200 || screenBounds.getHeight()< 900){
-            System.out.println(screenBounds);
             LOGO_DIM = LOGO_DIM / 2;
             TAB_WIDTH = TAB_WIDTH / 2;
             BUTTON_WIDTH = BUTTON_WIDTH / 2;
@@ -139,10 +138,6 @@ public class MenuInitialiser {
             case JSSC -> {
 
                 serialPortNameList = SerialPortList.getPortNames();
-
-                for(String s:SerialPortList.getPortNames()){
-                    System.out.println(s);
-                }
 
                 if (serialPortNameList.length > 0) {
                     for (String s : serialPortNameList) {
@@ -246,6 +241,7 @@ public class MenuInitialiser {
         switch (serialHandler.getLibrary_choice()){
             case JSSC -> serialRefresh.setOnAction(e -> {
                 try {
+                    initPortSelection();
                     menuEventHandler.onSerialPortSelection(serialPortNameList, serialPortPicker, serialPortJSSC, patchPicker);
                 } catch (SerialPortException | IOException serialPortException) {
                     serialPortException.printStackTrace();
@@ -254,6 +250,7 @@ public class MenuInitialiser {
 
             case JSERIALCOMM -> serialRefresh.setOnAction(e -> {
                 try {
+                    initPortSelection();
                     menuEventHandler.onSerialPortSelection(com.fazecast.jSerialComm.SerialPort.getCommPorts(), serialPortPicker, serialPortJSerialComm, patchPicker);
                 }
                 catch (SerialPortException | IOException serialPortException) {

@@ -9,8 +9,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
 
 /**
- * This IntField class is taken from a Stackoverflow answer by user jewelsea
- * Found here: https://stackoverflow.com/questions/7555564/what-is-the-recommended-way-to-make-a-numeric-textfield-in-javafx/18959399
+ * This IntField class is adapted from code by Jewelsea
+ * Found here: https://gist.github.com/jewelsea/1962045
  *
  * The class creates a textfield that is limited to a specific range of integers, useful in allowing users to type a
  * specific value for a parameter.

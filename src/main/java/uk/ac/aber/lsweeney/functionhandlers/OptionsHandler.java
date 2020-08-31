@@ -37,6 +37,8 @@ public class OptionsHandler {
         return liveChanges;
     }
 
+    /*
+    UNUSED
     public void writeFileToDevice(FILE_TYPE file_type) throws IOException, SerialPortException {
         File file = fileLoader.loadConfigFile(new Stage(), file_type);
 
@@ -46,7 +48,6 @@ public class OptionsHandler {
         }
 
     }
-
-
+     */
 
 }
