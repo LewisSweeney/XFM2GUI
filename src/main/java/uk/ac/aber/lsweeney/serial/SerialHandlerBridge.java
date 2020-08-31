@@ -400,10 +400,23 @@ public class SerialHandlerBridge {
 
 
     public void setSerialPort(SerialPort newPort) {
+        if (serialHandlerJSSC.getSerialPort() != null) {
+            if (serialHandlerJSSC.getSerialPort().isOpened()) {
+                try {
+                    serialHandlerJSSC.getSerialPort().closePort();
+                } catch (SerialPortException ignored) {
+                }
+            }
+        }
         serialHandlerJSSC.setSerialPort(newPort);
     }
 
     public void setSerialPort(com.fazecast.jSerialComm.SerialPort newPort) {
+        if (serialHandlerJSerialComm.getSerialPort() != null) {
+            if (serialHandlerJSerialComm.getSerialPort().isOpen()) {
+                serialHandlerJSerialComm.getSerialPort().closePort();
+            }
+        }
         serialHandlerJSerialComm.setSerialPort(newPort);
     }
 

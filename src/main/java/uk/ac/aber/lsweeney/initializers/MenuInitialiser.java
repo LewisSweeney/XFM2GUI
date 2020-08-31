@@ -111,17 +111,16 @@ public class MenuInitialiser {
         menuEventHandler.onMidiChannelChange(UNIT_NUMBER.ONE, val2);
 
         menuEventHandler.setUnit(UNIT_NUMBER.ZERO);
+        menuEventHandler.setLayering(false);
 
         try {
-            menuEventHandler.onPatchPicked(1);
-            menuEventHandler.setLayering(false);
+            patchPicker.getSelectionModel().selectFirst();
+            menuEventHandler.onPatchPicked(patchPicker.getValue());
         } catch (SerialPortException | IOException e) {
             e.printStackTrace();
         }
 
         return scene;
-
-
 
     }
 
@@ -303,7 +302,7 @@ public class MenuInitialiser {
 
         xfmButtonsLabel.getStyleClass().add("button-group-title");
 
-        Label localButtonsLabel = new Label("Local Controls");
+        Label localButtonsLabel = new Label("Save/Load Locally");
         localButtonsLabel.getStyleClass().add("button-group-title");
 
         //Label subtitle = new Label("By Lewis Sweeney");
@@ -323,7 +322,7 @@ public class MenuInitialiser {
         HBox xfmButtonBox = new HBox(menuButtons[0], menuButtons[1]);
         xfmControls.getChildren().addAll(xfmButtonsLabel, xfmButtonBox, patchControl, menuButtons[2], getUnitControls());
         HBox localButtonHBox = new HBox(menuButtons[3], menuButtons[4]);
-        localControls.getChildren().addAll(localButtonsLabel, localButtonHBox, liveChanges);
+        localControls.getChildren().addAll(localButtonsLabel, localButtonHBox);
 
         // Assigns style classes for each required node.
         serialPortSelection.getStyleClass().add("button-row");
@@ -485,7 +484,7 @@ public class MenuInitialiser {
         menuButtons[1].setOnAction(actionEvent -> {
             try {
                 menuEventHandler.onWriteButtonPress();
-            } catch (SerialPortException | IOException e) {
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         });
@@ -510,7 +509,7 @@ public class MenuInitialiser {
         menuButtons[4].setOnAction(actionEvent -> {
             try {
                 menuEventHandler.onLoadButtonPress(fileStage);
-            } catch (SerialPortException | IOException e) {
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         });
@@ -527,6 +526,8 @@ public class MenuInitialiser {
             case JSSC -> serialPortPicker.setOnAction(e -> {
                 try {
                     menuEventHandler.onSerialPortSelection(serialPortNameList, serialPortPicker, serialPortJSSC, patchPicker);
+                    patchPicker.getSelectionModel().selectFirst();
+                    menuEventHandler.onPatchPicked(patchPicker.getValue());
                 } catch (SerialPortException | IOException serialPortException) {
                     serialPortException.printStackTrace();
                 }
@@ -535,6 +536,8 @@ public class MenuInitialiser {
             case JSERIALCOMM -> serialPortPicker.setOnAction(e -> {
                 try {
                     menuEventHandler.onSerialPortSelection(com.fazecast.jSerialComm.SerialPort.getCommPorts(), serialPortPicker, serialPortJSerialComm, patchPicker);
+                    patchPicker.getSelectionModel().selectFirst();
+                    menuEventHandler.onPatchPicked(patchPicker.getValue());
                 }
                 catch (SerialPortException | IOException serialPortException) {
                     serialPortException.printStackTrace();

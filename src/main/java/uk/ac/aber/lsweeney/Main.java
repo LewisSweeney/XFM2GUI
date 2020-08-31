@@ -97,12 +97,11 @@ public class Main extends Application {
 
             @Override
             protected ObservableList<String> call() throws IOException, SerialPortException {
-                ObservableList<String> requiredList = FXCollections.<String>observableArrayList();
+                ObservableList<String> requiredList = FXCollections.observableArrayList();
                 scene = menuInitialiser.initializeScene();
                 ParamValueChangeHandler.setSerialHandler(serialHandlerBridge);
                 optionsHandler.setLiveChanges(false);
                 data = menuInitialiser.getReadData();
-                menuEventHandler.setAllIntFieldValues(data);
                 return requiredList;
             }
         };
@@ -113,7 +112,7 @@ public class Main extends Application {
                 () -> {
                     try {
                         showPrimaryStage(splashTask.valueProperty());
-                    } catch (IOException | SerialPortException e) {
+                    } catch (SerialPortException e) {
                         e.printStackTrace();
                     }
                 }
@@ -125,7 +124,7 @@ public class Main extends Application {
     Displays Primary Stage
     Adapted from jewelsea's code
      */
-    private void showPrimaryStage(ReadOnlyObjectProperty<ObservableList<String>> friends) throws IOException, SerialPortException {
+    private void showPrimaryStage(ReadOnlyObjectProperty<ObservableList<String>> friends) throws SerialPortException {
 
         Stage primaryStage = new Stage(StageStyle.DECORATED);
 

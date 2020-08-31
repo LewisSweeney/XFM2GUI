@@ -104,39 +104,34 @@ public class MenuEventHandler {
     /**
      * Writes all current parameters to the board
      *
-     * @throws IOException         Data may not be read from device or written to BAOS
+     * @throws IOException Data may not be read from device or written to BAOS
      */
     public void onWriteButtonPress() throws IOException {
 
-        Runnable r = () -> {
-            if (serialHandler != null) {
-                if (optionsHandler.getLiveChanges()) {
-                    try {
-                        Thread.sleep(1);
-                        paramFields.sort(Comparator.comparingInt(p -> Integer.parseInt(p.getId())));
+        if (serialHandler != null) {
+            try {
+                Thread.sleep(1);
+                paramFields.sort(Comparator.comparingInt(p -> Integer.parseInt(p.getId())));
 
-                        byte[] bytes = new byte[512];
+                byte[] bytes = new byte[512];
 
-                        for (IntField p : paramFields) {
-                            bytes[Integer.parseInt(p.getId())] = (byte) p.getValue();
-                        }
-
-                        serialHandler.setAllValues(bytes);
-                    } catch (SerialPortException | IOException | InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                for (IntField p : paramFields) {
+                    bytes[Integer.parseInt(p.getId())] = (byte) p.getValue();
                 }
+
+                serialHandler.setAllValues(bytes);
+            } catch (SerialPortException | IOException | InterruptedException e) {
+                e.printStackTrace();
             }
-        };
+        }
 
     }
 
     /**
      * Handler for load button. Prompts user to load an XFM2 file to be loaded into the program
-     *
      * @throws FileNotFoundException File may not exist - should be fine if resources not meddled with...
      */
-    public void onLoadButtonPress(Stage fileStage) throws IOException, SerialPortException {
+    public void onLoadButtonPress(Stage fileStage) throws IOException {
         paramFields.sort(Comparator.comparingInt(p -> Integer.parseInt(p.getId())));
         ArrayList<String> lines = loader.loadXFM2FromFile(fileStage);
 

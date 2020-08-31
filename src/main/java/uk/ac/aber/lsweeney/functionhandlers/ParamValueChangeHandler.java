@@ -41,7 +41,6 @@ public class ParamValueChangeHandler {
     @SuppressWarnings("RedundantThrows")
     public static void onFieldChange(ParameterControl c) throws IOException {
 
-
                 if (c instanceof BitwiseControl) {
                     bitwiseChange(c);
                 } else if (c instanceof WaveControl) {
@@ -56,9 +55,9 @@ public class ParamValueChangeHandler {
             if (serialHandler != null) {
                 if (optionsHandler.getLiveChanges()) {
                     try {
+                        Thread.sleep(5);
                         menuEventHandler.onWriteButtonPress();
-                    } catch (SerialPortException | IOException e) {
-                        e.printStackTrace();
+                    } catch (IOException | InterruptedException ignored) {
                     }
                 }
             }

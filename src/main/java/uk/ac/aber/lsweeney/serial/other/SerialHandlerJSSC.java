@@ -42,7 +42,6 @@ public class SerialHandlerJSSC {
                     serialPort.openPort();
                 }
 
-
                 serialPort.setParams(BAUD_RATE,
                         SerialPort.DATABITS_8,
                         SerialPort.STOPBITS_1,
@@ -62,7 +61,10 @@ public class SerialHandlerJSSC {
                 }
             }
 
-            serialPort.closePort();
+            if(serialPort.isOpened()){
+                serialPort.closePort();
+            }
+
             return data;
         } else{
             return new byte[1];
@@ -133,7 +135,7 @@ public class SerialHandlerJSSC {
         byte[] b;
 
         try {
-            Thread.sleep(1);
+            Thread.sleep(10);
             while ((b = serialPort.readBytes(1, 100)) != null) {
                 byteArrayOutputStream.write(b);
             }
