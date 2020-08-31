@@ -15,4 +15,19 @@ cross-platform application for interacting with it, instead relying on terminal 
 - Back compatibility with the gen 1 XFM device (and potential compatibility with the XVA)
 
 ## THIRD-PARTY CODE
+### [JSSC](https://github.com/scream3r/java-simple-serial-connector)
+- Used for serial interaction on Linux and macOS
 
+### [jSerialComm](https://fazecast.github.io/jSerialComm/)
+- Used for serial interaction on Windows
+
+### [XLoad](https://www.futur3soundz.com/)
+- The program created by futur3soundz to initially program the XFM2
+- Used for adapting commands that are undocumented in the official XFM2 user manual
+
+### [Save/Load](https://www.genuinecoder.com/save-files-javafx-filechooser/)
+- Adapted this code to save/load local files
+
+### Code by jewelsea
+#### [IntField](https://gist.github.com/jewelsea/1962045)
+#### [SplashScreen](https://gist.github.com/jewelsea/2305098)
