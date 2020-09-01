@@ -1,1 +1,11 @@
-$JAVA_HOME/bin/jpackage --runtime-image target/XFM2GUI --module uk.ac.aber.lsweeney/GUIStarter --icon target/logo.icns --name XFM2GUI --app-version 1.1 --type pkg
+--macOS--
+$JAVA_HOME/bin/jpackage --runtime-image target/XFM2GUI --module com.github.steadiestllama.xfm2gui/GUIStarter --icon target/logo.icns --name XFM2GUI --app-version 1.2 --type pkg
+
+--Linux Mint--
+$JAVA_HOME/bin/jpackage --runtime-image target/XFM2GUI --module com.github.steadiestllama.xfm2gui/GUIStarter --icon target/logo.png --name XFM2GUI --app-version 1.2 --type deb --linux-deb-maintainer lewis.sweeney@outlook.com --linux-shortcut --linux-menu-group Sound-&-Video
+
+--Windows--
+%JAVA_HOME%\bin\jpackage --runtime-image target/XFM2GUI --module com.github.steadiestllama.xfm2gui/GUIStarter --icon target/logo.ico --name XFM2GUI --app-version 1.2 --type exe --win-shortcut --win-menu --win-upgrade-uuid XFM2GUI -win-dir-chooser
+
+--Fedora--
+$JAVA_HOME/bin/jpackage --runtime-image target/XFM2GUI --module com.github.steadiestllama.xfm2gui/GUIStarter --icon target/logo.png --name XFM2GUI --app-version 1.2 --type rpm --linux-deb-maintainer lewis.sweeney@outlook.com --linux-shortcut --linux-menu-group Sound-&-Video

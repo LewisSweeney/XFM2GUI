@@ -1,5 +1,26 @@
 package com.github.steadiestllama.xfm2gui.layouts;
 
+/*
+
+This file is part of XFM2GUI
+
+Copyright 2020 Lewis Sweeney
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software,
+and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
+THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+ */
+
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Hyperlink;
@@ -34,7 +55,7 @@ public class AboutSceneConstructor {
 
     private Scene sceneConstruction(){
 
-        VBox box = new VBox(getAboutSection(),getThirdPartySection());
+        VBox box = new VBox(getAboutSection(),getThirdPartySection(),getLicenseSection());
 
         return new Scene(box);
     }
@@ -46,7 +67,7 @@ public class AboutSceneConstructor {
         Label aboutText = new Label("This application has been developed as part of my MSc dissertation. The app is intended for use with the XFM2 synthesizer module created by futur3soundz. " +
                 "The aim of the project was to create a platform independent application to program the device using its USB-over-serial capabilities.\n" +
                 "\n" +
-                "The application can change all of the parameters and patches of your XFM2 device, as well as save and load programs locally.\n" +
+                "The application can change all of the parameters and patches of your XFM2 device, as well as save and load programs locally." +
                 "Unfortunately, the device will still need access to a windows machine to install the initial program.\n" +
                 "\n" +
                 "If you're seeing this text, I'd like to thank you for downloading this app and I hope it's been useful to you");
@@ -106,6 +127,32 @@ public class AboutSceneConstructor {
         return box;
     }
 
+    private VBox getLicenseSection(){
+        VBox license = new VBox();
+        Label licenseTitle = new Label("License & Copyright");
+        Label licenseText = new Label(
+                "Copyright 2020 Lewis Sweeney\n" +
+                "\n" +
+                "Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the \"Software\"), to deal in the Software without restriction, including without limitation\n" +
+                "the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software," +
+                "and to permit persons to whom the Software is furnished to do so, subject to the following conditions:" +
+                "\n" +
+                "The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.\n" +
+                "\n" +
+                "THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO " +
+                "THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. " +
+                "IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, " +
+                "WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE " +
+                "USE OR OTHER DEALINGS IN THE SOFTWARE.\n" +
+                "\n");
+
+        licenseTitle.getStyleClass().add("about-section-title");
+        licenseText.getStyleClass().add("about-text");
+        license.getStyleClass().add("about");
+        license.getChildren().addAll(licenseTitle,licenseText);
+        return license;
+    }
+
     private VBox getReferenceSection(String[] items){
         Label title = new Label(items[0]);
         Label text = new Label(items[1]);
@@ -121,7 +168,7 @@ public class AboutSceneConstructor {
         link.setOnMouseClicked(eventHandler);
 
         text.getStyleClass().add("about-text");
-        title.getStyleClass().add("about-section-title");
+        title.getStyleClass().add("about-section-subtitle");
         link.getStyleClass().add("about-link");
 
         return new VBox(title,text,link);
