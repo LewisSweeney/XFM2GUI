@@ -1,4 +1,4 @@
-module uk.ac.aber.lsweeney {
+module com.github.steadiestllama {
 
     requires com.fazecast.jSerialComm;
     requires java.desktop;
@@ -6,5 +6,5 @@ module uk.ac.aber.lsweeney {
     requires javafx.controls;
     requires javafx.base;
     requires jssc;
-    exports uk.ac.aber.lsweeney;
+    exports com.github.steadiestllama.xfm2gui;
 }

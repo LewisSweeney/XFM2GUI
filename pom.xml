@@ -26,7 +26,7 @@
                 <version>0.0.3</version>
 
                 <configuration>
-                    <mainClass>uk.ac.aber.lsweeney.GUIStarter</mainClass>
+                    <mainClass>com.github.steadiestllama.xfm2gui.GUIStarter</mainClass>
                     <launcher>launch</launcher>
                     <compress>2</compress>
                     <jlinkZipName>XFM2GUI</jlinkZipName>

@@ -4,8 +4,8 @@ import javafx.application.Platform;
 import javafx.scene.control.CheckBox;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import uk.ac.aber.lsweeney.controls.ParameterControl;
-import uk.ac.aber.lsweeney.layouts.ControlLayoutFactory;
+import com.github.steadiestllama.xfm2gui.controls.ParameterControl;
+import com.github.steadiestllama.xfm2gui.layouts.ControlLayoutFactory;
 
 import static org.junit.jupiter.api.Assertions.*;
 

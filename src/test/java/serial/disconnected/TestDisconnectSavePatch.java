@@ -2,9 +2,8 @@ package serial.disconnected;
 
 import jssc.SerialPort;
 import jssc.SerialPortException;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import uk.ac.aber.lsweeney.serial.SerialHandlerBridge;
+import com.github.steadiestllama.xfm2gui.serial.SerialHandlerBridge;
 
 import java.io.IOException;
 import java.util.Random;
