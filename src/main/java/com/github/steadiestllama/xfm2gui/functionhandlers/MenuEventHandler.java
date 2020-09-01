@@ -161,8 +161,6 @@ public class MenuEventHandler {
         paramFields.sort(Comparator.comparingInt(p -> Integer.parseInt(p.getId())));
         ArrayList<String> lines = loader.loadXFM2FromFile(fileStage);
 
-        optionsHandler.setLiveChanges(false);
-
         for (String line : lines) {
             String[] lineSplit = line.split(":");
             if (lineSplit.length == 2) {
@@ -173,8 +171,6 @@ public class MenuEventHandler {
                 }
             }
         }
-
-        optionsHandler.setLiveChanges(true);
 
         onWriteButtonPress();
     }
@@ -227,10 +223,8 @@ public class MenuEventHandler {
      * @throws IOException         Data may not be read from device or written to BAOS
      */
     public void onPatchPicked(int value) throws SerialPortException, IOException {
-        optionsHandler.setLiveChanges(false);
         serialHandler.readProgram(value);
         setAllIntFieldValues(serialHandler.getAllValues());
-        optionsHandler.revertLiveChanges();
     }
 
     /**

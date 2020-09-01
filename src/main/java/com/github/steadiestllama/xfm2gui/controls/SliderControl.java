@@ -44,7 +44,7 @@ public class SliderControl extends ParameterControl {
     private void constructLayout() {
         slider.getStyleClass().add("slider-new");
         slider.setMaxWidth(80);
-        slider.setSnapToTicks(true);
+        //slider.setSnapToTicks(true);
         paramField.setMaxWidth(45);
         paramField.setAlignment(Pos.CENTER);
         paramName.getStyleClass().add("param-label");

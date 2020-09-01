@@ -24,13 +24,16 @@ USE OR OTHER DEALINGS IN THE SOFTWARE.
 import com.github.steadiestllama.xfm2gui.functionhandlers.OptionsHandler;
 import com.github.steadiestllama.xfm2gui.functionhandlers.ParamValueChangeHandler;
 import com.github.steadiestllama.xfm2gui.initializers.MenuInitialiser;
+import com.github.steadiestllama.xfm2gui.instancehandling.SingleInstanceServer;
 import javafx.animation.FadeTransition;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
+import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
@@ -42,6 +45,7 @@ import javafx.scene.layout.*;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 import jssc.SerialPortException;
 import com.github.steadiestllama.xfm2gui.enums.ALERT_TYPE;
@@ -50,11 +54,12 @@ import com.github.steadiestllama.xfm2gui.functionhandlers.MenuEventHandler;
 import com.github.steadiestllama.xfm2gui.serial.SerialHandlerBridge;
 
 import java.io.IOException;
+import java.net.Socket;
 
 /**
  * Starts the program, constructing the GUI and readying the system for XFM communication
  * The system also displays a splash screen that stays on screen until the initialisation is complete
- *
+ * <p>
  * Splash screen code adapted from a github post by jewelsea:
  * https://gist.github.com/jewelsea/2305098
  */
@@ -83,11 +88,26 @@ public class XFM2GUI extends Application {
 
     final Rectangle2D bounds = Screen.getPrimary().getBounds();
 
+    SingleInstanceServer serve = null;
+
 
     @Override
     public void init() {
 
-        if(bounds.getWidth() < 1200 || bounds.getHeight()< 900){
+        /*
+         Adapted from here:
+         https://www.rgagnon.com/javadetails/java-0288.html
+        */
+        try {
+            Socket clientSocket = new Socket("localhost", SingleInstanceServer.PORT);
+            System.out.println("ALREADY RUNNING");
+            Platform.exit();
+        } catch (IOException e) {
+            serve = new SingleInstanceServer();
+            serve.start();
+        }
+
+        if (bounds.getWidth() < 1200 || bounds.getHeight() < 900) {
             style = this.getClass().getResource("/stylesheets/lowres/lowresstyle.css").toExternalForm();
             splashStyle = this.getClass().getResource("/stylesheets/lowres/lowressplash.css").toExternalForm();
         }
@@ -103,7 +123,7 @@ public class XFM2GUI extends Application {
         loadProgress.getStyleClass().add("load-bar");
         splashLayout.setCenter(splash);
         splashLayout.setBottom(loadProgress);
-        BorderPane.setAlignment(loadProgress,Pos.CENTER);
+        BorderPane.setAlignment(loadProgress, Pos.CENTER);
         splashLayout.setEffect(new DropShadow());
     }
 
@@ -151,15 +171,19 @@ public class XFM2GUI extends Application {
 
         primaryStage.setScene(scene);
         primaryStage.setTitle("XFM2GUI");
-        if(bounds.getWidth() < 1200 || bounds.getHeight()< 900){
+        if (bounds.getWidth() < 1200 || bounds.getHeight() < 900) {
             primaryStage.setMaxHeight(MAIN_WIDTH / 2);
             primaryStage.setMaxWidth(MAIN_WIDTH / 2 + 100);
-        } else{
+        } else {
             primaryStage.setMaxHeight(MAIN_HEIGHT);
             primaryStage.setMaxWidth(MAIN_WIDTH);
         }
         primaryStage.setResizable(false);
         primaryStage.getIcons().add(logo);
+        primaryStage.setOnCloseRequest(t -> {
+            Platform.exit();
+            System.exit(0);
+        });
         primaryStage.show();
 
         if (!serialHandlerBridge.isThereASerialPort()) {
@@ -204,7 +228,6 @@ public class XFM2GUI extends Application {
         initStage.setAlwaysOnTop(true);
         initStage.show();
     }
-
 
 
     public interface InitCompletionHandler {
