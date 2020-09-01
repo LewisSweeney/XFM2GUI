@@ -157,7 +157,7 @@ public class SerialHandlerBridge {
         bytes[1] = (byte) secondByte;
         bytes[2] = midiChannel.byteValue();
         sendCommand(bytes, 0, false);
-        initializeCurrentProgram();
+       // initializeCurrentProgram();
 
     }
 
