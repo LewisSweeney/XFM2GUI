@@ -1,11 +1,11 @@
 --macOS--
-$JAVA_HOME/bin/jpackage --runtime-image target/XFM2GUI --module com.github.steadiestllama.xfm2gui/GUIStarter --icon target/logo.icns --name XFM2GUI --app-version 1.2 --type pkg
+$JAVA_HOME/bin/jpackage --runtime-image target/XFM2GUI --module com.github.steadiestllama.xfm2gui/com.github.steadiestllama.xfm2gui.Main --icon target/logo.icns --name XFM2GUI --app-version 1.0 --type pkg
 
 --Linux Mint--
-$JAVA_HOME/bin/jpackage --runtime-image target/XFM2GUI --module com.github.steadiestllama.xfm2gui/GUIStarter --icon target/logo.png --name XFM2GUI --app-version 1.2 --type deb --linux-deb-maintainer lewis.sweeney@outlook.com --linux-shortcut --linux-menu-group Sound-&-Video
+$JAVA_HOME/bin/jpackage --runtime-image target/XFM2GUI --module com.github.steadiestllama.xfm2gui/com.github.steadiestllama.xfm2gui.Main --icon target/logo.png --name XFM2GUI --app-version 1.0 --type deb --linux-deb-maintainer lewis.sweeney@outlook.com --linux-shortcut --linux-menu-group Sound-&-Video
 
 --Windows--
-%JAVA_HOME%\bin\jpackage --runtime-image target/XFM2GUI --module com.github.steadiestllama.xfm2gui/GUIStarter --icon target/logo.ico --name XFM2GUI --app-version 1.2 --type exe --win-shortcut --win-menu --win-upgrade-uuid XFM2GUI -win-dir-chooser
+%JAVA_HOME%\bin\jpackage --runtime-image target/XFM2GUI --module com.github.steadiestllama.xfm2gui/com.github.steadiestllama.xfm2gui.Main --icon target/logo.ico --name XFM2GUI --app-version 1.0 --type exe --win-shortcut --win-menu --win-upgrade-uuid XFM2GUI -win-dir-chooser
 
 --Fedora--
-$JAVA_HOME/bin/jpackage --runtime-image target/XFM2GUI --module com.github.steadiestllama.xfm2gui/GUIStarter --icon target/logo.png --name XFM2GUI --app-version 1.2 --type rpm --linux-deb-maintainer lewis.sweeney@outlook.com --linux-shortcut --linux-menu-group Sound-&-Video
+$JAVA_HOME/bin/jpackage --runtime-image target/XFM2GUI --module com.github.steadiestllama.xfm2gui/com.github.steadiestllama.xfm2gui.Main --icon target/logo.png --name XFM2GUI --app-version 1.0 --type rpm  --linux-shortcut --linux-menu-group Sound-&-Video
