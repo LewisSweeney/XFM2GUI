@@ -5,7 +5,7 @@ This project focuses on creating a Java and JavaFX based application for interac
 
 ## Features
 - Connect to XFM2 board via USB-over-serial connection
-    - Change parameter values on the XFM2 board
+- Change parameter values on the XFM2 board
     - Sound parameters
     - MIDI Channels and Layering
     - Active Unit
@@ -14,8 +14,9 @@ This project focuses on creating a Java and JavaFX based application for interac
 - Automatic detection of XFM2 device on program load
 
 ## Future Features
-. Write Tuning, Bank and Program files to the XFM2
-. Back compatibility with the gen 1 XFM device (and potential compatibility with the XVA)
+- Write Tuning, Bank and Program files to the XFM2
+- Back compatibility with the gen 1 XFM device (and potential compatibility with the XVA)
+- Live Changes to device parameters
 
 ## Installation
 The application is available as a standalone, installable application on macOS (.pkg), Windows (.exe), and Linux (.deb or .rpm). The latest versions of these files can be found within the release section of the repository. 
