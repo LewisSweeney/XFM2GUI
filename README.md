@@ -45,3 +45,9 @@ The source code is also available within the release section.
 
 #### [SplashScreen](https://gist.github.com/jewelsea/2305098)
 - Adapted to create the splash screen shown on application launch
+
+## License
+MIT
+
+## Troubleshooting and Issues
+If you do have any issues using this software please contact me at lewis.sweeney@outlook.com and I'll do my best to help
