@@ -4,14 +4,18 @@
 This project focuses on creating a Java and JavaFX based application for interacting with the [futur3soundz XFM2 Synthesizer Module](https://futur3soundz.com). The application was originally developed for submission towards my MSc dissertation project. The idea behind the project comes from the XFM2 synthesizer module not currently having a cross-platform application for interacting with it, instead relying on terminal interaction (or an Excel spreadsheet on Windows platforms). This application provides many of the same features as the mentioned Excel spreadsheet, but provides it in a more user-friendly manner. The application does not have the ability to synthesize without the XFM2 module connected. The application is available on macOS, Windows, and Linux.
 
 ## Features
-- Change parameters of the XFM2 board
+- Connect to XFM2 board via USB-over-serial connection
+- Change parameter values on the XFM2 board
+... Sound parameters
+... MIDI Channels and Layering
+... Active Unit
+- Read, Write, and Save patches to/from the XFM2 board
 - Save and Load local patch files (saved as .xfm2 files)
 - Automatic detection of XFM2 device on program load
-- Usable on Windows, Mac and Linux
 
 ## Future Features
-- Write Tuning, Bank and Program files to the XFM2
-- Back compatibility with the gen 1 XFM device (and potential compatibility with the XVA)
+. Write Tuning, Bank and Program files to the XFM2
+. Back compatibility with the gen 1 XFM device (and potential compatibility with the XVA)
 
 ## Installation
 The application is available as a standalone, installable application on macOS (.pkg), Windows (.exe), and Linux (.deb or .rpm). The latest versions of these files can be found within the release section of the repository. 
