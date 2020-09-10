@@ -6,9 +6,9 @@ This project focuses on creating a Java and JavaFX based application for interac
 ## Features
 - Connect to XFM2 board via USB-over-serial connection
 - Change parameter values on the XFM2 board
-... Sound parameters
-... MIDI Channels and Layering
-... Active Unit
+-- Sound parameters
+-- MIDI Channels and Layering
+-- Active Unit
 - Read, Write, and Save patches to/from the XFM2 board
 - Save and Load local patch files (saved as .xfm2 files)
 - Automatic detection of XFM2 device on program load
